@@ -14,7 +14,7 @@ const projects = await Promise.all(
 );
 ---
 
-<section id="proyectos" class="flex h-screen w-full flex-col justify-center gap-10 px-4 py-16">
+<section id="proyectos" class="flex min-h-screen w-full flex-col justify-center gap-10 px-4 py-16 md:h-screen">
   <ProjectCarousel client:load projects={projects} />
-  <h2 class="text-center font-display text-8xl font-bold text-ink sm:text-8xl">Proyectos</h2>
+  <h2 class="text-center font-display text-[clamp(1.75rem,9vw,3rem)] font-bold text-ink md:text-8xl">Proyectos</h2>
 </section>
