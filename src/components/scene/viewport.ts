@@ -33,3 +33,20 @@ export function radiusForScreenFraction(
 ): number {
   return (visibleHeightAtDepth(camera, depth) * screenFraction) / 2;
 }
+
+/**
+ * `SPHERE_SCREEN_FRACTION`/`screenFraction` están pensados sobre el alto visible en un viewport
+ * ancho (desktop/landscape, `aspect >= 1`): el ancho visible en unidades de mundo (`alto × aspect`)
+ * sobra para separar 2 esferas ancladas a esquinas opuestas. En portrait (`aspect < 1`, celular
+ * vertical) el ancho visible pasa a ser el lado *corto* — sin este factor, el radio (calculado
+ * sobre el alto) excede varias veces el ancho real disponible y las esferas se ven enormes y
+ * solapadas de borde a borde. Factor `1` para `aspect >= 1` (cero cambio en desktop/landscape,
+ * donde ya se ve bien); decrece con el aspect ratio en portrait, con un piso para que las esferas
+ * no desaparezcan en los celulares más angostos.
+ */
+const MOBILE_PORTRAIT_MIN_SCALE = 0.4;
+
+export function mobilePortraitSizeScale(aspect: number): number {
+  if (aspect >= 1) return 1;
+  return Math.max(MOBILE_PORTRAIT_MIN_SCALE, aspect);
+}

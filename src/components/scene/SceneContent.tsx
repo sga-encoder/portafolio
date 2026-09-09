@@ -4,7 +4,7 @@ import { Color, Vector3, type PerspectiveCamera } from "three";
 import { getGradientTexture } from "./gradientTexture";
 import GradientBlob, { type GradientBlobHandle } from "./GradientBlob";
 import { DEFAULT_COLLISION_MARGIN, resolvedSceneStops, type SphereId } from "./sceneStops";
-import { normalizedToWorld, radiusForScreenFraction } from "./viewport";
+import { mobilePortraitSizeScale, normalizedToWorld, radiusForScreenFraction } from "./viewport";
 import { projectToScreenFraction, setSphereFrameVars } from "./headerFrameVars";
 
 const SPHERE_IDS: readonly SphereId[] = ["a", "b", "c"];
@@ -173,7 +173,8 @@ export default function SceneContent() {
       const targetColor = getColor(start.color).clone().lerp(getColor(end.color), sectionProgress);
       sphere.displayColor.copy(targetColor);
 
-      const screenFraction = lerp(start.screenFraction, end.screenFraction, sectionProgress);
+      const screenFraction =
+        lerp(start.screenFraction, end.screenFraction, sectionProgress) * mobilePortraitSizeScale(camera.aspect);
       sphere.radius = radiusForScreenFraction(camera, sphere.current.z, screenFraction) + 0.001;
     }
 
