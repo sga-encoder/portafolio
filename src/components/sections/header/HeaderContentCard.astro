@@ -1,0 +1,46 @@
+---
+// Tarjeta con borde degradado + esquinas redondeadas: `border-image` (el
+// mecanismo de `HeaderFrame.astro`) ignora `border-radius`, así que se usa la
+// misma técnica de 2 capas que `ProjectHeaderFrame.astro` — el div externo
+// pinta el `conic-gradient` como `background` y usa `padding` como grosor de
+// "borde"; el div interno tiene su propio radio más chico y un fondo
+// semi-opaco (a diferencia de `ProjectHeaderFrame`, acá sí necesita fondo:
+// esta tarjeta flota sobre el retrato de fondo en el layout mobile portrait
+// y el texto necesita contraste).
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["header-content-card", className]}>
+  <div class="header-content-card-inner flex flex-col justify-center gap-4">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .header-content-card {
+    /* Mismo criterio que `HeaderFrame` (piso más alto que el valor "natural"
+       de la fórmula): esta tarjeta es un segundo "marco" en el layout mobile
+       portrait y debe notarse tanto como el exterior, no quedar como una
+       línea delgada en celulares angostos. */
+    --card-border: clamp(8px, calc(10 / 1512 * 100vw), 14px);
+    --card-radius: 1.5rem;
+    border-radius: var(--card-radius);
+    padding: var(--card-border);
+    background: conic-gradient(
+      from 135deg at 50% 50%,
+      var(--sphere-left-color, var(--color-brand)),
+      var(--sphere-right-color, var(--color-accent-2)),
+      var(--sphere-left-color, var(--color-brand))
+    );
+  }
+
+  .header-content-card-inner {
+    border-radius: calc(var(--card-radius) - var(--card-border));
+    background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+    padding: 1.5rem;
+  }
+</style>

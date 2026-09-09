@@ -1,0 +1,38 @@
+---
+import type { Cta } from "../../../data/profile";
+
+interface Props {
+  nameLines: string[];
+  tagline: string;
+  primaryCta: Cta;
+  secondaryCta: Cta;
+}
+
+const { nameLines, tagline, primaryCta, secondaryCta } = Astro.props;
+---
+
+<h1 class="font-display font-bold leading-[0.95] text-ink" style="font-size: clamp(2.25rem, 5.95vw, 5.95rem);">
+  {
+    nameLines.map((line) => (
+      <span class="block">{line}</span>
+    ))
+  }
+</h1>
+<slot name="divider" />
+<p class="font-body text-ink-muted" style="font-size: clamp(1rem, 1.98vw, 1.875rem);">{tagline}</p>
+<div class="flex flex-wrap gap-4">
+  <a
+    href={primaryCta.href}
+    class="rounded-full px-6 py-3 text-sm font-medium text-brand-contrast transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:text-base"
+    style="background-color: var(--sphere-left-color, var(--color-brand));"
+  >
+    {primaryCta.label}
+  </a>
+  <a
+    href={secondaryCta.href}
+    class="rounded-full px-6 py-3 text-sm font-medium text-brand-contrast transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:text-base"
+    style="background-color: var(--sphere-right-color, var(--color-accent-2));"
+  >
+    {secondaryCta.label}
+  </a>
+</div>

@@ -5,15 +5,24 @@ import persona from "../../../assets/header/persona01.png";
 interface Props {
   initials: string;
   alt: string;
+  hideInitials?: boolean;
+  variant?: "side" | "background";
   class?: string;
 }
 
-const { initials, alt, class: className } = Astro.props;
+const { initials, alt, hideInitials = false, variant = "side", class: className } = Astro.props;
 ---
 
-<div class:list={["header-portrait", className]}>
-  <span class="header-portrait__initials" aria-hidden="true">{initials}</span>
-  <Image src={persona} alt={alt} class="header-portrait__image" sizes="(min-width: 768px) 28vw, 45vw" />
+<div class:list={["header-portrait", className]} data-variant={variant}>
+  {!hideInitials && (
+    <span class="header-portrait__initials" aria-hidden="true">{initials}</span>
+  )}
+  <Image
+    src={persona}
+    alt={alt}
+    class="header-portrait__image"
+    sizes="(min-width: 768px) 28vw, 90vw"
+  />
 </div>
 
 <style>
@@ -35,6 +44,19 @@ const { initials, alt, class: className } = Astro.props;
     object-position: bottom right;
     transform: scale(1.1);
     transform-origin: bottom right;
+  }
+
+  /* Variante "background": el retrato deja de ser una columna lateral y pasa
+     a cubrir todo el marco por detrás del contenido (usada en el layout
+     mobile portrait de HeaderSection). */
+  .header-portrait[data-variant="background"] .header-portrait__image {
+    inset: 0;
+    right: auto;
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: top center;
+    transform: none;
   }
 
   .header-portrait__initials {

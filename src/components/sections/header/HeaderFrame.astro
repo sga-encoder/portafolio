@@ -15,8 +15,12 @@ const { class: className } = Astro.props;
     position: relative;
     height: 100%;
     width: 100%;
-    /* 20px de referencia sobre un lienzo de diseño de 1512px de ancho. */
-    --frame-border: clamp(6px, calc(20 / 1512 * 100vw), 24px);
+    /* 20px de referencia sobre un lienzo de diseño de 1512px de ancho. Piso
+       de 12px (no 6px): por debajo de ~900px de ancho la fórmula da menos de
+       eso y el marco se ve desproporcionadamente delgado frente al resto del
+       contenido, que sigue encogiendo en `vw`/`vh` — el marco es el elemento
+       que más debe notarse, así que no baja de ese piso ni en celulares angostos (350px). */
+    --frame-border: clamp(12px, calc(20 / 1512 * 100vw), 24px);
     border-style: solid;
     border-width: var(--frame-border);
     border-image-slice: 1;
