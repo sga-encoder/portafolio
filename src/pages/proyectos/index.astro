@@ -1,0 +1,104 @@
+---
+import { getImage } from "astro:assets";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectScene3D from "../../components/projects/detail/scene/ProjectScene3D";
+import ProjectsListBackground from "../../components/projects/list/ProjectsListBackground.astro";
+import TimelineProjectCard from "../../components/projects/list/TimelineProjectCard.astro";
+import YearDotNav from "../../components/projects/list/YearDotNav";
+import { TIMELINE_COLORS } from "../../components/projects/list/timelineColors";
+import { buildTimelineZoneStops } from "../../components/projects/list/scene/listZoneStops";
+import { PROJECTS } from "../../data/projects";
+
+const enrichedProjects = await Promise.all(
+  PROJECTS.map(async (project) => ({
+    ...project,
+    imageSrc: project.image ? (await getImage({ src: project.image, width: 1200 })).src : undefined,
+  })),
+);
+
+// Más nuevo primero: "YYYY-MM" ordena correctamente como string.
+const sortedProjects = [...enrichedProjects].sort((a, b) => b.date.localeCompare(a.date));
+
+const monthFormatter = new Intl.DateTimeFormat("es", { month: "long" });
+function monthLabel(date: string): string {
+  const [year, month] = date.split("-").map(Number);
+  const label = monthFormatter.format(new Date(year, month - 1, 1));
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+interface MonthGroup {
+  key: string;
+  label: string;
+  projects: typeof sortedProjects;
+}
+
+interface YearGroup {
+  year: string;
+  zoneId: string;
+  months: MonthGroup[];
+}
+
+const yearGroups: YearGroup[] = [];
+for (const project of sortedProjects) {
+  const [year, month] = project.date.split("-");
+  let yearGroup = yearGroups.find((group) => group.year === year);
+  if (!yearGroup) {
+    yearGroup = { year, zoneId: `projects-year-${year}`, months: [] };
+    yearGroups.push(yearGroup);
+  }
+  let monthGroup = yearGroup.months.find((group) => group.key === month);
+  if (!monthGroup) {
+    monthGroup = { key: month, label: monthLabel(project.date), projects: [] };
+    yearGroup.months.push(monthGroup);
+  }
+  monthGroup.projects.push(project);
+}
+
+const zoneStops = buildTimelineZoneStops(yearGroups.map((group) => group.zoneId));
+---
+
+<BaseLayout title="Proyectos · Línea de tiempo" description="Todos los proyectos, organizados por año y mes." showHeader={false}>
+  <ProjectsListBackground />
+  <ProjectScene3D client:load colorA={TIMELINE_COLORS[0]} colorB={TIMELINE_COLORS[1]} zoneStops={zoneStops} />
+  <YearDotNav client:load years={yearGroups.map((group) => group.year)} />
+
+  <div class="mx-auto w-full px-4 pb-16 pt-12 md:w-[70%]">
+    <a
+      href="/"
+      class="mb-8 inline-block font-body text-sm text-ink-muted underline-offset-4 hover:underline md:hidden"
+    >
+      ← Volver al inicio
+    </a>
+
+    <h1 class="mb-16 text-center font-display text-[clamp(2rem,6vw,4rem)] font-bold text-ink">Proyectos</h1>
+
+    <div class="flex flex-col gap-20">
+      {
+        yearGroups.map((yearGroup) => (
+          <div id={yearGroup.zoneId} class="flex flex-col gap-10">
+            <h2 class="font-display text-[clamp(2.5rem,8vw,5rem)] font-bold text-ink">{yearGroup.year}</h2>
+
+            <div class="flex flex-col gap-10">
+              {yearGroup.months.map((monthGroup) => (
+                <div class="flex flex-col gap-6">
+                  <h3 class="font-display text-xl font-bold text-ink-muted uppercase tracking-wide">{monthGroup.label}</h3>
+
+                  <div class="flex flex-col gap-8">
+                    {monthGroup.projects.map((project) => (
+                      <TimelineProjectCard
+                        title={project.title}
+                        description={project.description}
+                        imageSrc={project.imageSrc}
+                        href={project.link}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

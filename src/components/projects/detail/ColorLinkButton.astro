@@ -5,7 +5,7 @@
 interface Props {
   href: string;
   color: string;
-  variant?: "outline" | "solid";
+  variant?: "outline" | "solid" | "invert";
   target?: string;
   rel?: string;
   class?: string;
@@ -58,6 +58,19 @@ const { href, color, variant = "outline", target, rel, class: className } = Astr
   }
 
   .color-link-button.solid:hover {
+    opacity: 0.9;
+  }
+
+  /* "Negativo": relleno y borde del color de acento, pero el texto toma el
+     color del fondo del sitio en vez del contraste habitual (blanco) — para
+     un botón que deba notarse menos que el resto (ej. "Volver al inicio"). */
+  .color-link-button.invert {
+    border: 1px solid var(--btn-color);
+    background-color: var(--btn-color);
+    color: var(--color-surface);
+  }
+
+  .color-link-button.invert:hover {
     opacity: 0.9;
   }
 </style>

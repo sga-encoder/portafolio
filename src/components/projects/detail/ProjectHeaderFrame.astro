@@ -43,6 +43,12 @@ const [first, second] = colors;
 
   .project-header-frame-inner {
     border-radius: calc(var(--frame-radius) - var(--frame-border));
+    /* Sin esto, el interior queda transparente y deja ver el `conic-gradient`
+       del padre en toda el área de contenido (no solo en la tira del borde),
+       porque no hay nada opaco detrás que lo tape. Mismo mecanismo que
+       `HeaderContentCard.astro` (85% de opacidad: interior legible, dejando
+       asomar apenas el fondo animado detrás). */
+    background: color-mix(in srgb, var(--color-surface) 85%, transparent);
     padding: 1rem;
   }
 

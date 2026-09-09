@@ -32,7 +32,8 @@ export interface SphereStop {
 }
 
 export interface ProjectZoneStop {
-  zoneId: ProjectZoneId;
+  /** `string`, no `ProjectZoneId`: otros callers (ej. `src/components/projects/list/scene/listZoneStops.ts`) definen sus propios ids de zona sin acoplarse a las 3 de detalle. */
+  zoneId: string;
   spheres: Record<ProjectSphereId, SphereStop>;
   /** Separación extra entre esferas en esta zona, como fracción de la suma de sus radios. */
   collisionMargin?: number;
@@ -72,14 +73,15 @@ export interface ResolvedSphereStop {
 }
 
 export interface ResolvedProjectZoneStop {
-  zoneId: ProjectZoneId;
+  zoneId: string;
   spheres: Record<ProjectSphereId, ResolvedSphereStop>;
   collisionMargin: number;
 }
 
 const SPHERE_IDS: readonly ProjectSphereId[] = ["a", "b"];
 
-function resolveStarts(stops: readonly ProjectZoneStop[]): readonly ResolvedProjectZoneStop[] {
+/** Reexportada para que otros callers (ver `list/scene/listZoneStops.ts`) resuelvan sus propias zonas con la misma lógica de continuidad automática. */
+export function resolveStarts(stops: readonly ProjectZoneStop[]): readonly ResolvedProjectZoneStop[] {
   const previousEnd: Partial<Record<ProjectSphereId, SpherePose>> = {};
 
   return stops.map((stop) => {

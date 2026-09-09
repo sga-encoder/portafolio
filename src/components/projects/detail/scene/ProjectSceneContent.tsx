@@ -5,11 +5,13 @@ import { getGradientTexture } from "../../../scene/gradientTexture";
 import GradientBlob, { type GradientBlobHandle } from "../../../scene/GradientBlob";
 import { projectToScreenFraction } from "../../../scene/headerFrameVars";
 import { normalizedToWorld, radiusForScreenFraction } from "../../../scene/viewport";
-import { DEFAULT_COLLISION_MARGIN, resolvedProjectZoneStops, type ProjectSphereId } from "./projectSceneStops";
+import { DEFAULT_COLLISION_MARGIN, type ProjectSphereId, type ResolvedProjectZoneStop } from "./projectSceneStops";
 
 interface Props {
   colorA: string;
   colorB: string;
+  /** Zonas de scroll a recorrer (ids de DOM + pose de cada esfera por zona, ya resueltas vía `resolveStarts`). */
+  zoneStops: readonly ResolvedProjectZoneStop[];
 }
 
 const SPHERE_IDS: readonly ProjectSphereId[] = ["a", "b"];
@@ -64,7 +66,7 @@ interface SphereRuntime {
   ghostRefs: { current: GradientBlobHandle | null }[];
 }
 
-export default function ProjectSceneContent({ colorA, colorB }: Props) {
+export default function ProjectSceneContent({ colorA, colorB, zoneStops }: Props) {
   const { camera } = useThree((state) => ({ camera: state.camera as PerspectiveCamera }));
 
   const texture = useStableRef(() => getGradientTexture());
@@ -75,8 +77,8 @@ export default function ProjectSceneContent({ colorA, colorB }: Props) {
 
   const runtime = useStableRef<Record<ProjectSphereId, SphereRuntime>>(() => {
     const build = (id: ProjectSphereId): SphereRuntime => {
-      // Arranca directo en la posición inicial de la zona "encabezado", sin animación de "vuelo".
-      const initialPose = resolvedProjectZoneStops[0].spheres[id].start;
+      // Arranca directo en la posición inicial de la primera zona, sin animación de "vuelo".
+      const initialPose = zoneStops[0].spheres[id].start;
       const initialPosition = new Vector3(...normalizedToWorld(camera, initialPose.position));
       return {
         current: initialPosition.clone(),
@@ -96,13 +98,14 @@ export default function ProjectSceneContent({ colorA, colorB }: Props) {
   const progressRef = useStableRef(() => ({ value: 0 }));
 
   // Zona activa vía scroll nativo (se lee del DOM directamente, sin pasar por props de Astro).
-  // Tolera que "project-zone-gallery" no exista en el DOM (proyectos sin galería).
+  // Tolera zonas de `zoneStops` que no existan en el DOM (ej. "project-zone-gallery" en
+  // proyectos sin galería).
   useEffect(() => {
     let ticking = false;
 
     function measure() {
       ticking = false;
-      const zones = resolvedProjectZoneStops
+      const zones = zoneStops
         .map((stop) => document.getElementById(stop.zoneId))
         .filter((el): el is HTMLElement => el !== null);
       if (zones.length === 0) return;
@@ -141,7 +144,7 @@ export default function ProjectSceneContent({ colorA, colorB }: Props) {
   useFrame((state, delta) => {
     const activeIndex = activeIndexRef.current.value;
     const progress = progressRef.current.value;
-    const stop = resolvedProjectZoneStops[activeIndex];
+    const stop = zoneStops[activeIndex];
 
     frameCount.current.value += 1;
     const shouldSampleTrail = frameCount.current.value % TRAIL_SAMPLE_EVERY_N_FRAMES === 0;

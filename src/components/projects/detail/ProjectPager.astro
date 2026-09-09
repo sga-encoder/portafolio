@@ -24,9 +24,12 @@ const rightColor = `var(--project-right-color, ${second})`;
     }
   </div>
 
-  <div class="justify-self-center">
-    <ColorLinkButton href="/" color={leftColor}>
+  <div class="flex flex-col items-center gap-2 justify-self-center">
+    <ColorLinkButton href="/" color={leftColor} variant="invert">
       Volver al inicio
+    </ColorLinkButton>
+    <ColorLinkButton href="/proyectos" color={rightColor}>
+      Ver todos los proyectos
     </ColorLinkButton>
   </div>
 

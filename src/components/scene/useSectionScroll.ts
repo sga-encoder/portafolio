@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import { SECTION_IDS } from "./sceneStops";
 
 export interface SectionScrollState {
-  /** Índice (0-3) de la sección activa dentro de SECTION_IDS. */
+  /** Índice de la sección/zona activa dentro de los ids pasados. */
   activeIndex: number;
-  /** Progreso 0-1 dentro de la sección activa. */
+  /** Progreso 0-1 dentro de la sección/zona activa. */
   progress: number;
 }
 
-/** Calcula, a partir del scroll nativo, qué sección del CV está activa y el progreso dentro de ella. */
-export function useSectionScroll(): SectionScrollState {
+/**
+ * Calcula, a partir del scroll nativo, cuál de `ids` está activo y el progreso dentro de él.
+ * `ids` por defecto son las 4 secciones de Inicio (`SECTION_IDS`) — otros callers (ej.
+ * `YearDotNav.tsx` de `/proyectos`) pasan sus propios ids de zona.
+ */
+export function useSectionScroll(ids: readonly string[] = SECTION_IDS): SectionScrollState {
   const [state, setState] = useState<SectionScrollState>({ activeIndex: 0, progress: 0 });
 
   useEffect(() => {
@@ -17,7 +21,7 @@ export function useSectionScroll(): SectionScrollState {
 
     function measure() {
       ticking = false;
-      const sections = SECTION_IDS.map((id) => document.getElementById(id)).filter(
+      const sections = ids.map((id) => document.getElementById(id)).filter(
         (el): el is HTMLElement => el !== null,
       );
       if (sections.length === 0) return;
@@ -55,6 +59,8 @@ export function useSectionScroll(): SectionScrollState {
       window.removeEventListener("scroll", onScrollOrResize);
       window.removeEventListener("resize", onScrollOrResize);
     };
+    // `ids` no cambia durante la vida de la página (secciones/zonas fijas del DOM) — se omite del array de deps a propósito.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return state;

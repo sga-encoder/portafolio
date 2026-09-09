@@ -10,9 +10,11 @@ export interface ProjectItem {
   /** Preview del proyecto; opcional mientras no haya foto real (se muestra un fallback). */
   image?: ImageMetadata;
   link: string;
+  /** Mes/año en que se hizo el proyecto (`"YYYY-MM"`) — usado para agrupar/ordenar el listado en `/proyectos`. */
+  date: string;
 }
 
-/** Contenido placeholder — reemplaza título/descripción/link con los datos reales cuando los tengas. */
+/** Contenido placeholder — reemplaza título/descripción/link/date con los datos reales cuando los tengas. */
 export const PROJECTS: ProjectItem[] = [
   {
     id: "proyecto-1",
@@ -20,6 +22,7 @@ export const PROJECTS: ProjectItem[] = [
     description: "Descripción breve de qué resuelve este proyecto y con qué lo construiste.",
     image: proyecto01,
     link: "/proyectos/proyecto-1",
+    date: "2025-06",
   },
   {
     id: "proyecto-2",
@@ -27,6 +30,7 @@ export const PROJECTS: ProjectItem[] = [
     description: "Descripción breve de qué resuelve este proyecto y con qué lo construiste.",
     image: proyecto02,
     link: "/proyectos/proyecto-2",
+    date: "2024-11",
   },
   {
     id: "proyecto-3",
@@ -34,5 +38,14 @@ export const PROJECTS: ProjectItem[] = [
     description: "Descripción breve de qué resuelve este proyecto y con qué lo construiste.",
     image: proyecto03,
     link: "/proyectos/proyecto-3",
+    date: "2024-02",
+  },
+  {
+    id: "proyecto-4",
+    title: "Proyecto aleja hola",
+    description: "Descripción breve de qué resuelve este proyecto y con qué lo construiste.",
+    image: proyecto03,
+    link: "/proyectos/proyecto-4",
+    date: "2024-02",
   },
 ];

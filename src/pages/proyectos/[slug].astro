@@ -12,6 +12,7 @@ import ProjectLiveSteps from "../../components/projects/detail/ProjectLiveSteps.
 import ProjectGallery from "../../components/projects/detail/ProjectGallery.tsx";
 import { getDominantColors } from "../../utils/dominantColors";
 import { PROJECTS } from "../../data/projects";
+import { resolvedProjectZoneStops } from "../../components/projects/detail/scene/projectSceneStops";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -41,7 +42,7 @@ const galleryImages = await Promise.all(
 
 <BaseLayout title={`${title} · Proyectos`} description={summary} showHeader={false}>
   <ProjectPageBackground colors={colors} />
-  <ProjectScene3D client:load colorA={colors[0]} colorB={colors[1]} />
+  <ProjectScene3D client:load colorA={colors[0]} colorB={colors[1]} zoneStops={resolvedProjectZoneStops} />
 
   <div id="project-zone-header" class="mx-auto w-full px-4 pt-12 md:w-[70%]">
     <ProjectPager

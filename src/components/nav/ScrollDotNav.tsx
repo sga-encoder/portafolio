@@ -1,4 +1,5 @@
 import { useSectionScroll } from "../scene/useSectionScroll";
+import { SECTION_IDS } from "../scene/sceneStops";
 import { SCROLL_NAV_ITEMS } from "../../data/scrollNav";
 
 function scrollToSection(id: string) {
@@ -15,7 +16,7 @@ function scrollToSection(id: string) {
  * (`group-hover`/`group-focus-within`), sin estado React adicional.
  */
 export default function ScrollDotNav() {
-  const { activeIndex } = useSectionScroll();
+  const { activeIndex } = useSectionScroll(SECTION_IDS);
 
   return (
     <nav

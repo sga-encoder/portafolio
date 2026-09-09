@@ -1,10 +1,13 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import type { ResolvedProjectZoneStop } from "./projectSceneStops";
 
 const ProjectSceneCanvas = lazy(() => import("./ProjectSceneCanvas"));
 
 interface Props {
   colorA: string;
   colorB: string;
+  /** Zonas de scroll a recorrer — `[slug].astro` pasa las 3 de detalle (`resolvedProjectZoneStops`); otras páginas (ej. `/proyectos`) pasan las suyas. */
+  zoneStops: readonly ResolvedProjectZoneStop[];
 }
 
 function supportsWebGL(): boolean {
@@ -25,7 +28,7 @@ function supportsWebGL(): boolean {
  * de reposo de la zona "encabezado", así que no hace falta publicar ninguna
  * variable CSS extra para el caso sin 3D.
  */
-export default function ProjectScene3D({ colorA, colorB }: Props) {
+export default function ProjectScene3D({ colorA, colorB, zoneStops }: Props) {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
@@ -37,7 +40,7 @@ export default function ProjectScene3D({ colorA, colorB }: Props) {
 
   return (
     <Suspense fallback={null}>
-      <ProjectSceneCanvas colorA={colorA} colorB={colorB} />
+      <ProjectSceneCanvas colorA={colorA} colorB={colorB} zoneStops={zoneStops} />
     </Suspense>
   );
 }
