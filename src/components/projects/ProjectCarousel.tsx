@@ -60,7 +60,7 @@ export default function ProjectCarousel({ projects }: Props) {
   return (
     <div className="relative mx-auto w-full max-w-7xl">
       {/* Layout de escritorio: visible en landscape o md:+ (016 fija este criterio para el esfuerzo de responsive). */}
-      <div className="relative hidden px-12 landscape:block sm:px-16 md:block">
+      <div className="relative hidden px-12 short:px-6 landscape:block sm:px-16 md:block">
         <button
           type="button"
           aria-label="Proyecto anterior"
@@ -82,7 +82,7 @@ export default function ProjectCarousel({ projects }: Props) {
         </button>
 
         <div className="relative flex flex-col sm:block">
-          <div className="aspect-[4/3] w-full overflow-hidden rounded-3xl bg-surface-muted sm:w-[70%]">
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-3xl bg-surface-muted sm:w-[70%] short:w-[80%] short:max-h-[32vh]">
             {project.imageSrc ? (
               <img src={project.imageSrc} alt={project.title} className="h-full w-full object-cover" />
             ) : (
@@ -90,22 +90,22 @@ export default function ProjectCarousel({ projects }: Props) {
             )}
           </div>
 
-          <div className="mt-4 flex flex-col gap-4 sm:absolute sm:right-0 sm:top-[22%] sm:mt-0 sm:w-[46%]">
-            <h3 className="font-display text-3xl font-bold text-ink [text-shadow:0_2px_8px_rgba(0,0,0,0.55),0_0_22px_rgba(0,0,0,0.45)] sm:text-5xl">
+          <div className="mt-4 flex flex-col gap-4 short:gap-1 sm:absolute sm:right-0 sm:top-[22%] short:top-0 sm:mt-0 sm:w-[46%]">
+            <h3 className="font-display text-3xl font-bold text-ink [text-shadow:0_2px_8px_rgba(0,0,0,0.55),0_0_22px_rgba(0,0,0,0.45)] sm:text-5xl short:text-sm">
               {project.title}
             </h3>
             <div
-              className="project-card-frame rounded-2xl bg-surface/40 p-5 backdrop-blur-sm"
+              className="project-card-frame rounded-2xl bg-surface/40 p-5 short:p-2 backdrop-blur-sm"
               style={{
                 // @ts-expect-error -- custom property, no está tipada en CSSProperties
                 "--project-frame-gradient":
                   "linear-gradient(135deg, var(--sphere-left-color, var(--color-brand)), var(--sphere-right-color, var(--color-accent-2)))",
               }}
             >
-              <p className="font-body text-sm text-ink-muted sm:text-base">{project.description}</p>
+              <p className="font-body text-sm text-ink-muted short:hidden sm:text-base">{project.description}</p>
               <a
                 href={project.link}
-                className="mt-4 inline-block rounded-full px-5 py-2 font-body text-sm font-semibold text-(--color-brand-contrast)"
+                className="mt-4 short:mt-0 inline-block rounded-full px-5 py-2 short:px-3 short:py-1 short:text-xs font-body text-sm font-semibold text-(--color-brand-contrast)"
                 style={{ backgroundColor: "var(--sphere-right-color, var(--color-accent-2))" }}
               >
                 Ver más

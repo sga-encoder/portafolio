@@ -37,17 +37,30 @@ const ringColor =
   .skill-ring {
     position: relative;
     /*
-     * Fluido en función del ancho (no solo del alto): clamp(min, max, ...) invertido
-     * dejaba esto en 7rem fijo siempre, sin achicarse entre 1500px y el quiebre móvil
-     * (768px). Interpolación lineal que vale 4.5rem a 768px y 7rem a 1500px, plana por
-     * fuera de ese rango (mismo tamaño de escritorio ya aprobado arriba de 1500px, piso
-     * de 4.5rem desde el quiebre móvil hacia abajo).
+     * Fluido en función del ancho, pero con techo de alto vía `min(..., 9vh)`: en
+     * laptops anchas pero de alto limitado (~1366x768), la fórmula solo-de-ancho
+     * (`1.88rem + 5.46vw`, pensada para llegar a 7rem a 1500px de ancho) daba
+     * anillos de ~104px que, con 5 tarjetas apiladas por columna (`SkillColumn`),
+     * desbordaban el `md:h-screen` — el `justify-content:center` reparte ese
+     * desborde mitad arriba (tapa el `<h2>`) y mitad abajo (tapa la sección
+     * siguiente). El término `9vh` acota el anillo cuando el alto es el factor
+     * limitante, sin tocar el crecimiento por ancho en monitores altos.
      */
-    width: clamp(4.5rem, calc(1.88rem + 0.34vw), 7rem);
+    width: clamp(2.5rem, min(calc(1.88rem + 5.46vw), 9vh), 7rem);
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  /* Celular en landscape (~320-430px de alto): con 5 tarjetas apiladas por
+     columna, el anillo de 4.5rem (piso fijo de la fórmula de arriba, pensada
+     solo en función del ancho) no deja que la columna quepa en el alto
+     disponible. Aquí sí depende del alto, con piso más bajo. */
+  @media (max-height: 499px) {
+    .skill-ring {
+      width: clamp(2.25rem, 11vh, 4.5rem);
+    }
   }
 
   .skill-ring__svg {
