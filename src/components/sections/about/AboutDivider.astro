@@ -12,6 +12,9 @@ const { class: className } = Astro.props;
   .about-divider {
     height: clamp(6px, 0.8vh, 10px);
     border-radius: 999px;
-    background: linear-gradient(90deg, var(--sphere-c-color, #00c080), var(--sphere-a-color, var(--color-brand)));
+    /* `--sphere-left-color`/`--sphere-right-color`, no `--sphere-a-color`/`--sphere-c-color`
+       directamente — ver el comentario en `AboutFrame.astro` (mismo bug: color fantasma de una
+       esfera todavía fuera de cuadro). */
+    background: linear-gradient(90deg, var(--sphere-left-color, #00c080), var(--sphere-right-color, var(--color-brand)));
   }
 </style>

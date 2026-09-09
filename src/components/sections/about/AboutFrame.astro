@@ -7,22 +7,28 @@ const { class: className } = Astro.props;
 ---
 
 <div class:list={["about-frame rounded-3xl p-[3px]", className]}>
-  <div class="h-full rounded-[calc(1.5rem-3px)] bg-surface/70 p-6 backdrop-blur-sm sm:p-8">
+  <div class="h-full rounded-[calc(1.5rem-3px)] bg-surface/70 p-6 backdrop-blur-sm sm:p-8 short:p-3">
     <slot />
   </div>
 </div>
 
 <style>
   .about-frame {
-    /* Esferas C (verde) y A (violeta), las dos que conviven en "Sobre mí" — B sale de
-       pantalla en esta sección. `border-image` (usado por HeaderFrame) ignora
-       `border-radius`, así que aquí el degradado va en el fondo del contenedor exterior
-       y el panel interior lo tapa, dejando solo el borde visible ("padding-box gradient"). */
+    /* `--sphere-left-color`/`--sphere-right-color` (no `--sphere-a-color`/`--sphere-c-color`
+       directamente): en reposo en "Sobre mí" son C (verde, izquierda) y A (violeta, derecha) —
+       mismo resultado visual — pero durante la transición desde Proyectos, A todavía está fuera
+       de cuadro con un color a medio camino entre magenta y violeta; `--sphere-a-color` mostraba
+       ese magenta transitorio aunque la esfera rosada no estuviera en pantalla. Left/right ya
+       excluyen esferas fuera de cuadro (ver `headerFrameVars.ts`), así que muestran el par que
+       realmente se ve en cada momento (B/C al entrar, C/A en reposo). `border-image` (usado por
+       HeaderFrame) ignora `border-radius`, así que aquí el degradado va en el fondo del
+       contenedor exterior y el panel interior lo tapa, dejando solo el borde visible
+       ("padding-box gradient"). */
     background: conic-gradient(
       from 315deg at 50% 50%,
-      var(--sphere-c-color, #00c080) 0%,
-      var(--sphere-a-color, var(--color-brand)) 50%,
-      var(--sphere-c-color, #00c080) 100%
+      var(--sphere-left-color, #00c080) 0%,
+      var(--sphere-right-color, var(--color-brand)) 50%,
+      var(--sphere-left-color, #00c080) 100%
     );
   }
 </style>
