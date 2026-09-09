@@ -65,6 +65,8 @@ interface SphereRuntime {
   previous: Vector3;
   displayColor: Color;
   radius: number;
+  /** Si `screenFraction` en este frame es > 0 — esferas "dormidas" (aún no nacidas) no cuentan como on-screen. */
+  active: boolean;
   motionFactor: number;
   trail: Vector3[];
   mainRef: { current: GradientBlobHandle | null };
@@ -86,6 +88,7 @@ export default function SceneContent() {
         previous: initialPosition.clone(),
         displayColor: getColor(initialPose.color).clone(),
         radius: 0,
+        active: initialPose.screenFraction > 0,
         motionFactor: 0,
         trail: Array.from({ length: TRAIL_LENGTH }, () => new Vector3()),
         mainRef: { current: null },
@@ -173,8 +176,9 @@ export default function SceneContent() {
       const targetColor = getColor(start.color).clone().lerp(getColor(end.color), sectionProgress);
       sphere.displayColor.copy(targetColor);
 
-      const screenFraction =
-        lerp(start.screenFraction, end.screenFraction, sectionProgress) * mobilePortraitSizeScale(camera.aspect);
+      const rawScreenFraction = lerp(start.screenFraction, end.screenFraction, sectionProgress);
+      sphere.active = rawScreenFraction > 0;
+      const screenFraction = rawScreenFraction * mobilePortraitSizeScale(camera.aspect);
       sphere.radius = radiusForScreenFraction(camera, sphere.current.z, screenFraction) + 0.001;
     }
 
@@ -229,17 +233,30 @@ export default function SceneContent() {
       });
     }
 
-    // Marco dinámico de HeaderSection: publica posición en pantalla + color de A/B como CSS vars.
-    // También publica el color de C (usado por el panel/divisor de "Sobre mí").
+    // Marco dinámico de HeaderSection: publica posición en pantalla + color de A/B/C como CSS vars.
+    // C también participa en izquierda/derecha (ver `setSphereFrameVars`): en Proyectos/Sobre-mí
+    // es la que está realmente en pantalla mientras A o B salen de cuadro.
     if (typeof document !== "undefined") {
       const sphereA = runtime.current.a;
       const sphereB = runtime.current.b;
       const sphereC = runtime.current.c;
       setSphereFrameVars(
         document.documentElement,
-        { ...projectToScreenFraction(camera, sphereA.current), color: `#${sphereA.displayColor.getHexString()}` },
-        { ...projectToScreenFraction(camera, sphereB.current), color: `#${sphereB.displayColor.getHexString()}` },
-        { color: `#${sphereC.displayColor.getHexString()}` },
+        {
+          ...projectToScreenFraction(camera, sphereA.current),
+          color: `#${sphereA.displayColor.getHexString()}`,
+          active: sphereA.active,
+        },
+        {
+          ...projectToScreenFraction(camera, sphereB.current),
+          color: `#${sphereB.displayColor.getHexString()}`,
+          active: sphereB.active,
+        },
+        {
+          ...projectToScreenFraction(camera, sphereC.current),
+          color: `#${sphereC.displayColor.getHexString()}`,
+          active: sphereC.active,
+        },
       );
     }
 
