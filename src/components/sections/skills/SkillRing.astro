@@ -36,7 +36,14 @@ const ringColor =
 <style>
   .skill-ring {
     position: relative;
-    width: clamp(7rem, 8vh, 4.5rem);
+    /*
+     * Fluido en función del ancho (no solo del alto): clamp(min, max, ...) invertido
+     * dejaba esto en 7rem fijo siempre, sin achicarse entre 1500px y el quiebre móvil
+     * (768px). Interpolación lineal que vale 4.5rem a 768px y 7rem a 1500px, plana por
+     * fuera de ese rango (mismo tamaño de escritorio ya aprobado arriba de 1500px, piso
+     * de 4.5rem desde el quiebre móvil hacia abajo).
+     */
+    width: clamp(4.5rem, calc(1.88rem + 0.34vw), 7rem);
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;

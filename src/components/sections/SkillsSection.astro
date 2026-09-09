@@ -1,18 +1,27 @@
 ---
 import { Image } from "astro:assets";
-import { leftSkills, rightSkills } from "../../data/skills";
+import { leftSkills, rightSkills, skillsByCategory, MOBILE_CATEGORY_ORDER } from "../../data/skills";
 import persona from "../../assets/skills/persona02.png";
 import SkillColumn from "./skills/SkillColumn.astro";
+import SkillGroup from "./skills/SkillGroup.astro";
 ---
 
-<section id="habilidades" class="flex h-screen w-full flex-col px-[5vw] py-[2vh]">
+<section id="habilidades" class="flex min-h-screen w-full flex-col px-[5vw] py-[2vh] md:h-screen">
+  {/*
+    Título fluido en 2 tramos, sin salto en el breakpoint `md` (768px):
+    - <768px: clamp(1.75rem, 9vw, 3rem) — crece con el ancho hasta 3rem (tope ~533px, luego se mantiene plano).
+    - ≥768px: clamp(3rem, calc(-0.15rem + 0.41vw), 6rem) — interpolación lineal que vale exactamente 3rem a 768px
+      (mismo valor donde termina el tramo mobile) y 6rem a 1500px (tamaño de escritorio ya aprobado), quedando
+      plano por fuera de ese rango en vez de saltar de golpe al cruzar el breakpoint.
+  */}
   <h2
-    class="shrink-0 text-center font-display font-bold text-ink"
-    style="font-size: clamp(6rem, 3.6vh, 3rem);"
+    class="shrink-0 text-center font-display font-bold text-ink text-[clamp(1.75rem,9vw,3rem)] md:text-[clamp(3rem,calc(-0.15rem_+_0.41vw),6rem)]"
   >
     Habilidades
   </h2>
-  <div class="flex min-h-0 flex-1 items-center justify-center gap-[2vw]">
+
+  {/* Desktop/tablet (≥768px): 3 columnas, retrato central, chevron. */}
+  <div class="hidden min-h-0 flex-1 items-center justify-center gap-[2vw] md:flex">
     <SkillColumn skills={leftSkills} side="left" />
     <div class="flex h-full max-w-[30vw] shrink-0 items-center justify-center">
       <Image
@@ -23,5 +32,18 @@ import SkillColumn from "./skills/SkillColumn.astro";
       />
     </div>
     <SkillColumn skills={rightSkills} side="right" />
+  </div>
+
+  {/* Mobile (<768px): 4 filas por categoría, sin retrato ni chevron. */}
+  <div class="flex flex-1 flex-col items-center justify-center gap-8 py-6 md:hidden">
+    {
+      MOBILE_CATEGORY_ORDER.map((category) => (
+        <SkillGroup
+          category={category}
+          items={skillsByCategory[category].map((skill) => ({ skill }))}
+          variant="mobile"
+        />
+      ))
+    }
   </div>
 </section>

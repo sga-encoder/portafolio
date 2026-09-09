@@ -1,6 +1,6 @@
 ---
-import SkillCard from "./SkillCard.astro";
-import type { Skill } from "../../../data/skills";
+import SkillGroup from "./SkillGroup.astro";
+import type { Skill, SkillCategory } from "../../../data/skills";
 
 interface Props {
   skills: Skill[];
@@ -13,17 +13,47 @@ const { skills, side } = Astro.props;
  * Desplazamiento en chevron: simétrico respecto al ítem central (índice 2),
  * que es el que más se aleja hacia el borde de la columna. El signo lo pone
  * `side` (izquierda hacia el borde izquierdo, derecha hacia el borde derecho).
+ * Indexado sobre los 5 ítems de la columna completa, sin importar en qué
+ * subgrupo de categoría caiga cada uno.
  */
 const CHEVRON_STEPS = [1, 4, 8, 4, 1];
 const sign = side === "left" ? -1 : 1;
+
+/**
+ * El offset más chico de `CHEVRON_STEPS` siempre cae en los extremos (índice
+ * 0 y 4); cada subgrupo de categoría siempre contiene uno de esos extremos.
+ * Alineando el título al mismo extremo (start para el primer subgrupo, end
+ * para el segundo) el título queda junto al ítem con menor desplazamiento,
+ * evitando que el chevron del ítem central (el de mayor offset) lo tape.
+ */
+
+interface Group {
+  category: SkillCategory;
+  items: { skill: Skill; offset: number }[];
+}
+
+const groups: Group[] = [];
+skills.forEach((skill, index) => {
+  const offset = sign * CHEVRON_STEPS[index];
+  const current = groups[groups.length - 1];
+  if (current && current.category === skill.category) {
+    current.items.push({ skill, offset });
+  } else {
+    groups.push({ category: skill.category, items: [{ skill, offset }] });
+  }
+});
 ---
 
 <div class={`skill-column skill-column--${side}`}>
   {
-    skills.map((skill, index) => (
-      <div class="skill-column__item" style={`--chevron-offset: ${sign * CHEVRON_STEPS[index]};`}>
-        <SkillCard skill={skill} />
-      </div>
+    groups.map((group, groupIndex) => (
+      <SkillGroup
+        category={group.category}
+        items={group.items}
+        side={side}
+        variant="desktop"
+        align={groupIndex === 0 ? "start" : "end"}
+      />
     ))
   }
 </div>
@@ -33,12 +63,8 @@ const sign = side === "left" ? -1 : 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: clamp(1rem, 1.8vh, 1.25rem);
+    justify-content: center;
     height: 100%;
-    justify-content:center;
-  }
-
-  .skill-column__item {
-    transform: translateX(calc(var(--chevron-offset) * clamp(0.6rem, 2.4vw, 1.75rem)));
+    gap: clamp(1.5rem, 3vh, 2.5rem);
   }
 </style>

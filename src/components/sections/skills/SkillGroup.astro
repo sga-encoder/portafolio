@@ -1,0 +1,95 @@
+---
+import SkillCard from "./SkillCard.astro";
+import type { Skill, SkillCategory } from "../../../data/skills";
+
+interface Props {
+  category: SkillCategory;
+  items: { skill: Skill; offset?: number }[];
+  variant: "desktop" | "mobile";
+  side?: "left" | "right";
+  align?: "start" | "end";
+}
+
+const { category, items, variant, side, align } = Astro.props;
+---
+
+<div
+  class={`skill-group skill-group--${variant} ${variant === "desktop" ? `skill-group--${side} skill-group--align-${align}` : ""}`}
+>
+  <span class="skill-group__label font-display font-bold capitalize text-ink">{category}</span>
+  <div class="skill-group__items">
+    {
+      items.map(({ skill, offset }) => (
+        <div class="skill-group__item" style={`--chevron-offset: ${offset ?? 0};`}>
+          <SkillCard skill={skill} />
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .skill-group__label {
+    white-space: nowrap;
+    text-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.55),
+      0 0 18px rgba(0, 0, 0, 0.4);
+  }
+
+  .skill-group__item {
+    transform: translateX(calc(var(--chevron-offset, 0) * clamp(0.6rem, 2.4vw, 1.75rem)));
+  }
+
+  /* Desktop: título junto a la columna de tarjetas, centrado verticalmente respecto a su propio subgrupo. */
+  .skill-group--desktop {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 2rem);
+  }
+
+  .skill-group--left {
+    flex-direction: row;
+  }
+
+  .skill-group--right {
+    flex-direction: row-reverse;
+  }
+
+  .skill-group--align-start {
+    align-items: flex-start;
+  }
+
+  .skill-group--align-end {
+    align-items: flex-end;
+  }
+
+  .skill-group--desktop .skill-group__label {
+    font-size: clamp(1rem, 2vh, 1.4rem);
+  }
+
+  .skill-group--desktop .skill-group__items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(1rem, 1.8vh, 1.25rem);
+  }
+
+  /* Mobile: título arriba, tarjetas en fila debajo (sin chevron). */
+  .skill-group--mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .skill-group--mobile .skill-group__label {
+    font-size: clamp(1.1rem, 4vw, 1.4rem);
+  }
+
+  .skill-group--mobile .skill-group__items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(0.75rem, 3vw, 1.5rem);
+  }
+</style>

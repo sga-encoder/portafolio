@@ -10,26 +10,39 @@ import tailwind from "../assets/skills/08-TailWind-70.png";
 import css from "../assets/skills/09-css-80.png";
 import figma from "../assets/skills/10-figma-90.png";
 
+export type SkillCategory = "lenguajes" | "herramientas" | "diseño" | "frameworks";
+
 export interface Skill {
   name: string;
   percentage: number;
   image: ImageMetadata;
   side: "left" | "right";
+  category: SkillCategory;
 }
 
-/** Orden exacto de `spec.md`: define tanto el orden vertical dentro de su columna como el lado. */
+/** Orden exacto de `spec.md`: define tanto el orden vertical/chevron dentro de su columna en desktop como el orden dentro de su categoría en mobile. */
 export const skills: Skill[] = [
-  { name: "JavaScript", percentage: 85, image: js, side: "left" },
-  { name: "Python", percentage: 60, image: python, side: "left" },
-  { name: "Java", percentage: 55, image: java, side: "left" },
-  { name: "TypeScript", percentage: 65, image: typescript, side: "left" },
-  { name: "Node.js", percentage: 75, image: nodejs, side: "left" },
-  { name: "Figma", percentage: 90, image: figma, side: "right" },
-  { name: "CSS", percentage: 80, image: css, side: "right" },
-  { name: "Tailwind", percentage: 70, image: tailwind, side: "right" },
-  { name: "Next.js", percentage: 65, image: nextjs, side: "right" },
-  { name: "React", percentage: 70, image: react, side: "right" },
+  { name: "JavaScript", percentage: 85, image: js, side: "left", category: "lenguajes" },
+  { name: "Python", percentage: 60, image: python, side: "left", category: "lenguajes" },
+  { name: "Java", percentage: 55, image: java, side: "left", category: "lenguajes" },
+  { name: "TypeScript", percentage: 65, image: typescript, side: "left", category: "lenguajes" },
+  { name: "Figma", percentage: 90, image: figma, side: "left", category: "herramientas" },
+  { name: "Tailwind", percentage: 70, image: tailwind, side: "right", category: "diseño" },
+  { name: "CSS", percentage: 80, image: css, side: "right", category: "diseño" },
+  { name: "Node.js", percentage: 75, image: nodejs, side: "right", category: "frameworks" },
+  { name: "Next.js", percentage: 65, image: nextjs, side: "right", category: "frameworks" },
+  { name: "React", percentage: 70, image: react, side: "right", category: "frameworks" },
 ];
 
 export const leftSkills = skills.filter((skill) => skill.side === "left");
 export const rightSkills = skills.filter((skill) => skill.side === "right");
+
+/** Orden fijo de categorías para el layout mobile (una fila por categoría). */
+export const MOBILE_CATEGORY_ORDER: SkillCategory[] = ["lenguajes", "herramientas", "frameworks", "diseño"];
+
+export const skillsByCategory: Record<SkillCategory, Skill[]> = {
+  lenguajes: skills.filter((skill) => skill.category === "lenguajes"),
+  herramientas: skills.filter((skill) => skill.category === "herramientas"),
+  diseño: skills.filter((skill) => skill.category === "diseño"),
+  frameworks: skills.filter((skill) => skill.category === "frameworks"),
+};
