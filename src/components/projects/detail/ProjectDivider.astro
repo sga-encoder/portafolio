@@ -1,0 +1,33 @@
+---
+interface Props {
+  colors: [string, string];
+  class?: string;
+}
+
+const { colors, class: className } = Astro.props;
+const [first, second] = colors;
+---
+
+<div
+  class:list={["project-divider", className]}
+  role="presentation"
+  style={`--divider-c1: var(--project-left-color, ${first}); --divider-c2: var(--project-right-color, ${second});`}
+>
+</div>
+
+<style>
+  .project-divider {
+    width: clamp(6px, 0.6vw, 10px);
+    border-radius: 999px;
+    background: linear-gradient(180deg, var(--divider-c1), var(--divider-c2));
+    justify-self: center;
+  }
+
+  @media (max-width: 767px) {
+    .project-divider {
+      width: 100%;
+      height: clamp(6px, 0.8vh, 10px);
+      background: linear-gradient(90deg, var(--divider-c1), var(--divider-c2));
+    }
+  }
+</style>

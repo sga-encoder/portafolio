@@ -1,0 +1,50 @@
+---
+import SkillRing from "./SkillRing.astro";
+import type { Skill } from "../../../data/skills";
+
+interface Props {
+  skill: Skill;
+}
+
+const { skill } = Astro.props;
+const textColor =
+  skill.side === "left" ? "var(--sphere-left-color, var(--color-brand))" : "var(--sphere-right-color, var(--color-accent-2))";
+---
+
+<div class="skill-card">
+  <SkillRing percentage={skill.percentage} side={skill.side} image={skill.image} alt={skill.name} />
+  <p class="skill-card__percentage font-display font-bold" style={`color: ${textColor};`}>{skill.percentage}%</p>
+  <p class="skill-card__name font-body text-ink-muted">{skill.name}</p>
+</div>
+
+<style>
+  .skill-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.15rem;
+    /* Al salir del hover, vuelve con un rebote pronunciado (overshoot). */
+    transition: transform 0.6s cubic-bezier(0.34, 2.8, 0.64, 1);
+  }
+
+  .skill-card:hover {
+    transform: translateY(-0.85rem);
+    /* Al entrar, sube rápido y sin rebote. */
+    transition: transform 0.18s ease-out;
+  }
+
+  .skill-card__percentage {
+    font-size: clamp(0.85rem, 1.8vh, 1.1rem);
+    line-height: 1.1;
+    text-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.55),
+      0 0 18px rgba(0, 0, 0, 0.4);
+  }
+
+  .skill-card__name {
+    font-size: clamp(0.65rem, 1.3vh, 0.85rem);
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+</style>

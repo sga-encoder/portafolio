@@ -1,0 +1,26 @@
+---
+interface Props {
+  platform: "mobile" | "desktop";
+  class?: string;
+}
+
+const { platform, class: className } = Astro.props;
+const label = platform === "mobile" ? "Móvil" : "PC";
+---
+
+{
+  platform === "mobile" ? (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" role="img" aria-label={label} class={className}>
+      <title>{label}</title>
+      <rect x="7" y="2" width="10" height="20" rx="2" stroke="currentColor" stroke-width="2" />
+      <line x1="11" y1="18" x2="13" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" role="img" aria-label={label} class={className}>
+      <title>{label}</title>
+      <rect x="2" y="4" width="20" height="13" rx="2" stroke="currentColor" stroke-width="2" />
+      <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="2" />
+    </svg>
+  )
+}

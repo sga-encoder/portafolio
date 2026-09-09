@@ -1,0 +1,164 @@
+---
+import ColorLinkButton from "./ColorLinkButton.astro";
+
+interface CopyItem {
+  value: string;
+  label?: string;
+}
+
+interface Step {
+  text: string;
+  copyText?: CopyItem[];
+  actionLabel?: string;
+  actionHref?: string;
+}
+
+interface Props {
+  steps: Step[];
+  colors: [string, string];
+  demoHref?: string;
+}
+
+const { steps, colors, demoHref } = Astro.props;
+const [first, second] = colors;
+const leftColor = `var(--project-left-color, ${first})`;
+const rightColor = `var(--project-right-color, ${second})`;
+
+const allSteps: Step[] = demoHref
+  ? [...steps, { text: "Prueba el proyecto ya desplegado.", actionLabel: "Ver demo", actionHref: demoHref }]
+  : steps;
+---
+
+<div class="flex h-full flex-col gap-4">
+  <h2 class="font-display text-sm font-bold uppercase tracking-wide text-ink-muted">Cómo verlo en vivo</h2>
+
+  <ol class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    {
+      allSteps.map((step, index) => {
+        const stepColor = index % 2 === 0 ? leftColor : rightColor;
+        return (
+          <li class="flex flex-col gap-3 rounded-2xl bg-surface-muted p-4">
+            <div class="flex items-start gap-3">
+              <span
+                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold text-(--color-brand-contrast)"
+                style={`background-color: ${stepColor};`}
+              >
+                {index + 1}
+              </span>
+              <p class="font-body text-sm text-ink-muted">{step.text}</p>
+            </div>
+
+            {step.copyText?.map((item) => (
+              <button
+                type="button"
+                class="copy-chip"
+                data-copy-text={item.value}
+                aria-label={item.label ? `Copiar ${item.label}: ${item.value}` : `Copiar: ${item.value}`}
+                style={`--chip-color: ${stepColor};`}
+              >
+                <span class="copy-chip-text">
+                  {item.label && <span class="copy-chip-label">{item.label}</span>}
+                  <code class="copy-chip-code">{item.value}</code>
+                </span>
+                <span class="copy-chip-feedback" data-copy-feedback>
+                  Copiar
+                </span>
+              </button>
+            ))}
+
+            {step.actionHref && step.actionLabel && (
+              <ColorLinkButton
+                href={step.actionHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                color={stepColor}
+                variant="solid"
+                class="w-fit"
+              >
+                {step.actionLabel}
+              </ColorLinkButton>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+</div>
+
+<style>
+  .copy-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--chip-color);
+    background-color: color-mix(in srgb, var(--chip-color) 12%, transparent);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    transition: background-color 0.2s;
+  }
+
+  .copy-chip:hover {
+    background-color: color-mix(in srgb, var(--chip-color) 22%, transparent);
+  }
+
+  .copy-chip-text {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .copy-chip-label {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--color-ink-muted);
+  }
+
+  .copy-chip-code {
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.8rem;
+    color: var(--color-ink);
+  }
+
+  .copy-chip-feedback {
+    flex-shrink: 0;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--chip-color);
+  }
+</style>
+
+<script is:inline data-astro-rerun>
+  (function () {
+    document.querySelectorAll("[data-copy-text]").forEach((button) => {
+      if (button.dataset.copyBound === "true") return;
+      button.dataset.copyBound = "true";
+
+      button.addEventListener("click", async () => {
+        const text = button.getAttribute("data-copy-text") || "";
+        const feedback = button.querySelector("[data-copy-feedback]");
+        const original = feedback ? feedback.textContent : "";
+
+        try {
+          await navigator.clipboard.writeText(text);
+          if (feedback) {
+            feedback.textContent = "¡Copiado!";
+            setTimeout(() => {
+              feedback.textContent = original;
+            }, 1500);
+          }
+        } catch (error) {
+          console.error("No se pudo copiar el texto", error);
+        }
+      });
+    });
+  })();
+</script>

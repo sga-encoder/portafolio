@@ -1,0 +1,38 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["header-frame", className]}>
+  <slot />
+</div>
+
+<style>
+  .header-frame {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    /* 20px de referencia sobre un lienzo de diseño de 1512px de ancho. */
+    --frame-border: clamp(6px, calc(20 / 1512 * 100vw), 24px);
+    border-style: solid;
+    border-width: var(--frame-border);
+    border-image-slice: 1;
+    /* Cónico (no lineal): un `linear-gradient` recortado en un border-image
+       rellena las 4 esquinas con un solo color plano (sin degradado), lo que
+       se ve como un parche de color pegado en la esquina. El cónico envuelve
+       el borde de forma continua, esquinas incluidas.
+       `--sphere-gradient-angle` es la dirección "de A hacia B" (convención de
+       linear-gradient); `from` en un cónico ubica el color 0% en esa dirección
+       vista desde el centro, así que hay que sumarle 180° para que el 0%
+       (color de A) quede del lado de A en vez del lado de B. */
+    border-image-source: conic-gradient(
+      from calc(var(--sphere-gradient-angle, 135deg) + 180deg) at 50% 50%,
+      var(--sphere-a-color, var(--color-brand)) 0%,
+      var(--sphere-b-color, var(--color-accent-2)) 50%,
+      var(--sphere-a-color, var(--color-brand)) 100%
+    );
+  }
+</style>

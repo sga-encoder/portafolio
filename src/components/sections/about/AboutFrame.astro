@@ -1,0 +1,28 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["about-frame rounded-3xl p-[3px]", className]}>
+  <div class="h-full rounded-[calc(1.5rem-3px)] bg-surface/70 p-6 backdrop-blur-sm sm:p-8">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .about-frame {
+    /* Esferas C (verde) y A (violeta), las dos que conviven en "Sobre mí" — B sale de
+       pantalla en esta sección. `border-image` (usado por HeaderFrame) ignora
+       `border-radius`, así que aquí el degradado va en el fondo del contenedor exterior
+       y el panel interior lo tapa, dejando solo el borde visible ("padding-box gradient"). */
+    background: conic-gradient(
+      from 315deg at 50% 50%,
+      var(--sphere-c-color, #00c080) 0%,
+      var(--sphere-a-color, var(--color-brand)) 50%,
+      var(--sphere-c-color, #00c080) 100%
+    );
+  }
+</style>

@@ -1,0 +1,27 @@
+---
+import { Image } from "astro:assets";
+import { leftSkills, rightSkills } from "../../data/skills";
+import persona from "../../assets/skills/persona02.png";
+import SkillColumn from "./skills/SkillColumn.astro";
+---
+
+<section id="habilidades" class="flex h-screen w-full flex-col px-[5vw] py-[2vh]">
+  <h2
+    class="shrink-0 text-center font-display font-bold text-ink"
+    style="font-size: clamp(6rem, 3.6vh, 3rem);"
+  >
+    Habilidades
+  </h2>
+  <div class="flex min-h-0 flex-1 items-center justify-center gap-[2vw]">
+    <SkillColumn skills={leftSkills} side="left" />
+    <div class="flex h-full max-w-[30vw] shrink-0 items-center justify-center">
+      <Image
+        src={persona}
+        alt="Retrato ilustrado del autor"
+        class="h-full w-auto object-contain object-center"
+        sizes="22vw"
+      />
+    </div>
+    <SkillColumn skills={rightSkills} side="right" />
+  </div>
+</section>

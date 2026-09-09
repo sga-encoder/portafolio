@@ -1,0 +1,46 @@
+---
+const navItems = [
+  { href: "/#habilidades", label: "Habilidades" },
+  { href: "/#proyectos", label: "Proyectos" },
+  { href: "/#sobre-mi", label: "Sobre mí" },
+  { href: "/blog", label: "Blog" },
+];
+
+const currentPath = Astro.url.pathname;
+
+function isActive(href: string) {
+  // Los links con ancla (ej. "/#habilidades") viven todos en "/"; su estado
+  // activo real lo daría un scrollspy (mejora opcional, no implementada aún).
+  if (href.includes("#")) return false;
+  return currentPath.startsWith(href);
+}
+---
+
+<header
+  transition:persist
+  class="sticky top-0 z-50 border-b border-border/60 bg-surface/80 backdrop-blur"
+>
+  <nav class="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3 sm:py-4">
+    <a href="/" class="shrink-0 font-semibold tracking-tight text-ink hover:text-brand">
+      Tu Nombre
+    </a>
+    <ul class="flex min-w-0 flex-1 items-center gap-4 overflow-x-auto text-sm sm:gap-6">
+      {
+        navItems.map((item) => (
+          <li class="shrink-0">
+            <a
+              href={item.href}
+              aria-current={isActive(item.href) ? "page" : undefined}
+              class:list={[
+                "transition-colors hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand",
+                isActive(item.href) ? "font-medium text-brand" : "text-ink-muted",
+              ]}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>

@@ -1,0 +1,54 @@
+---
+// Borde degradado con esquinas redondeadas: `border-image` (el mecanismo que
+// usa `HeaderFrame.astro` de Inicio) ignora `border-radius`, así que acá se
+// arma con el truco de 2 capas — el div externo pinta el `conic-gradient`
+// como `background` y usa `padding` como grosor de "borde"; el div interno
+// (el contenido real) tiene su propio radio más chico y fondo transparente,
+// dejando ver el fondo de la página (`ProjectPageBackground`) a través del
+// hueco del medio.
+interface Props {
+  colors: [string, string];
+  class?: string;
+}
+
+const { colors, class: className } = Astro.props;
+const [first, second] = colors;
+---
+
+<div
+  class:list={["project-header-frame", className]}
+  style={`--project-frame-color-a: var(--project-left-color, ${first}); --project-frame-color-b: var(--project-right-color, ${second});`}
+>
+  <div class="project-header-frame-inner flex h-full flex-col gap-4 md:flex-row md:gap-6">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .project-header-frame {
+    /* 8px de referencia sobre un lienzo de diseño de 1512px de ancho (borde
+       más fino que el de HeaderFrame: este marco es un elemento de contenido,
+       no un hero a pantalla completa). */
+    --frame-border: clamp(3px, calc(8 / 1512 * 100vw), 10px);
+    --frame-radius: 2rem;
+    border-radius: var(--frame-radius);
+    padding: var(--frame-border);
+    background: conic-gradient(
+      from 135deg at 50% 50%,
+      var(--project-frame-color-a),
+      var(--project-frame-color-b),
+      var(--project-frame-color-a)
+    );
+  }
+
+  .project-header-frame-inner {
+    border-radius: calc(var(--frame-radius) - var(--frame-border));
+    padding: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .project-header-frame-inner {
+      padding: 1.5rem;
+    }
+  }
+</style>

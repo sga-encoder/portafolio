@@ -1,0 +1,73 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  percentage: number;
+  side: "left" | "right";
+  image: ImageMetadata;
+  alt: string;
+}
+
+const { percentage, side, image, alt } = Astro.props;
+
+const radius = 42;
+const circumference = 2 * Math.PI * radius;
+const clamped = Math.min(Math.max(percentage, 0), 100);
+const offset = circumference * (1 - clamped / 100);
+const ringColor =
+  side === "left" ? "var(--sphere-left-color, var(--color-brand))" : "var(--sphere-right-color, var(--color-accent-2))";
+---
+
+<div class="skill-ring" style={`--ring-color: ${ringColor};`}>
+  <svg viewBox="0 0 100 100" class="skill-ring__svg" aria-hidden="true">
+    <circle
+      cx="50"
+      cy="50"
+      r={radius}
+      class="skill-ring__progress"
+      stroke-dasharray={circumference}
+      stroke-dashoffset={offset}
+    />
+  </svg>
+  <Image src={image} alt={alt} class="skill-ring__icon" width={48} height={48} />
+</div>
+
+<style>
+  .skill-ring {
+    position: relative;
+    width: clamp(7rem, 8vh, 4.5rem);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .skill-ring__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    /* Arranca el trazo de progreso en las 12 y avanza en sentido horario. */
+    transform: rotate(-90deg);
+    /* Los <svg> recortan su contenido en su propio borde por defecto; sin esto
+       el drop-shadow (que se extiende más allá del trazo) queda cortado. */
+    overflow: visible;
+  }
+
+  .skill-ring__progress {
+    fill: none;
+    stroke: var(--ring-color);
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke 0.4s ease;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 14px rgba(0, 0, 0, 0.4));
+  }
+
+  .skill-ring__icon {
+    position: relative;
+    width: 46%;
+    height: 46%;
+    object-fit: contain;
+  }
+</style>

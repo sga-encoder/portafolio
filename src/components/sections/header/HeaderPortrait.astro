@@ -1,0 +1,55 @@
+---
+import { Image } from "astro:assets";
+import persona from "../../../assets/header/persona01.png";
+
+interface Props {
+  initials: string;
+  alt: string;
+  class?: string;
+}
+
+const { initials, alt, class: className } = Astro.props;
+---
+
+<div class:list={["header-portrait", className]}>
+  <span class="header-portrait__initials" aria-hidden="true">{initials}</span>
+  <Image src={persona} alt={alt} class="header-portrait__image" sizes="(min-width: 768px) 28vw, 45vw" />
+</div>
+
+<style>
+  .header-portrait {
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+
+  .header-portrait__image {
+    position: absolute;
+    inset: calc(var(--frame-border, 20px) * -1) calc(var(--frame-border, 20px) * -1)
+      calc(var(--frame-border, 20px) * -1) auto;
+    right: calc(var(--frame-border, 20px) * -1);
+    height: calc(100% + var(--frame-border, 20px) * 2);
+    width: auto;
+    max-width: none;
+    object-fit: contain;
+    object-position: bottom right;
+    transform: scale(1.1);
+    transform-origin: bottom right;
+  }
+
+  .header-portrait__initials {
+    position: absolute;
+    z-index: 1;
+    left: 18%;
+    bottom: 22%;
+    transform-origin: left bottom;
+    transform: rotate(-90deg) translateX(-100%);
+    display: inline-block;
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.575rem, 3.15vw, 3.15rem);
+    letter-spacing: 0.05em;
+    color: var(--color-ink);
+  }
+</style>

@@ -1,0 +1,63 @@
+---
+// Botón reutilizado por ProjectPager, "Repositorio" y "Ver demo" — todos a
+// juego con los 2 colores dominantes del proyecto (mismos que usa
+// ProjectHeaderFrame), en vez de un morado fijo sin relación con el fondo.
+interface Props {
+  href: string;
+  color: string;
+  variant?: "outline" | "solid";
+  target?: string;
+  rel?: string;
+  class?: string;
+}
+
+const { href, color, variant = "outline", target, rel, class: className } = Astro.props;
+---
+
+<a
+  href={href}
+  target={target}
+  rel={rel}
+  class:list={["color-link-button", variant, className]}
+  style={`--btn-color: ${color};`}
+>
+  <slot />
+</a>
+
+<style>
+  .color-link-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    padding: 0.5rem 1.25rem;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      opacity 0.2s;
+  }
+
+  .color-link-button.outline {
+    border: 1px solid var(--btn-color);
+    color: var(--btn-color);
+    background-color: transparent;
+  }
+
+  .color-link-button.outline:hover {
+    background-color: var(--btn-color);
+    color: var(--color-brand-contrast);
+  }
+
+  .color-link-button.solid {
+    border: 1px solid transparent;
+    background-color: var(--btn-color);
+    color: var(--color-brand-contrast);
+  }
+
+  .color-link-button.solid:hover {
+    opacity: 0.9;
+  }
+</style>

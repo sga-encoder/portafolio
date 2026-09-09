@@ -1,0 +1,28 @@
+---
+// Fondo estático de respaldo de `/proyectos/[slug]`: mismo mecanismo que
+// `SceneFallbackBackground.astro` de Inicio (blobs `radial-gradient` + blur,
+// fijos a pantalla completa, sin JS), coloreado con los 2 colores dominantes
+// de la portada del proyecto. Es lo único visible si `ProjectScene3D` no llega
+// a montar (sin WebGL / `prefers-reduced-motion`) — ver 015-fondo-detalle-proyecto-three.
+// Antes de 015 este componente tenía su propio scroll listener vanilla (014);
+// esa reactividad ahora vive en la escena 3D.
+interface Props {
+  colors: [string, string];
+}
+
+const { colors } = Astro.props;
+const [first, second] = colors;
+---
+
+<div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-surface" aria-hidden="true">
+  <div
+    class="absolute left-[8%] top-[12%] h-[48vh] w-[48vh] rounded-full opacity-60 blur-3xl"
+    style={`background: radial-gradient(circle, ${first} 0%, transparent 70%);`}
+  >
+  </div>
+  <div
+    class="absolute right-[8%] top-[30%] h-[45vh] w-[45vh] rounded-full opacity-60 blur-3xl"
+    style={`background: radial-gradient(circle, ${second} 0%, transparent 70%);`}
+  >
+  </div>
+</div>

@@ -1,0 +1,22 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["header-divider", className]} role="presentation"></div>
+
+<style>
+  .header-divider {
+    /* Hereda `--frame-border` de `HeaderFrame` (custom property, se propaga por herencia). */
+    height: var(--frame-border, 20px);
+    width: 100%;
+    background: linear-gradient(
+      var(--sphere-gradient-angle, 135deg),
+      var(--sphere-a-color, var(--color-brand)),
+      var(--sphere-b-color, var(--color-accent-2))
+    );
+  }
+</style>

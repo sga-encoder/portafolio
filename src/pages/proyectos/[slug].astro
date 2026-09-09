@@ -1,0 +1,89 @@
+---
+import { getCollection, render } from "astro:content";
+import { getImage } from "astro:assets";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectHeader from "../../components/projects/detail/ProjectHeader.astro";
+import ProjectPager from "../../components/projects/detail/ProjectPager.astro";
+import ProjectPageBackground from "../../components/projects/detail/ProjectPageBackground.astro";
+import ProjectScene3D from "../../components/projects/detail/scene/ProjectScene3D";
+import ProjectDescriptionContext from "../../components/projects/detail/ProjectDescriptionContext.astro";
+import ProjectDivider from "../../components/projects/detail/ProjectDivider.astro";
+import ProjectLiveSteps from "../../components/projects/detail/ProjectLiveSteps.astro";
+import ProjectGallery from "../../components/projects/detail/ProjectGallery.tsx";
+import { getDominantColors } from "../../utils/dominantColors";
+import { PROJECTS } from "../../data/projects";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  const order = PROJECTS.map((item) => item.id);
+
+  return projects.map((project) => {
+    const index = order.indexOf(project.id);
+    const prevSlug = index > 0 ? order[index - 1] : undefined;
+    const nextSlug = index >= 0 && index < order.length - 1 ? order[index + 1] : undefined;
+    return {
+      params: { slug: project.id },
+      props: { project, prevSlug, nextSlug },
+    };
+  });
+}
+
+const { project, prevSlug, nextSlug } = Astro.props;
+const { Content } = await render(project);
+const { title, summary, coverImage, gallery, techStack, platforms, links, steps } = project.data;
+
+const cover = await getImage({ src: coverImage, width: 900 });
+const colors = await getDominantColors(project.filePath ?? "");
+const galleryImages = await Promise.all(
+  gallery.map((img) => getImage({ src: img, width: 800 })),
+);
+---
+
+<BaseLayout title={`${title} · Proyectos`} description={summary} showHeader={false}>
+  <ProjectPageBackground colors={colors} />
+  <ProjectScene3D client:load colorA={colors[0]} colorB={colors[1]} />
+
+  <div id="project-zone-header" class="mx-auto w-full px-4 pt-12 md:w-[70%]">
+    <ProjectPager
+      prevHref={prevSlug ? `/proyectos/${prevSlug}` : undefined}
+      nextHref={nextSlug ? `/proyectos/${nextSlug}` : undefined}
+      colors={colors}
+    />
+
+    <div class="mt-6">
+      <ProjectHeader
+        title={title}
+        coverSrc={cover.src}
+        techStack={techStack}
+        platforms={platforms}
+        repoHref={links.repo}
+        colors={colors}
+      />
+    </div>
+  </div>
+
+  <div class="mx-auto w-full px-4 pb-12 pt-10 md:w-[70%] sm:pb-16">
+    <div id="project-zone-content" class="grid grid-cols-1 gap-8 md:grid-cols-[35%_auto_1fr] md:items-stretch md:gap-10">
+      <ProjectDescriptionContext summary={summary}>
+        <Content />
+      </ProjectDescriptionContext>
+
+      <ProjectDivider colors={colors} />
+
+      <ProjectLiveSteps steps={steps} colors={colors} demoHref={links.demo} />
+    </div>
+
+    {
+      galleryImages.length > 0 && (
+        <div id="project-zone-gallery" class="mt-12">
+          <ProjectGallery
+            client:load
+            images={galleryImages.map((img) => ({ src: img.src, alt: title }))}
+            colorLeft={`var(--project-left-color, ${colors[0]})`}
+            colorRight={`var(--project-right-color, ${colors[1]})`}
+          />
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>

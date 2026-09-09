@@ -1,0 +1,53 @@
+---
+import ProjectHeaderFrame from "./ProjectHeaderFrame.astro";
+import PlatformIcon from "./PlatformIcon.astro";
+import ColorLinkButton from "./ColorLinkButton.astro";
+
+interface Props {
+  title: string;
+  coverSrc: string;
+  techStack: string[];
+  platforms: ("mobile" | "desktop")[];
+  repoHref?: string;
+  colors: [string, string];
+}
+
+const { title, coverSrc, techStack, platforms, repoHref, colors } = Astro.props;
+const [, second] = colors;
+const rightColor = `var(--project-right-color, ${second})`;
+---
+
+<ProjectHeaderFrame colors={colors} class="md:h-[40vh]">
+  <div class="aspect-video w-full shrink-0 overflow-hidden rounded-2xl md:aspect-auto md:h-full md:w-[42%]">
+    <img src={coverSrc} alt={title} class="h-full w-full object-cover" />
+  </div>
+
+  <div class="flex min-w-0 flex-1 flex-col justify-center gap-4">
+    <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">{title}</h1>
+
+    <div class="flex flex-wrap items-center gap-2">
+      {
+        techStack.map((tech) => (
+          <span class="rounded-full bg-surface-muted px-3 py-1 font-body text-sm text-ink">{tech}</span>
+        ))
+      }
+      {
+        platforms.length > 0 && (
+          <span class="ml-1 flex items-center gap-2 text-ink-muted">
+            {platforms.map((platform) => (
+              <PlatformIcon platform={platform} />
+            ))}
+          </span>
+        )
+      }
+    </div>
+
+    {
+      repoHref && (
+        <ColorLinkButton href={repoHref} target="_blank" rel="noopener noreferrer" color={rightColor} variant="solid" class="w-fit">
+          Repositorio
+        </ColorLinkButton>
+      )
+    }
+  </div>
+</ProjectHeaderFrame>

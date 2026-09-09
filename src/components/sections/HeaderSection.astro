@@ -1,0 +1,47 @@
+---
+import { profile } from "../../data/profile";
+import HeaderFrame from "./header/HeaderFrame.astro";
+import HeaderDivider from "./header/HeaderDivider.astro";
+import HeaderPortrait from "./header/HeaderPortrait.astro";
+
+const { nameLines, initials, tagline, primaryCta, secondaryCta } = profile.header;
+---
+
+<section id="header" class="h-screen w-full p-[5vw]">
+  <HeaderFrame>
+    <div class="flex h-full w-full items-stretch gap-[3vw] px-[2vw]">
+      <div class="flex min-w-0 flex-1 flex-col justify-center gap-6">
+        <h1 class="font-display font-bold leading-[0.95] text-ink" style="font-size: clamp(2.25rem, 5.95vw, 5.95rem);">
+          {
+            nameLines.map((line) => (
+              <span class="block">{line}</span>
+            ))
+          }
+        </h1>
+        <HeaderDivider class="w-full" />
+        <p class="font-body text-ink-muted" style="font-size: clamp(1rem, 1.98vw, 1.875rem);">{tagline}</p>
+        <div class="flex flex-wrap gap-4">
+          <a
+            href={primaryCta.href}
+            class="rounded-full px-6 py-3 text-sm font-medium text-brand-contrast transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:text-base"
+            style="background-color: var(--sphere-left-color, var(--color-brand));"
+          >
+            {primaryCta.label}
+          </a>
+          <a
+            href={secondaryCta.href}
+            class="rounded-full px-6 py-3 text-sm font-medium text-brand-contrast transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:text-base"
+            style="background-color: var(--sphere-right-color, var(--color-accent-2));"
+          >
+            {secondaryCta.label}
+          </a>
+        </div>
+      </div>
+      <HeaderPortrait
+        initials={initials}
+        alt={`Retrato de ${nameLines.join(" ")}`}
+        class="hidden w-[26vw] max-w-[420px] shrink-0 sm:block"
+      />
+    </div>
+  </HeaderFrame>
+</section>

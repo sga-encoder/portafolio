@@ -1,0 +1,111 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --color-surface: #ffffff;
+  --color-surface-muted: #f2f1fb;
+  --color-ink: #05061a;
+  --color-ink-muted: #4b4b6b;
+  --color-border: #e2e1f0;
+  --color-brand: #6a00ff;
+  --color-brand-contrast: #ffffff;
+  --color-accent: #c0009d;
+  --color-accent-2: #0033ff;
+}
+
+.dark {
+  --color-surface: #000622;
+  --color-surface-muted: #050b33;
+  --color-ink: #f5f5ff;
+  --color-ink-muted: #b3b3d1;
+  --color-border: #1a1f4d;
+  --color-brand: #6a00ff;
+  --color-brand-contrast: #ffffff;
+  --color-accent: #c0009d;
+  --color-accent-2: #0033ff;
+}
+
+:root {
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Montserrat", sans-serif;
+}
+
+@theme inline {
+  --color-surface: var(--color-surface);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-border: var(--color-border);
+  --color-brand: var(--color-brand);
+  --color-brand-contrast: var(--color-brand-contrast);
+  --color-accent: var(--color-accent);
+  --color-accent-2: var(--color-accent-2);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Label del dot-nav lateral (ScrollDotNav): oculto por defecto, aparece con
+   rebote (overshoot) al hacer hover/focus del punto; al salir se encoge sin
+   rebote (sin animation, solo la transition de vuelta al estado base). */
+@keyframes dot-nav-label-pop {
+  0% {
+    opacity: 0;
+    transform: translateX(-8px) scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(4px) scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.scroll-dot-label {
+  opacity: 0;
+  transform: translateX(-8px) scale(0.5);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.group:hover .scroll-dot-label,
+.group:focus-within .scroll-dot-label {
+  animation: dot-nav-label-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Tarjeta de contenido del carrusel de Proyectos (ProjectCarousel): borde con
+   degradado dinámico entre el color de la esfera izquierda/derecha, publicado
+   por el propio componente vía la custom property `--project-frame-gradient`. */
+.project-card-frame {
+  border-style: solid;
+  border-width: 2px;
+  border-image-slice: 1;
+  border-image-source: var(
+    --project-frame-gradient,
+    linear-gradient(135deg, var(--color-brand), var(--color-accent-2))
+  );
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+}
