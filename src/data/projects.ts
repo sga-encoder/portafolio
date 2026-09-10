@@ -1,7 +1,5 @@
 import type { ImageMetadata } from "astro";
 import proyecto01 from "../assets/projects/proyecto-01.jpg";
-import proyecto02 from "../assets/projects/proyecto-02.jpg";
-import proyecto03 from "../assets/projects/proyecto-03.jpg";
 
 export interface ProjectItem {
   id: string;
@@ -14,38 +12,55 @@ export interface ProjectItem {
   date: string;
 }
 
-/** Contenido placeholder — reemplaza título/descripción/link/date con los datos reales cuando los tengas. */
 export const PROJECTS: ProjectItem[] = [
   {
-    id: "proyecto-1",
-    title: "Proyecto de ejemplo uno",
-    description: "Descripción breve de qué resuelve este proyecto y con qué lo construiste.",
+    id: "pelis",
+    title: "Pelis",
+    description:
+      "Mi primera web: la hice siguiendo un curso de YouTube (HTML, CSS y JS puro). La subo para mostrar mi evolución con el tiempo.",
+    // Portada temporal mientras integro un servicio de imágenes (p. ej. Cloudinary) para las capturas reales.
     image: proyecto01,
-    link: "/proyectos/proyecto-1",
-    date: "2025-06",
+    link: "/proyectos/pelis",
+    date: "2020-10",
   },
   {
-    id: "proyecto-2",
-    title: "Proyecto de ejemplo dos",
-    description: "Descripción breve de qué resuelve este proyecto y con qué lo construiste.",
-    image: proyecto02,
-    link: "/proyectos/proyecto-2",
-    date: "2024-11",
+    id: "practica-estilos",
+    title: "Práctica de estilos",
+    description:
+      "Segundo proyecto de aprendizaje: practiqué mucho CSS con React, siguiendo tutoriales de YouTube.",
+    // Portada temporal mientras integro un servicio de imágenes (p. ej. Cloudinary) para las capturas reales.
+    image: proyecto01,
+    link: "/proyectos/practica-estilos",
+    date: "2021-03",
   },
   {
-    id: "proyecto-3",
-    title: "Proyecto de ejemplo tres",
-    description: "Descripción breve de qué resuelve este proyecto y con qué lo construiste.",
-    image: proyecto03,
-    link: "/proyectos/proyecto-3",
-    date: "2024-02",
+    id: "blog-semillero",
+    title: "Blog del Semillero",
+    description:
+      "Blog hecho para un semillero de investigación universitario, para mostrar sus avances (Next.js + Strapi).",
+    // Portada temporal mientras integro un servicio de imágenes (p. ej. Cloudinary) para las capturas reales.
+    image: proyecto01,
+    link: "/proyectos/blog-semillero",
+    date: "2022-11",
   },
   {
-    id: "proyecto-4",
-    title: "Proyecto aleja hola",
-    description: "Descripción breve de qué resuelve este proyecto y con qué lo construiste.",
-    image: proyecto03,
-    link: "/proyectos/proyecto-4",
-    date: "2024-02",
+    id: "city-builder",
+    title: "City Builder",
+    description:
+      "Juego de construcción de ciudad hecho para la universidad, con patrones de diseño y renderización reactiva propia (sin frameworks).",
+    // Portada temporal mientras integro un servicio de imágenes (p. ej. Cloudinary) para las capturas reales.
+    image: proyecto01,
+    link: "/proyectos/city-builder",
+    date: "2026-04",
+  },
+  {
+    id: "class-manager",
+    title: "Class Manager",
+    description:
+      "Aplicación para gestionar clases, cursos y estudiantes — solo frontend, hecha con React.",
+    // Portada temporal mientras integro un servicio de imágenes (p. ej. Cloudinary) para las capturas reales.
+    image: proyecto01,
+    link: "/proyectos/class-manager",
+    date: "2026-05",
   },
 ];
