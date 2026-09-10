@@ -8,19 +8,19 @@ import AboutInfoBlock from "./about/AboutInfoBlock.astro";
 const { about } = profile;
 ---
 
-<section id="sobre-mi" class="flex min-h-screen w-full flex-col md:h-screen md:flex-row">
+<section id="sobre-mi" class="flex min-h-screen w-full flex-col pb-20 md:h-screen md:flex-row md:pb-0 short:py-2">
   <div
-    class="flex shrink-0 items-center justify-center py-6 md:h-full md:w-[12vw] md:items-end md:justify-center md:pb-[6vh]"
+    class="flex shrink-0 items-center justify-center py-6 short:py-1 md:h-full md:w-[12vw] md:items-end md:justify-center md:pb-[6vh]"
   >
     <h2 class="about-title font-display font-bold text-ink">Sobre mí</h2>
   </div>
 
-  <div class="flex min-w-0 flex-1 flex-col justify-center gap-[3vh] px-[6vw] py-[3vh] md:px-[4vw]">
+  <div class="flex min-w-0 flex-1 flex-col justify-center gap-[3vh] px-[6vw] py-[3vh] short:gap-[1vh] short:py-[1vh] md:px-[4vw]">
     <AboutFrame class="flex-[2]">
-      <p class="font-body text-ink-muted">{about.bio}</p>
+      <p class="font-body text-ink-muted text-sm short:text-xs short:line-clamp-3">{about.bio}</p>
     </AboutFrame>
 
-    <AboutInfoBlock about={about} class="hidden md:flex md:flex-col md:gap-[3vh]" />
+    <AboutInfoBlock about={about} class="hidden md:flex md:flex-col md:gap-[3vh] short:gap-[1vh]" />
 
     <div class="flex flex-row items-center gap-4 md:hidden">
       <AboutInfoBlock about={about} class="flex min-w-0 flex-1 flex-col gap-[3vh]" dividerClass="w-full" />

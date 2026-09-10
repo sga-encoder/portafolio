@@ -14,10 +14,21 @@ const projects = await Promise.all(
 );
 ---
 
-<section id="proyectos" class="flex min-h-screen w-full flex-col justify-center gap-10 px-4 py-16 md:h-screen">
+<section
+  id="proyectos"
+  class="flex min-h-screen w-full flex-col justify-center gap-10 px-4 py-16 md:h-screen short:gap-8 short:py-4"
+>
   <ProjectCarousel client:load projects={projects} />
-  <h2 class="text-center font-display text-[clamp(1.75rem,9vw,3rem)] font-bold text-ink md:text-8xl">Proyectos</h2>
-  <a href="/proyectos" class="text-center font-body text-sm text-accent-2 underline-offset-4 hover:underline">
+  <h2
+    class="text-center font-display text-[clamp(1.75rem,9vw,3rem)] font-bold text-ink md:text-8xl short:text-[clamp(1.25rem,6vh,3rem)]"
+  >
+    Proyectos
+  </h2>
+  <a
+    href="/proyectos"
+    class="mx-auto inline-block rounded-full px-6 py-2.5 text-center font-body text-sm font-semibold text-(--color-brand-contrast) transition-transform hover:scale-105"
+    style="background: linear-gradient(135deg, var(--sphere-left-color, var(--color-brand)), var(--sphere-right-color, var(--color-accent-2)));"
+  >
     Ver todos los proyectos →
   </a>
 </section>

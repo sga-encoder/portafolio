@@ -15,13 +15,13 @@ import SkillGroup from "./skills/SkillGroup.astro";
       plano por fuera de ese rango en vez de saltar de golpe al cruzar el breakpoint.
   */}
   <h2
-    class="shrink-0 text-center font-display font-bold text-ink text-[clamp(1.75rem,9vw,3rem)] md:text-[clamp(3rem,calc(-0.15rem_+_0.41vw),6rem)]"
+    class="shrink-0 text-center font-display font-bold text-ink text-[clamp(1.75rem,9vw,3rem)] md:text-[clamp(3rem,calc(-0.15rem_+_0.41vw),6rem)] short:text-[clamp(1.25rem,6vh,2rem)]"
   >
     Habilidades
   </h2>
 
   {/* Desktop/tablet (≥768px): 3 columnas, retrato central, chevron. */}
-  <div class="hidden min-h-0 flex-1 items-center justify-center gap-[2vw] md:flex">
+  <div class="hidden min-h-0 flex-1 items-center justify-center gap-[2vw] md:flex short:gap-[1vw]">
     <SkillColumn skills={leftSkills} side="left" />
     <div class="flex h-full max-w-[30vw] shrink-0 items-center justify-center">
       <Image

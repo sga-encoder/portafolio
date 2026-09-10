@@ -1,0 +1,142 @@
+---
+// Reemplaza a ProjectPager (3 botones de texto en fila) por un menú de
+// navegación tipo dot-nav (mismo mecanismo visual que ScrollDotNav/YearDotNav:
+// fijo al lateral, label en hover, oculto en mobile). A diferencia de esos dos
+// -que son scroll-spy entre secciones equivalentes-, aquí las 4 acciones son
+// distintas (retroceder/avanzar/inicio/ver todos), así que cada ítem se
+// distingue por forma/ícono además de color, y el "activo" no existe: en su
+// lugar hay un estado deshabilitado para anterior/siguiente en los extremos.
+import NavIcon from "./NavIcon.astro";
+import {
+  NAV_BAR_MOBILE,
+  NAV_BAR_MOBILE_LIST,
+  NAV_ITEM_HIT_AREA,
+  NAV_RAIL_DESKTOP,
+  NAV_RAIL_LIST,
+} from "../../nav/navRailClasses";
+
+interface Props {
+  prevHref?: string;
+  nextHref?: string;
+  colors: [string, string];
+}
+
+const { prevHref, nextHref, colors } = Astro.props;
+const [first, second] = colors;
+const leftColor = `var(--project-left-color, ${first})`;
+const rightColor = `var(--project-right-color, ${second})`;
+
+interface NavItem {
+  key: string;
+  label: string;
+  href?: string;
+  color: string;
+  disabled: boolean;
+  icon: "chevron-left" | "home" | "grid" | "chevron-right";
+}
+
+const items: NavItem[] = [
+  {
+    key: "prev",
+    label: "Proyecto anterior",
+    href: prevHref,
+    color: leftColor,
+    disabled: !prevHref,
+    icon: "chevron-left",
+  },
+  { key: "home", label: "Volver al inicio", href: "/", color: leftColor, disabled: false, icon: "home" },
+  {
+    key: "all",
+    label: "Ver todos los proyectos",
+    href: "/proyectos",
+    color: rightColor,
+    disabled: false,
+    icon: "grid",
+  },
+  {
+    key: "next",
+    label: "Próximo proyecto",
+    href: nextHref,
+    color: rightColor,
+    disabled: !nextHref,
+    icon: "chevron-right",
+  },
+];
+
+const circleStyle = (color: string) =>
+  `border: 2px solid ${color}; color: ${color}; background-color: color-mix(in srgb, var(--color-surface) 80%, transparent);`;
+---
+
+{
+  /* Desktop: nav lateral fijo, mismo criterio hidden/md:flex que ScrollDotNav/YearDotNav. */
+}
+<nav aria-label="Navegación entre proyectos" class={NAV_RAIL_DESKTOP}>
+  <ul class={NAV_RAIL_LIST}>
+    {
+      items.map((item) => (
+        <li class="group relative flex items-center">
+          {item.disabled ? (
+            <span
+              aria-hidden="true"
+              class="relative z-10 flex h-9 w-9 items-center justify-center rounded-full opacity-30"
+              style={circleStyle(item.color)}
+            >
+              <NavIcon icon={item.icon} />
+            </span>
+          ) : (
+            <>
+              <a
+                href={item.href}
+                aria-label={item.label}
+                class="relative z-10 flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-brand)"
+                style={circleStyle(item.color)}
+              >
+                <NavIcon icon={item.icon} />
+              </a>
+              <span
+                class="scroll-dot-label pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg px-3 py-1.5 font-body text-base font-semibold"
+                style={`background-color: #000622; color: ${item.color}; box-shadow: 0 4px 16px -2px ${item.color};`}
+              >
+                {item.label}
+              </span>
+            </>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+{
+  /* Mobile: barra fija inferior, sin label (sin gesto de hover en touch),
+     mismo contenedor compartido que ScrollDotNav/YearDotNav. */
+}
+<nav aria-label="Navegación entre proyectos" class={NAV_BAR_MOBILE}>
+  <ul class={NAV_BAR_MOBILE_LIST}>
+    {
+      items.map((item) => (
+        <li class="flex items-center">
+          {item.disabled ? (
+            <span aria-hidden="true" class={`${NAV_ITEM_HIT_AREA} opacity-30`}>
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full"
+                style={circleStyle(item.color)}
+              >
+                <NavIcon icon={item.icon} />
+              </span>
+            </span>
+          ) : (
+            <a href={item.href} aria-label={item.label} class={NAV_ITEM_HIT_AREA}>
+              <span
+                class="flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 active:scale-95"
+                style={circleStyle(item.color)}
+              >
+                <NavIcon icon={item.icon} />
+              </span>
+            </a>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</nav>

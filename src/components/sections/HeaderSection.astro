@@ -6,16 +6,18 @@ import HeaderPortrait from "./header/HeaderPortrait.astro";
 import HeaderContentCard from "./header/HeaderContentCard.astro";
 import HeaderTextBlock from "./header/HeaderTextBlock.astro";
 
-const { nameLines, initials, tagline, primaryCta, secondaryCta } = profile.header;
+// secondaryCta ("Blog") no se pasa a propósito: sigue en backlog sin contenido
+// (ver roadmap.md), oculto de forma reversible (026) sin borrar el dato en profile.ts.
+const { nameLines, initials, tagline, primaryCta } = profile.header;
 const portraitAlt = `Retrato de ${nameLines.join(" ")}`;
 ---
 
-<section id="header" class="h-screen w-full p-[5vw]">
+<section id="header" class="h-screen w-full p-[5vw] short:py-[2vh]">
   <HeaderFrame>
     <!-- Desktop / celular en landscape: layout actual sin cambios. -->
     <div class="hidden h-full w-full items-stretch gap-[3vw] px-[2vw] landscape:flex md:flex">
-      <div class="flex min-w-0 flex-1 flex-col justify-center gap-6">
-        <HeaderTextBlock nameLines={nameLines} tagline={tagline} primaryCta={primaryCta} secondaryCta={secondaryCta}>
+      <div class="flex min-w-0 flex-1 flex-col justify-center gap-6 short:gap-2">
+        <HeaderTextBlock nameLines={nameLines} tagline={tagline} primaryCta={primaryCta}>
           <HeaderDivider class="w-full" slot="divider" />
         </HeaderTextBlock>
       </div>
@@ -28,7 +30,7 @@ const portraitAlt = `Retrato de ${nameLines.join(" ")}`;
     <div class="relative h-full w-full landscape:hidden md:hidden">
       <HeaderPortrait initials={initials} alt={portraitAlt} hideInitials variant="background" class="absolute inset-0" />
       <HeaderContentCard class="absolute inset-x-[-4vw] bottom-[9vh]">
-        <HeaderTextBlock nameLines={nameLines} tagline={tagline} primaryCta={primaryCta} secondaryCta={secondaryCta} />
+        <HeaderTextBlock nameLines={nameLines} tagline={tagline} primaryCta={primaryCta} />
       </HeaderContentCard>
     </div>
   </HeaderFrame>

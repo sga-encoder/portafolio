@@ -67,4 +67,13 @@ skills.forEach((skill, index) => {
     height: 100%;
     gap: clamp(1.5rem, 3vh, 2.5rem);
   }
+
+  /* Celular en landscape (~320-430px de alto): el gap fijo de 1.5rem entre
+     categorías no deja espacio suficiente para que los 5 ítems + textos
+     quepan sin desbordar la sección — ver `SkillRing`/`SkillCard`. */
+  @media (max-height: 499px) {
+    .skill-column {
+      gap: clamp(0.4rem, 2vh, 1.5rem);
+    }
+  }
 </style>

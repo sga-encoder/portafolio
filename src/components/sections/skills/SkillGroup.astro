@@ -40,6 +40,12 @@ const { category, items, variant, side, align } = Astro.props;
     transform: translateX(calc(var(--chevron-offset, 0) * clamp(0.6rem, 2.4vw, 1.75rem)));
   }
 
+  @media (max-height: 499px) {
+    .skill-group__item {
+      transform: translateX(calc(var(--chevron-offset, 0) * clamp(0.3rem, 1.2vw, 0.9rem)));
+    }
+  }
+
   /* Desktop: título junto a la columna de tarjetas, centrado verticalmente respecto a su propio subgrupo. */
   .skill-group--desktop {
     display: flex;
@@ -72,6 +78,21 @@ const { category, items, variant, side, align } = Astro.props;
     flex-direction: column;
     align-items: center;
     gap: clamp(1rem, 1.8vh, 1.25rem);
+  }
+
+  /* Celular en landscape: labels/gaps más chicos, mismo motivo que `SkillColumn`. */
+  @media (max-height: 499px) {
+    .skill-group--desktop {
+      gap: clamp(0.4rem, 1.5vw, 1.5rem);
+    }
+
+    .skill-group--desktop .skill-group__label {
+      font-size: clamp(0.7rem, 1.6vh, 1rem);
+    }
+
+    .skill-group--desktop .skill-group__items {
+      gap: clamp(0.3rem, 1.2vh, 1rem);
+    }
   }
 
   /* Mobile: título arriba, tarjetas en fila debajo (sin chevron). */

@@ -10,7 +10,10 @@ export interface HeaderData {
   initials: string;
   tagline: string;
   primaryCta: Cta;
-  secondaryCta: Cta;
+  /** Oculto a propósito (026): el blog sigue sin contenido (backlog en roadmap.md).
+   *  Se deja el dato definido, sin borrar, para reactivarlo con solo volver a pasarlo
+   *  a `HeaderTextBlock` — mismo criterio de reversibilidad que 011. */
+  secondaryCta?: Cta;
 }
 
 export interface StudyItem {
@@ -43,7 +46,8 @@ export const profile: ProfileData = {
     nameLines: ["Sebastián Garzón", "Arias"],
     initials: "SGA",
     tagline: "Estudiante de Ingeniería de Sistemas",
-    primaryCta: { label: "Proyectos", href: "#proyectos" },
+    // 026: apunta al listado /proyectos (todos los proyectos), no al ancla de esta misma página.
+    primaryCta: { label: "Proyectos", href: "/proyectos" },
     secondaryCta: { label: "Blog", href: "/blog" },
   },
   about: {

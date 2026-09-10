@@ -3,6 +3,13 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Viewport demasiado bajo (celular en landscape: ~320-430px de alto) para
+   que los títulos/paddings a pantalla completa de Inicio, dimensionados
+   sobre todo en `vw`, quepan sin recortarse. Nunca se da en portrait (alto
+   ≥600px en los celulares más chicos) ni en tablets/desktop. Sirve para
+   achicar tamaños puntuales (nunca para agregar scroll) en ese caso. */
+@custom-variant short (@media (max-height: 499px));
+
 :root {
   --color-surface: #ffffff;
   --color-surface-muted: #f2f1fb;

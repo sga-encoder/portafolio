@@ -3,7 +3,7 @@ import { getCollection, render } from "astro:content";
 import { getImage } from "astro:assets";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectHeader from "../../components/projects/detail/ProjectHeader.astro";
-import ProjectPager from "../../components/projects/detail/ProjectPager.astro";
+import ProjectDetailNav from "../../components/projects/detail/ProjectDetailNav.astro";
 import ProjectPageBackground from "../../components/projects/detail/ProjectPageBackground.astro";
 import ProjectScene3D from "../../components/projects/detail/scene/ProjectScene3D";
 import ProjectDescriptionContext from "../../components/projects/detail/ProjectDescriptionContext.astro";
@@ -45,7 +45,7 @@ const galleryImages = await Promise.all(
   <ProjectScene3D client:load colorA={colors[0]} colorB={colors[1]} zoneStops={resolvedProjectZoneStops} />
 
   <div id="project-zone-header" class="mx-auto w-full px-4 pt-12 md:w-[70%]">
-    <ProjectPager
+    <ProjectDetailNav
       prevHref={prevSlug ? `/proyectos/${prevSlug}` : undefined}
       nextHref={nextSlug ? `/proyectos/${nextSlug}` : undefined}
       colors={colors}
@@ -63,7 +63,7 @@ const galleryImages = await Promise.all(
     </div>
   </div>
 
-  <div class="mx-auto w-full px-4 pb-12 pt-10 md:w-[70%] sm:pb-16">
+  <div class="mx-auto w-full px-4 pb-28 pt-10 md:w-[70%] md:pb-16">
     <div id="project-zone-content" class="grid grid-cols-1 gap-8 md:grid-cols-[35%_auto_1fr] md:items-stretch md:gap-10">
       <ProjectDescriptionContext summary={summary}>
         <Content />

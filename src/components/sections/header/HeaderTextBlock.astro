@@ -5,13 +5,14 @@ interface Props {
   nameLines: string[];
   tagline: string;
   primaryCta: Cta;
-  secondaryCta: Cta;
+  /** Opcional (026): si no se pasa, el CTA secundario simplemente no se renderiza. */
+  secondaryCta?: Cta;
 }
 
 const { nameLines, tagline, primaryCta, secondaryCta } = Astro.props;
 ---
 
-<h1 class="font-display font-bold leading-[0.95] text-ink" style="font-size: clamp(2.25rem, 5.95vw, 5.95rem);">
+<h1 class="font-display font-bold leading-[0.95] text-ink text-[clamp(2.25rem,5.95vw,5.95rem)] short:text-[clamp(1.25rem,10vh,5.95rem)]">
   {
     nameLines.map((line) => (
       <span class="block">{line}</span>
@@ -19,20 +20,24 @@ const { nameLines, tagline, primaryCta, secondaryCta } = Astro.props;
   }
 </h1>
 <slot name="divider" />
-<p class="font-body text-ink-muted" style="font-size: clamp(1rem, 1.98vw, 1.875rem);">{tagline}</p>
-<div class="flex flex-wrap gap-4">
+<p class="font-body text-ink-muted text-[clamp(1rem,1.98vw,1.875rem)] short:text-[clamp(0.7rem,3vh,1.875rem)]">{tagline}</p>
+<div class="flex flex-wrap gap-4 short:gap-2">
   <a
     href={primaryCta.href}
-    class="rounded-full px-6 py-3 text-sm font-medium text-brand-contrast transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:text-base"
+    class="rounded-full px-6 py-3 short:px-4 short:py-1.5 text-sm short:text-xs font-medium text-brand-contrast transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:text-base"
     style="background-color: var(--sphere-left-color, var(--color-brand));"
   >
     {primaryCta.label}
   </a>
-  <a
-    href={secondaryCta.href}
-    class="rounded-full px-6 py-3 text-sm font-medium text-brand-contrast transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:text-base"
-    style="background-color: var(--sphere-right-color, var(--color-accent-2));"
-  >
-    {secondaryCta.label}
-  </a>
+  {
+    secondaryCta && (
+      <a
+        href={secondaryCta.href}
+        class="rounded-full px-6 py-3 short:px-4 short:py-1.5 text-sm short:text-xs font-medium text-brand-contrast transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:text-base"
+        style="background-color: var(--sphere-right-color, var(--color-accent-2));"
+      >
+        {secondaryCta.label}
+      </a>
+    )
+  }
 </div>
