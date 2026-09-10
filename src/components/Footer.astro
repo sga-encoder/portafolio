@@ -1,15 +1,38 @@
 ---
+// Reactivo al fondo 3D sin saber en qué página está montado (Footer vive una
+// sola vez en BaseLayout, visible en /, /proyectos y /proyectos/[slug]):
+// cadena de fallback de CSS custom properties — --sphere-left/right-color lo
+// publica SceneContent.tsx (solo en /), --project-left/right-color lo
+// publica ProjectSceneContent.tsx (solo en /proyectos*); nunca coexisten los
+// dos pares en la misma página, así que la cadena no es ambigua. Estático
+// (--color-brand/--color-accent-2) si ningún script de esfera corrió.
+import SocialLink from "./sections/about/SocialLink.astro";
+import { profile } from "../data/profile";
+
 const year = new Date().getFullYear();
+const leftColor = "var(--sphere-left-color, var(--project-left-color, var(--color-brand)))";
+const rightColor = "var(--sphere-right-color, var(--project-right-color, var(--color-accent-2)))";
 ---
 
 <footer class="border-t border-border/60 py-8 text-sm text-ink-muted">
   <div
-    class="mx-auto flex max-w-5xl flex-col items-center gap-3 px-4 text-center sm:flex-row sm:justify-between sm:text-left"
+    class="mx-auto flex max-w-5xl flex-col items-center gap-4 px-4 text-center sm:flex-row sm:justify-between sm:text-left"
   >
-    <p>&copy; {year} Tu Nombre. Todos los derechos reservados.</p>
-    <div class="flex gap-4">
-      <a href="/#sobre-mi" class="transition-colors hover:text-brand">Sobre mí</a>
-      <a href="/blog" class="transition-colors hover:text-brand">Blog</a>
+    <p class="flex items-baseline gap-2">
+      <span
+        class="font-display text-xl font-bold"
+        style={`background: linear-gradient(90deg, ${leftColor}, ${rightColor}); background-clip: text; -webkit-background-clip: text; color: transparent;`}
+      >
+        sga
+      </span>
+      <span>&copy; {year}</span>
+    </p>
+    <div class="flex gap-3">
+      {
+        profile.about.social.map((link, index) => (
+          <SocialLink link={link} compact color={index % 2 === 0 ? leftColor : rightColor} />
+        ))
+      }
     </div>
   </div>
 </footer>

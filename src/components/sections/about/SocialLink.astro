@@ -3,20 +3,38 @@ import type { SocialLink } from "../../../data/profile";
 
 interface Props {
   link: SocialLink;
+  /** Sin label visible ni escalado `short:` — para usos fuera de una sección `h-screen` (ej. el footer). */
+  compact?: boolean;
+  /** Color del ícono/borde en modo `compact` (ej. reactivo al fondo 3D). Ignorado si `compact` es falso. */
+  color?: string;
 }
 
-const { link } = Astro.props;
+const { link, compact = false, color } = Astro.props;
 const isExternal = link.platform !== "email";
+const circleStyle = compact
+  ? `border-color: ${color}; color: ${color}; background-color: color-mix(in srgb, var(--color-surface) 80%, transparent);`
+  : undefined;
 ---
 
 <a
   href={link.href}
-  class="flex min-w-0 items-center gap-3 text-ink transition-colors hover:text-brand"
+  aria-label={compact ? link.label : undefined}
+  title={compact ? link.label : undefined}
+  class={
+    compact
+      ? "flex shrink-0 items-center transition-transform duration-200 hover:scale-110"
+      : "flex min-w-0 items-center gap-3 short:gap-1.5 text-ink transition-colors hover:text-brand"
+  }
   target={isExternal ? "_blank" : undefined}
   rel={isExternal ? "noreferrer" : undefined}
 >
   <span
-    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border-2 border-current"
+    class={
+      compact
+        ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2"
+        : "flex h-9 w-9 short:h-6 short:w-6 shrink-0 items-center justify-center rounded-lg border-2 border-current"
+    }
+    style={circleStyle}
     aria-hidden="true"
   >
     {
@@ -48,5 +66,5 @@ const isExternal = link.platform !== "email";
       )
     }
   </span>
-  <span class="min-w-0 break-words font-body text-sm sm:text-base">{link.label}</span>
+  {!compact && <span class="min-w-0 break-words font-body text-sm sm:text-base">{link.label}</span>}
 </a>
