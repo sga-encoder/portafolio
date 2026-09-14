@@ -6,13 +6,13 @@ interface Props {
 const { summary } = Astro.props;
 ---
 
-<div class="flex h-full flex-col gap-8">
-  <div>
+<div class="flex h-full flex-col gap-4">
+  <div class="rounded-2xl bg-surface-muted p-4">
     <h2 class="font-display text-sm font-bold uppercase tracking-wide text-ink-muted">Descripción</h2>
     <p class="mt-2 font-body text-lg text-ink">{summary}</p>
   </div>
 
-  <div class="min-w-0">
+  <div class="min-w-0 rounded-2xl bg-surface-muted p-4">
     <h2 class="font-display text-sm font-bold uppercase tracking-wide text-ink-muted">Contexto</h2>
     <div class="prose dark:prose-invert mt-2 max-w-none font-body prose-p:text-ink prose-li:text-ink">
       <slot />

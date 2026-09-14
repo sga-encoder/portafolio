@@ -1,6 +1,7 @@
 import EngineScene3D from "../../../scene/engine/Scene3D";
 import type { SphereFrameState } from "../../../scene/engine/SceneContent";
 import type { ResolvedZoneStop } from "../../../scene/engine/zoneStops";
+import { mobilePortraitSizeScale } from "../../../scene/viewport";
 import { PROJECT_SPHERE_IDS, type ProjectSphereId } from "./projectSceneStops";
 
 interface Props {
@@ -24,5 +25,12 @@ function publishProjectVars(spheres: readonly SphereFrameState[]): void {
  * como por el listado `/proyectos` (mismo componente desde 021).
  */
 export default function ProjectScene3D({ zoneStops }: Props) {
-  return <EngineScene3D sphereIds={PROJECT_SPHERE_IDS} zoneStops={zoneStops} onFrame={publishProjectVars} />;
+  return (
+    <EngineScene3D
+      sphereIds={PROJECT_SPHERE_IDS}
+      zoneStops={zoneStops}
+      sizeScale={mobilePortraitSizeScale}
+      onFrame={publishProjectVars}
+    />
+  );
 }

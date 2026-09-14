@@ -37,12 +37,15 @@ export interface ZoneStop<TSphereId extends string = string, TPose extends Spher
 }
 
 /**
- * Separación por defecto entre esferas cuando una zona no define `collisionMargin`.
- * `-1` la desactiva por completo (las esferas se pueden solapar libremente) — con tamaños
- * (`screenFraction`) grandes, cualquier margen positivo casi siempre termina empujándolas a una
- * posición distinta de la que pusiste en `position`.
+ * Separación por defecto entre esferas cuando una zona no define `collisionMargin`. `0` mantiene
+ * sus radios nominales tangentes como máximo (nunca invade el núcleo opaco de la otra) sin
+ * empujarlas más lejos de su posición de diseño de lo estrictamente necesario. Antes era `-1`
+ * (colisión desactivada a propósito); se activó a pedido explícito del usuario — con
+ * `AdditiveBlending` (`GradientBlob.tsx`), permitir que dos esferas coincidieran centro-sobre-
+ * centro sumaba su opacidad casi hasta blanco, tapando el texto detrás en Proyectos (ver
+ * 042-fondo-3d-mobile-colisiones-brillo/spec.md).
  */
-export const DEFAULT_COLLISION_MARGIN = -1;
+export const DEFAULT_COLLISION_MARGIN = 0;
 
 export interface ResolvedSphereStop<TPose extends SphereGeometry = SpherePose> {
   start: TPose;
