@@ -1,6 +1,5 @@
 ---
-import { Image } from "astro:assets";
-import persona from "../../../assets/header/persona01.png";
+import { getCloudinaryUrl } from "../../../utils/cloudinaryManifest";
 
 interface Props {
   initials: string;
@@ -11,18 +10,14 @@ interface Props {
 }
 
 const { initials, alt, hideInitials = false, variant = "side", class: className } = Astro.props;
+const personaUrl = getCloudinaryUrl("header/persona01", "q_auto,f_auto");
 ---
 
 <div class:list={["header-portrait", className]} data-variant={variant}>
   {!hideInitials && (
     <span class="header-portrait__initials" aria-hidden="true">{initials}</span>
   )}
-  <Image
-    src={persona}
-    alt={alt}
-    class="header-portrait__image"
-    sizes="(min-width: 768px) 28vw, 90vw"
-  />
+  <img src={personaUrl} alt={alt} class="header-portrait__image" loading="eager" decoding="async" />
 </div>
 
 <style>

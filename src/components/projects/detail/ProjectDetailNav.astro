@@ -6,22 +6,38 @@
 // distintas (retroceder/avanzar/inicio/ver todos), así que cada ítem se
 // distingue por forma/ícono además de color, y el "activo" no existe: en su
 // lugar hay un estado deshabilitado para anterior/siguiente en los extremos.
+// (037) El riel/barra ganan un borde animado (`NAV_RAIL_FRAME`/`.nav-rail-glow`)
+// y, en mobile, mantener presionado un botón muestra su label sin navegar
+// hasta soltar (mismo mecanismo que ScrollDotNav/YearDotNav, pero aquí los
+// ítems son `<a href>` en vez de `<button onClick>`, así que el gating vive en
+// un script inline en vez de React). El botón "Ver todos" se agrupa junto al
+// nuevo selector rápido de proyectos (`ProjectSwitcherPanel`).
 import NavIcon from "./NavIcon.astro";
+import ProjectSwitcherPanel from "./ProjectSwitcherPanel.astro";
 import {
   NAV_BAR_MOBILE,
   NAV_BAR_MOBILE_LIST,
   NAV_ITEM_HIT_AREA,
   NAV_RAIL_DESKTOP,
+  NAV_RAIL_FRAME,
   NAV_RAIL_LIST,
 } from "../../nav/navRailClasses";
+
+interface SwitcherItem {
+  href: string;
+  title: string;
+  date: string;
+  imageSrc?: string;
+}
 
 interface Props {
   prevHref?: string;
   nextHref?: string;
   colors: [string, string];
+  otherProjects: SwitcherItem[];
 }
 
-const { prevHref, nextHref, colors } = Astro.props;
+const { prevHref, nextHref, colors, otherProjects } = Astro.props;
 const [first, second] = colors;
 const leftColor = `var(--project-left-color, ${first})`;
 const rightColor = `var(--project-right-color, ${second})`;
@@ -71,35 +87,95 @@ const circleStyle = (color: string) =>
   /* Desktop: nav lateral fijo, mismo criterio hidden/md:flex que ScrollDotNav/YearDotNav. */
 }
 <nav aria-label="Navegación entre proyectos" class={NAV_RAIL_DESKTOP}>
-  <ul class={NAV_RAIL_LIST}>
+  <div class={NAV_RAIL_FRAME}>
+    <ul class={NAV_RAIL_LIST}>
+      {
+        items.map((item) => (
+          <li class="relative flex items-center gap-2">
+            <span class="group relative flex items-center">
+              {item.disabled ? (
+                <span
+                  aria-hidden="true"
+                  class="relative z-10 flex h-9 w-9 items-center justify-center rounded-full opacity-30"
+                  style={circleStyle(item.color)}
+                >
+                  <NavIcon icon={item.icon} />
+                </span>
+              ) : (
+                <>
+                  <a
+                    href={item.href}
+                    aria-label={item.label}
+                    class="relative z-10 flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-brand)"
+                    style={circleStyle(item.color)}
+                  >
+                    <NavIcon icon={item.icon} />
+                  </a>
+                  <span
+                    class="scroll-dot-label pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg px-3 py-1.5 font-body text-base font-semibold"
+                    style={`background-color: #000622; color: ${item.color}; box-shadow: 0 4px 16px -2px ${item.color};`}
+                  >
+                    {item.label}
+                  </span>
+                </>
+              )}
+            </span>
+            {item.key === "all" && otherProjects.length > 0 && (
+              <ProjectSwitcherPanel items={otherProjects} color={rightColor} />
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</nav>
+
+{
+  /* Mobile: barra fija inferior. Mantener presionado muestra el label
+     (`.scroll-dot-label`/`is-pressed`, ver `holdToNavigate.ts`); la
+     navegación solo se dispara al soltar encima del botón (037). */
+}
+<nav aria-label="Navegación entre proyectos" class={NAV_BAR_MOBILE}>
+  <ul class={`${NAV_BAR_MOBILE_LIST} hold-to-navigate-list`}>
     {
       items.map((item) => (
-        <li class="group relative flex items-center">
-          {item.disabled ? (
-            <span
-              aria-hidden="true"
-              class="relative z-10 flex h-9 w-9 items-center justify-center rounded-full opacity-30"
-              style={circleStyle(item.color)}
-            >
-              <NavIcon icon={item.icon} />
-            </span>
-          ) : (
-            <>
-              <a
-                href={item.href}
-                aria-label={item.label}
-                class="relative z-10 flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-brand)"
-                style={circleStyle(item.color)}
-              >
-                <NavIcon icon={item.icon} />
-              </a>
-              <span
-                class="scroll-dot-label pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg px-3 py-1.5 font-body text-base font-semibold"
-                style={`background-color: #000622; color: ${item.color}; box-shadow: 0 4px 16px -2px ${item.color};`}
-              >
-                {item.label}
+        <li class="relative flex items-center gap-2">
+          <span class="group relative flex items-center">
+            {item.disabled ? (
+              <span aria-hidden="true" class={`${NAV_ITEM_HIT_AREA} opacity-30`}>
+                <span
+                  class="flex h-9 w-9 items-center justify-center rounded-full"
+                  style={circleStyle(item.color)}
+                >
+                  <NavIcon icon={item.icon} />
+                </span>
               </span>
-            </>
+            ) : (
+              <>
+                <a
+                  href={item.href}
+                  aria-label={item.label}
+                  data-hold-nav={item.href}
+                  class={NAV_ITEM_HIT_AREA}
+                >
+                  <span
+                    class="flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 active:scale-95"
+                    style={circleStyle(item.color)}
+                  >
+                    <NavIcon icon={item.icon} />
+                  </span>
+                </a>
+                <span
+                  class="scroll-dot-label pointer-events-none absolute bottom-full left-0 mb-2 whitespace-nowrap rounded-lg px-3 py-1.5 font-body text-base font-semibold"
+                  style={`background-color: #000622; color: ${item.color}; box-shadow: 0 4px 16px -2px ${item.color};`}
+                >
+                  {item.label}
+                </span>
+              </>
+            )}
+          </span>
+          {item.key === "all" && otherProjects.length > 0 && (
+            <ProjectSwitcherPanel items={otherProjects} color={rightColor} />
           )}
         </li>
       ))
@@ -107,36 +183,47 @@ const circleStyle = (color: string) =>
   </ul>
 </nav>
 
-{
-  /* Mobile: barra fija inferior, sin label (sin gesto de hover en touch),
-     mismo contenedor compartido que ScrollDotNav/YearDotNav. */
-}
-<nav aria-label="Navegación entre proyectos" class={NAV_BAR_MOBILE}>
-  <ul class={NAV_BAR_MOBILE_LIST}>
-    {
-      items.map((item) => (
-        <li class="flex items-center">
-          {item.disabled ? (
-            <span aria-hidden="true" class={`${NAV_ITEM_HIT_AREA} opacity-30`}>
-              <span
-                class="flex h-9 w-9 items-center justify-center rounded-full"
-                style={circleStyle(item.color)}
-              >
-                <NavIcon icon={item.icon} />
-              </span>
-            </span>
-          ) : (
-            <a href={item.href} aria-label={item.label} class={NAV_ITEM_HIT_AREA}>
-              <span
-                class="flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 active:scale-95"
-                style={circleStyle(item.color)}
-              >
-                <NavIcon icon={item.icon} />
-              </span>
-            </a>
-          )}
-        </li>
-      ))
-    }
-  </ul>
-</nav>
+<script is:inline data-astro-rerun>
+  (function () {
+    document.querySelectorAll(".hold-to-navigate-list").forEach((list) => {
+      if (list.dataset.holdBound === "true") return;
+      list.dataset.holdBound = "true";
+
+      var pressedLink = null;
+
+      function setPressed(link, pressed) {
+        var group = link && link.closest(".group");
+        if (group) group.classList.toggle("is-pressed", pressed);
+      }
+
+      function clear() {
+        setPressed(pressedLink, false);
+        pressedLink = null;
+      }
+
+      list.addEventListener("pointerdown", function (event) {
+        if (event.pointerType !== "touch") return;
+        var link = event.target.closest && event.target.closest("[data-hold-nav]");
+        if (!link) return;
+        pressedLink = link;
+        setPressed(link, true);
+        event.preventDefault();
+      });
+
+      list.addEventListener("pointerup", function (event) {
+        if (event.pointerType !== "touch" || !pressedLink) return;
+        var link = pressedLink;
+        var rect = link.getBoundingClientRect();
+        var inside =
+          event.clientX >= rect.left &&
+          event.clientX <= rect.right &&
+          event.clientY >= rect.top &&
+          event.clientY <= rect.bottom;
+        clear();
+        if (inside) window.location.href = link.getAttribute("data-hold-nav");
+      });
+
+      list.addEventListener("pointercancel", clear);
+    });
+  })();
+</script>

@@ -1,11 +1,11 @@
 ---
-import { Image } from "astro:assets";
 import { profile } from "../../data/profile";
-import persona from "../../assets/about/persona03.png";
+import { getCloudinaryUrl } from "../../utils/cloudinaryManifest";
 import AboutFrame from "./about/AboutFrame.astro";
 import AboutInfoBlock from "./about/AboutInfoBlock.astro";
 
 const { about } = profile;
+const personaUrl = getCloudinaryUrl("about/persona03", "q_auto,f_auto");
 ---
 
 <section id="sobre-mi" class="flex min-h-screen w-full flex-col pb-20 md:h-screen md:flex-row md:pb-0 short:py-2">
@@ -25,22 +25,24 @@ const { about } = profile;
     <div class="flex flex-row items-center gap-4 md:hidden">
       <AboutInfoBlock about={about} class="flex min-w-0 flex-1 flex-col gap-[3vh]" dividerClass="w-full" />
       <div class="w-[30vw] shrink-0">
-        <Image
-          src={persona}
+        <img
+          src={personaUrl}
           alt="Retrato de cuerpo completo del autor"
           class="h-auto w-full object-contain"
-          sizes="30vw"
+          loading="lazy"
+          decoding="async"
         />
       </div>
     </div>
   </div>
 
   <div class="hidden shrink-0 md:block md:h-full md:w-[40vw]">
-    <Image
-      src={persona}
+    <img
+      src={personaUrl}
       alt="Retrato de cuerpo completo del autor"
       class="h-full w-full object-contain object-center"
-      sizes="40vw"
+      loading="lazy"
+      decoding="async"
     />
   </div>
 </section>

@@ -65,7 +65,7 @@ export default function ProjectCarousel({ projects }: Props) {
           type="button"
           aria-label="Proyecto anterior"
           onClick={() => goTo(-1)}
-          className="absolute left-0 top-1/2 z-20 -translate-y-1/2 transition-transform hover:scale-110"
+          className="absolute left-0 short:left-20 top-1/2 z-20 -translate-y-1/2 transition-transform hover:scale-110"
           style={{ color: "var(--sphere-left-color, var(--color-brand))" }}
         >
           <ChevronIcon direction="left" />
@@ -82,7 +82,7 @@ export default function ProjectCarousel({ projects }: Props) {
         </button>
 
         <div className="relative flex flex-col sm:block">
-          <div className="aspect-[4/3] w-full overflow-hidden rounded-3xl bg-surface-muted sm:w-[70%] short:w-[80%] short:max-h-[32vh]">
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-3xl bg-surface-muted sm:w-[70%] short:w-[72%] short:max-h-[32vh]">
             {project.imageSrc ? (
               <img src={project.imageSrc} alt={project.title} className="h-full w-full object-cover" />
             ) : (
@@ -90,7 +90,7 @@ export default function ProjectCarousel({ projects }: Props) {
             )}
           </div>
 
-          <div className="mt-4 flex flex-col gap-4 short:gap-1 sm:absolute sm:right-0 sm:top-[22%] short:top-0 sm:mt-0 sm:w-[46%]">
+          <div className="mt-4 flex flex-col gap-4 short:gap-1 sm:absolute sm:right-0 sm:top-[22%] short:top-[8%] sm:mt-0 sm:w-[46%]">
             <h3 className="font-display text-3xl font-bold text-ink [text-shadow:0_2px_8px_rgba(0,0,0,0.55),0_0_22px_rgba(0,0,0,0.45)] sm:text-5xl short:text-sm">
               {project.title}
             </h3>
@@ -102,7 +102,9 @@ export default function ProjectCarousel({ projects }: Props) {
                   "linear-gradient(135deg, var(--sphere-left-color, var(--color-brand)), var(--sphere-right-color, var(--color-accent-2)))",
               }}
             >
-              <p className="font-body text-sm text-ink-muted short:hidden sm:text-base">{project.description}</p>
+              <p className="font-body text-sm text-ink-muted short:line-clamp-2 short:text-[10px] short:leading-snug sm:text-base">
+                {project.description}
+              </p>
               <a
                 href={project.link}
                 className="mt-4 short:mt-0 inline-block rounded-full px-5 py-2 short:px-3 short:py-1 short:text-xs font-body text-sm font-semibold text-(--color-brand-contrast)"

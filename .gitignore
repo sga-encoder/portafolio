@@ -17,6 +17,11 @@ pnpm-debug.log*
 .env
 .env.production
 
+# Cloudinary: imágenes fuente reales. El manifest commiteado
+# (src/data/cloudinaryManifest.json) es la única fuente de verdad para el resto del código.
+/cloudinary-images/*
+!/cloudinary-images/.gitkeep
+
 # macOS-specific files
 .DS_Store
 

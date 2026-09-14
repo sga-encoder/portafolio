@@ -2,9 +2,9 @@
 // Reactivo al fondo 3D sin saber en qué página está montado (Footer vive una
 // sola vez en BaseLayout, visible en /, /proyectos y /proyectos/[slug]):
 // cadena de fallback de CSS custom properties — --sphere-left/right-color lo
-// publica SceneContent.tsx (solo en /), --project-left/right-color lo
-// publica ProjectSceneContent.tsx (solo en /proyectos*); nunca coexisten los
-// dos pares en la misma página, así que la cadena no es ambigua. Estático
+// publica scene/Scene3D.tsx (solo en /), --project-left/right-color lo
+// publica projects/detail/scene/ProjectScene3D.tsx (solo en /proyectos*); nunca
+// coexisten los dos pares en la misma página, así que la cadena no es ambigua. Estático
 // (--color-brand/--color-accent-2) si ningún script de esfera corrió.
 import SocialLink from "./sections/about/SocialLink.astro";
 import { profile } from "../data/profile";

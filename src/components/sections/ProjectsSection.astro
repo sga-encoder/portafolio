@@ -1,17 +1,15 @@
 ---
-import { getImage } from "astro:assets";
+import { getCloudinaryUrl } from "../../utils/cloudinaryManifest";
 import { PROJECTS } from "../../data/projects";
 import ProjectCarousel from "../projects/ProjectCarousel";
 
-const projects = await Promise.all(
-  PROJECTS.map(async (project) => ({
-    id: project.id,
-    title: project.title,
-    description: project.description,
-    link: project.link,
-    imageSrc: project.image ? (await getImage({ src: project.image, width: 1200 })).src : undefined,
-  })),
-);
+const projects = PROJECTS.map((project) => ({
+  id: project.id,
+  title: project.title,
+  description: project.description,
+  link: project.link,
+  imageSrc: project.imageKey ? getCloudinaryUrl(project.imageKey, "w_1200,q_auto,f_auto") : undefined,
+}));
 ---
 
 <section

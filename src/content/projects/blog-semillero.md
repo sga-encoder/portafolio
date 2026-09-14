@@ -1,9 +1,12 @@
 ---
 title: "Blog del Semillero"
 summary: "Blog hecho para un semillero de investigación universitario, para mostrar sus avances (Next.js + Strapi)."
-coverImage: "../../assets/projects/proyecto-01.jpg"
+coverImage: "projects/blog-semillero/cover"
 gallery:
-  - "../../assets/projects/proyecto-01.jpg"
+  - "projects/blog-semillero/gallery-inicio"
+  - "projects/blog-semillero/gallery-blog"
+  - "projects/blog-semillero/gallery-admin-panel"
+  - "projects/blog-semillero/gallery-map"
 techStack:
   - "JavaScript"
   - "Next.js"

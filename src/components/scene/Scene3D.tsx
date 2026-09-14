@@ -1,40 +1,29 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { setStaticHeaderFrameVars } from "./headerFrameVars";
+import EngineScene3D from "./engine/Scene3D";
+import type { SphereFrameState } from "./engine/SceneContent";
+import { setSphereFrameVars, setStaticHeaderFrameVars } from "./headerFrameVars";
+import { resolvedSceneStops, SPHERE_IDS } from "./sceneStops";
+import { mobilePortraitSizeScale } from "./viewport";
 
-const SceneCanvas = lazy(() => import("./SceneCanvas"));
-
-function supportsWebGL(): boolean {
-  try {
-    const canvas = document.createElement("canvas");
-    return !!(canvas.getContext("webgl2") || canvas.getContext("webgl"));
-  } catch {
-    return false;
-  }
+function publishHomeSceneVars(spheres: readonly SphereFrameState[]): void {
+  const a = spheres.find((sphere) => sphere.id === "a");
+  const b = spheres.find((sphere) => sphere.id === "b");
+  const c = spheres.find((sphere) => sphere.id === "c");
+  if (!a || !b) return;
+  setSphereFrameVars(document.documentElement, a, b, c);
 }
 
 /**
- * Gate liviano: no importa `three`/R3F a nivel de módulo. Solo si el usuario
- * no pidió `prefers-reduced-motion` y el navegador soporta WebGL se dispara
- * la carga diferida de `SceneCanvas` (y con ella, el bundle pesado de 3D).
- * En cualquier otro caso no renderiza nada y deja ver `SceneFallbackBackground`.
+ * Escenario de Inicio (3 esferas, color que cicla por parada de `sceneStops.ts`) sobre el motor
+ * genérico compartido (`engine/`, ver 034-unificar-escenas-threejs/plan.md).
  */
 export default function Scene3D() {
-  const [enabled, setEnabled] = useState(false);
-
-  useEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const shouldEnable = !reducedMotion && supportsWebGL();
-    setEnabled(shouldEnable);
-    if (!shouldEnable) {
-      setStaticHeaderFrameVars();
-    }
-  }, []);
-
-  if (!enabled) return null;
-
   return (
-    <Suspense fallback={null}>
-      <SceneCanvas />
-    </Suspense>
+    <EngineScene3D
+      sphereIds={SPHERE_IDS}
+      zoneStops={resolvedSceneStops}
+      sizeScale={mobilePortraitSizeScale}
+      onFrame={publishHomeSceneVars}
+      onDisabled={() => setStaticHeaderFrameVars()}
+    />
   );
 }

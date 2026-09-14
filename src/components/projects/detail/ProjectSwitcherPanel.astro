@@ -1,0 +1,150 @@
+---
+// Selector rápido de proyectos (037): botón-ícono que abre un panel con
+// tarjetas (imagen+título+fecha) de los demás proyectos, para saltar directo
+// a cualquiera sin depender solo de prev/siguiente. `<details>` nativo (sin
+// JS de estado) + un script mínimo para cerrar al hacer click fuera / Escape,
+// mismo patrón `is:inline data-astro-rerun` que el resto de scripts del sitio
+// (necesario para que siga funcionando tras una navegación con
+// `<ClientRouter />`, que no recarga la página).
+import NavIcon from "./NavIcon.astro";
+
+interface SwitcherItem {
+  href: string;
+  title: string;
+  date: string;
+  imageSrc?: string;
+}
+
+interface Props {
+  items: SwitcherItem[];
+  color: string;
+}
+
+const { items, color } = Astro.props;
+
+const circleStyle = `border: 2px solid ${color}; color: ${color}; background-color: color-mix(in srgb, var(--color-surface) 80%, transparent);`;
+---
+
+<details class="project-switcher group relative flex items-center">
+  <summary
+    aria-label="Cambiar de proyecto"
+    class="relative z-10 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition-transform duration-200 hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-brand)"
+    style={circleStyle}
+  >
+    <NavIcon icon="layers" />
+  </summary>
+
+  <span
+    class="scroll-dot-label project-switcher-label pointer-events-none absolute whitespace-nowrap rounded-lg px-3 py-1.5 font-body text-base font-semibold"
+    style={`background-color: #000622; color: ${color}; box-shadow: 0 4px 16px -2px ${color};`}
+  >
+    Cambiar de proyecto
+  </span>
+
+  <div
+    class="project-switcher-panel absolute z-20 rounded-2xl border p-3 backdrop-blur"
+    style={`border-color: ${color}; background-color: color-mix(in srgb, var(--color-surface) 92%, transparent); box-shadow: 0 12px 32px -8px ${color};`}
+  >
+    <ul class="project-switcher-grid flex flex-row gap-3 overflow-x-auto pb-1 md:grid md:grid-cols-2 md:overflow-x-visible md:overflow-y-auto md:pb-0">
+      {
+        items.map((item) => (
+          <li class="shrink-0">
+            <a
+              href={item.href}
+              class="flex h-full w-36 flex-col gap-1 rounded-xl border border-border/60 bg-surface-muted/60 p-2 transition-colors duration-200 hover:border-(--color-brand) md:w-40"
+            >
+              {item.imageSrc && (
+                <img
+                  src={item.imageSrc}
+                  alt=""
+                  loading="lazy"
+                  class="h-20 w-full rounded-lg object-cover"
+                />
+              )}
+              <span class="font-display text-sm font-bold leading-tight text-ink">{item.title}</span>
+              <span class="font-body text-xs" style={`color: ${color}`}>
+                {item.date}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</details>
+
+<style>
+  .project-switcher > summary {
+    list-style: none;
+  }
+
+  .project-switcher > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .project-switcher:not([open]) .project-switcher-panel {
+    display: none;
+  }
+
+  .project-switcher-label {
+    left: 100%;
+    margin-left: 0.75rem;
+  }
+
+  .project-switcher-panel {
+    left: 100%;
+    top: 50%;
+    margin-left: 0.75rem;
+    transform: translateY(-50%);
+    /* Ancho fijo: el contenedor de posicionamiento (`<details>`) mide solo
+       36px (el botón), así que el "shrink-to-fit" por defecto de un absolute
+       con `left` fijo pero sin `width` calcula el espacio disponible sobre
+       esos 36px y colapsa el panel al mínimo — hay que fijar el ancho a mano. */
+    width: 23.5rem;
+    max-height: 20rem;
+  }
+
+  @media (max-width: 767px) {
+    .project-switcher-label {
+      left: auto;
+      right: 0;
+      margin-left: 0;
+      bottom: 100%;
+      margin-bottom: 0.5rem;
+    }
+
+    .project-switcher-panel {
+      left: auto;
+      right: 0;
+      top: auto;
+      bottom: 100%;
+      margin-left: 0;
+      margin-bottom: 0.75rem;
+      transform: none;
+      width: 15rem;
+      max-height: none;
+    }
+  }
+</style>
+
+<script is:inline data-astro-rerun>
+  (function () {
+    if (document.body.dataset.projectSwitcherBound === "true") return;
+    document.body.dataset.projectSwitcherBound = "true";
+
+    function closeOpenPanels(except) {
+      document.querySelectorAll("details.project-switcher[open]").forEach((el) => {
+        if (el !== except) el.open = false;
+      });
+    }
+
+    document.addEventListener("click", (event) => {
+      const openPanel = event.target.closest && event.target.closest("details.project-switcher[open]");
+      closeOpenPanels(openPanel || null);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeOpenPanels(null);
+    });
+  })();
+</script>

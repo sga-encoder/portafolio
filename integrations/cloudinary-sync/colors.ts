@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
 import sharp from "sharp";
 
 /** `--color-accent` / `--color-accent-2` — usado si la extracción falla o la imagen no tiene suficiente color. */
@@ -36,34 +34,13 @@ function toHex({ r, g, b }: RgbColor): string {
 }
 
 /**
- * Resuelve la ruta absoluta en disco de una imagen local referenciada en el frontmatter
- * de una entrada de content collection (ej. `coverImage: "../../assets/projects/x.jpg"`).
- *
- * Necesario porque `entry.data.coverImage` (ya procesado por el helper `image()` de Zod)
- * solo expone la URL pública optimizada (`/_astro/x.HASH.jpg`), cuyo archivo aún no existe
- * en disco en el momento en que se renderiza la página (se genera después, en la fase
- * "generating optimized images" del build) — no sirve para leer bytes con `sharp`.
- * Se relee el frontmatter crudo en vez de eso para obtener la ruta relativa original.
+ * Extrae los 2 colores dominantes de una imagen vía cuantización simple + filtro de
+ * saturación/lightness, sobre un buffer ya en memoria (no toca disco). Cae a `FALLBACK`
+ * si la imagen no tiene suficiente color (ej. casi todo gris/blanco/negro) o si sharp falla.
  */
-function resolveContentImagePath(entryFilePath: string, field: string): string {
-  const raw = readFileSync(resolve(process.cwd(), entryFilePath), "utf-8");
-  const match = raw.match(new RegExp(`^${field}:\\s*"([^"]+)"`, "m"));
-  if (!match) {
-    throw new Error(`No se encontró el campo "${field}" en el frontmatter de ${entryFilePath}`);
-  }
-  return resolve(dirname(resolve(process.cwd(), entryFilePath)), match[1]);
-}
-
-/**
- * Extrae los 2 colores dominantes de la imagen de portada de una entrada de content
- * collection, en build-time, vía cuantización simple + filtro de saturación. Cae a
- * `FALLBACK` si no puede leer el archivo o si la imagen no tiene suficiente color
- * (ej. casi todo gris/blanco/negro).
- */
-export async function getDominantColors(entryFilePath: string, field = "coverImage"): Promise<[string, string]> {
+export async function extractDominantColors(imageBuffer: Buffer): Promise<[string, string]> {
   try {
-    const imagePath = resolveContentImagePath(entryFilePath, field);
-    const { data, info } = await sharp(imagePath)
+    const { data, info } = await sharp(imageBuffer)
       .resize(48, 48, { fit: "cover" })
       .removeAlpha()
       .raw()
@@ -84,8 +61,8 @@ export async function getDominantColors(entryFilePath: string, field = "coverIma
     }
 
     // Descarta tonos oscuros (aunque tengan buena saturación, ej. rojo casi
-    // negro) y casi blancos: el fondo debe quedarse con el color "principal"
-    // vívido de la imagen, no con sombras.
+    // negro) y casi blancos: se busca el color "principal" vívido de la
+    // imagen, no las sombras.
     const candidates = [...buckets.values()]
       .map(({ r, g, b, count }) => ({ r: r / count, g: g / count, b: b / count, count }))
       .filter((color) => saturation(color) > 0.15 && lightness(color) > 0.28 && lightness(color) < 0.9)

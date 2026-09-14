@@ -1,9 +1,11 @@
 ---
 title: "City Builder"
 summary: "Juego de construcción de ciudad hecho para la universidad, con patrones de diseño y renderización reactiva propia (sin frameworks)."
-coverImage: "../../assets/projects/proyecto-01.jpg"
+coverImage: "projects/city-builder/cover"
 gallery:
-  - "../../assets/projects/proyecto-01.jpg"
+  - "projects/city-builder/gallery-menu"
+  - "projects/city-builder/gallery-game"
+  - "projects/city-builder/gallery-score"
 techStack:
   - "HTML"
   - "CSS"

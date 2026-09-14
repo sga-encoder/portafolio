@@ -10,11 +10,20 @@ interface Props {
   platforms: ("mobile" | "desktop")[];
   repoHref?: string;
   colors: [string, string];
+  /** Mes/año del proyecto (`"YYYY-MM"`), opcional. */
+  date?: string;
 }
 
-const { title, coverSrc, techStack, platforms, repoHref, colors } = Astro.props;
+const { title, coverSrc, techStack, platforms, repoHref, colors, date } = Astro.props;
 const [, second] = colors;
 const rightColor = `var(--project-right-color, ${second})`;
+
+const monthYearFormatter = new Intl.DateTimeFormat("es", { month: "long", year: "numeric" });
+function formatProjectDate(value: string): string {
+  const [year, month] = value.split("-").map(Number);
+  const label = monthYearFormatter.format(new Date(year, month - 1, 1));
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
 ---
 
 <ProjectHeaderFrame colors={colors} class="md:h-[40vh]">
@@ -24,6 +33,8 @@ const rightColor = `var(--project-right-color, ${second})`;
 
   <div class="flex min-w-0 flex-1 flex-col justify-center gap-4">
     <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">{title}</h1>
+
+    {date && <p class="font-body text-sm text-ink-muted">{formatProjectDate(date)}</p>}
 
     <div class="flex flex-wrap items-center gap-2">
       {

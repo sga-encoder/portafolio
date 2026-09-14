@@ -1,13 +1,15 @@
-// Config de posición/tamaño de las 2 esferas del fondo 3D de `/proyectos/[slug]`,
-// una entrada por zona de la página. Mismo shape que `src/components/scene/sceneStops.ts`
-// de Inicio (start?/end con continuidad automática, resolveStarts()), pero:
-// - 2 esferas (`a`/`b`) en vez de 3, sin color por stop: el color de cada esfera es
-//   fijo por proyecto (los 2 dominantes de la portada, ver `ProjectSceneContent.tsx`),
-//   no cicla entre una paleta de marca.
-// - Zonas de la página de detalle (encabezado/contenido/galería) en vez de las 4
-//   secciones de Inicio — los ids ya existen en `[slug].astro` desde 014.
+// Config de posición/tamaño de las 2 esferas del fondo 3D de `/proyectos/[slug]`, una entrada
+// por zona de la página. Motor compartido en `src/components/scene/engine/` (ver
+// 034-unificar-escenas-threejs/plan.md) — este archivo solo define geometría (sin color: el
+// color de cada esfera es fijo por página, los 2 dominantes de la portada o los 2 acentos de
+// marca del listado, ver `withProjectColors`), y las zonas de la página de detalle
+// (encabezado/contenido/galería) en vez de las 4 secciones de Inicio — los ids ya existen en
+// `[slug].astro` desde 014.
+import { resolveStarts, type ResolvedZoneStop, type SphereGeometry, type ZoneStop } from "../../../scene/engine/zoneStops";
 
 export type ProjectSphereId = "a" | "b";
+
+export const PROJECT_SPHERE_IDS: readonly ProjectSphereId[] = ["a", "b"];
 
 export const PROJECT_ZONE_IDS = [
   "project-zone-header",
@@ -17,33 +19,7 @@ export const PROJECT_ZONE_IDS = [
 
 export type ProjectZoneId = (typeof PROJECT_ZONE_IDS)[number];
 
-/** Posición/tamaño de una esfera en un punto concreto (inicio o fin de una zona). */
-export interface SpherePose {
-  /** Posición normalizada: x,y en [-1,1] (fracción del viewport visible), z = profundidad relativa. */
-  position: readonly [number, number, number];
-  /** Tamaño como fracción del alto visible. */
-  screenFraction: number;
-}
-
-export interface SphereStop {
-  /** Si se omite, hereda el `end` de esta misma esfera en la zona anterior (continuidad automática). */
-  start?: SpherePose;
-  end: SpherePose;
-}
-
-export interface ProjectZoneStop {
-  /** `string`, no `ProjectZoneId`: otros callers (ej. `src/components/projects/list/scene/listZoneStops.ts`) definen sus propios ids de zona sin acoplarse a las 3 de detalle. */
-  zoneId: string;
-  spheres: Record<ProjectSphereId, SphereStop>;
-  /** Separación extra entre esferas en esta zona, como fracción de la suma de sus radios. */
-  collisionMargin?: number;
-}
-
-/** `-1` desactiva la anti-colisión por completo — con esferas grandes, cualquier margen positivo
- * termina dominando sobre `position` (misma lección que `sceneStops.ts` de Inicio). */
-export const DEFAULT_COLLISION_MARGIN = -1;
-
-export const projectZoneStops: readonly ProjectZoneStop[] = [
+export const projectZoneStops: readonly ZoneStop<ProjectSphereId, SphereGeometry>[] = [
   {
     zoneId: "project-zone-header",
     spheres: {
@@ -67,34 +43,34 @@ export const projectZoneStops: readonly ProjectZoneStop[] = [
   },
 ];
 
-export interface ResolvedSphereStop {
-  start: SpherePose;
-  end: SpherePose;
+/** `projectZoneStops` con todos los `start` resueltos, sin color todavía — ver `withProjectColors`. */
+export const resolvedProjectZoneStops: readonly ResolvedZoneStop<ProjectSphereId, SphereGeometry>[] =
+  resolveStarts(PROJECT_SPHERE_IDS, projectZoneStops);
+
+/**
+ * Inyecta los 2 colores fijos de la página (dominantes de portada en detalle, acentos de marca en
+ * el listado) en cada pose ya resuelta, produciendo el shape con color que espera el motor
+ * genérico (`SpherePose`). Un solo `colorA`/`colorB` para toda la vida de la escena — el color no
+ * cicla por zona en Proyectos, a diferencia de Inicio.
+ */
+export function withProjectColors(
+  stops: readonly ResolvedZoneStop<ProjectSphereId, SphereGeometry>[],
+  colorA: string,
+  colorB: string,
+): readonly ResolvedZoneStop<ProjectSphereId>[] {
+  const colors: Record<ProjectSphereId, string> = { a: colorA, b: colorB };
+  return stops.map((stop) => ({
+    zoneId: stop.zoneId,
+    collisionMargin: stop.collisionMargin,
+    spheres: {
+      a: {
+        start: { ...stop.spheres.a.start, color: colors.a },
+        end: { ...stop.spheres.a.end, color: colors.a },
+      },
+      b: {
+        start: { ...stop.spheres.b.start, color: colors.b },
+        end: { ...stop.spheres.b.end, color: colors.b },
+      },
+    },
+  }));
 }
-
-export interface ResolvedProjectZoneStop {
-  zoneId: string;
-  spheres: Record<ProjectSphereId, ResolvedSphereStop>;
-  collisionMargin: number;
-}
-
-const SPHERE_IDS: readonly ProjectSphereId[] = ["a", "b"];
-
-/** Reexportada para que otros callers (ver `list/scene/listZoneStops.ts`) resuelvan sus propias zonas con la misma lógica de continuidad automática. */
-export function resolveStarts(stops: readonly ProjectZoneStop[]): readonly ResolvedProjectZoneStop[] {
-  const previousEnd: Partial<Record<ProjectSphereId, SpherePose>> = {};
-
-  return stops.map((stop) => {
-    const spheres = {} as Record<ProjectSphereId, ResolvedSphereStop>;
-    for (const id of SPHERE_IDS) {
-      const sphereStop = stop.spheres[id];
-      const start = sphereStop.start ?? previousEnd[id] ?? sphereStop.end;
-      spheres[id] = { start, end: sphereStop.end };
-      previousEnd[id] = sphereStop.end;
-    }
-    return { zoneId: stop.zoneId, spheres, collisionMargin: stop.collisionMargin ?? DEFAULT_COLLISION_MARGIN };
-  });
-}
-
-/** `projectZoneStops` con todos los `start` resueltos — esto es lo que consume `ProjectSceneContent.tsx`. */
-export const resolvedProjectZoneStops: readonly ResolvedProjectZoneStop[] = resolveStarts(projectZoneStops);

@@ -1,5 +1,5 @@
 ---
-import { getImage } from "astro:assets";
+import { getCloudinaryUrl } from "../../utils/cloudinaryManifest";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectScene3D from "../../components/projects/detail/scene/ProjectScene3D";
 import ProjectsListBackground from "../../components/projects/list/ProjectsListBackground.astro";
@@ -9,12 +9,10 @@ import { TIMELINE_COLORS } from "../../components/projects/list/timelineColors";
 import { buildTimelineZoneStops } from "../../components/projects/list/scene/listZoneStops";
 import { PROJECTS } from "../../data/projects";
 
-const enrichedProjects = await Promise.all(
-  PROJECTS.map(async (project) => ({
-    ...project,
-    imageSrc: project.image ? (await getImage({ src: project.image, width: 1200 })).src : undefined,
-  })),
-);
+const enrichedProjects = PROJECTS.map((project) => ({
+  ...project,
+  imageSrc: project.imageKey ? getCloudinaryUrl(project.imageKey, "w_1200,q_auto,f_auto") : undefined,
+}));
 
 // Más nuevo primero: "YYYY-MM" ordena correctamente como string.
 const sortedProjects = [...enrichedProjects].sort((a, b) => b.date.localeCompare(a.date));
@@ -54,12 +52,16 @@ for (const project of sortedProjects) {
   monthGroup.projects.push(project);
 }
 
-const zoneStops = buildTimelineZoneStops(yearGroups.map((group) => group.zoneId));
+const zoneStops = buildTimelineZoneStops(
+  yearGroups.map((group) => group.zoneId),
+  TIMELINE_COLORS[0],
+  TIMELINE_COLORS[1],
+);
 ---
 
 <BaseLayout title="Proyectos · Línea de tiempo" description="Todos los proyectos, organizados por año y mes." showHeader={false}>
   <ProjectsListBackground />
-  <ProjectScene3D client:load colorA={TIMELINE_COLORS[0]} colorB={TIMELINE_COLORS[1]} zoneStops={zoneStops} />
+  <ProjectScene3D client:load zoneStops={zoneStops} />
   <YearDotNav client:load years={yearGroups.map((group) => group.year)} />
 
   <div class="mx-auto w-full px-4 pb-28 pt-12 md:w-[70%] md:pb-16">

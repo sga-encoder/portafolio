@@ -1,6 +1,5 @@
 ---
-import { getCollection, render } from "astro:content";
-import { getImage } from "astro:assets";
+import { getCollection, getEntry, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectHeader from "../../components/projects/detail/ProjectHeader.astro";
 import ProjectDetailNav from "../../components/projects/detail/ProjectDetailNav.astro";
@@ -10,9 +9,10 @@ import ProjectDescriptionContext from "../../components/projects/detail/ProjectD
 import ProjectDivider from "../../components/projects/detail/ProjectDivider.astro";
 import ProjectLiveSteps from "../../components/projects/detail/ProjectLiveSteps.astro";
 import ProjectGallery from "../../components/projects/detail/ProjectGallery.tsx";
-import { getDominantColors } from "../../utils/dominantColors";
+import ProjectMainContent from "../../components/projects/detail/ProjectMainContent.astro";
+import { getCloudinaryUrl, getCloudinaryColors } from "../../utils/cloudinaryManifest";
 import { PROJECTS } from "../../data/projects";
-import { resolvedProjectZoneStops } from "../../components/projects/detail/scene/projectSceneStops";
+import { resolvedProjectZoneStops, withProjectColors } from "../../components/projects/detail/scene/projectSceneStops";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -33,32 +33,53 @@ const { project, prevSlug, nextSlug } = Astro.props;
 const { Content } = await render(project);
 const { title, summary, coverImage, gallery, techStack, platforms, links, steps } = project.data;
 
-const cover = await getImage({ src: coverImage, width: 900 });
-const colors = await getDominantColors(project.filePath ?? "");
-const galleryImages = await Promise.all(
-  gallery.map((img) => getImage({ src: img, width: 800 })),
-);
+const cover = getCloudinaryUrl(coverImage, "w_900,q_auto,f_auto");
+const colors = getCloudinaryColors(coverImage);
+const galleryImages = gallery.map((key) => ({ src: getCloudinaryUrl(key, "w_800,q_auto,f_auto"), alt: title }));
+const coloredZoneStops = withProjectColors(resolvedProjectZoneStops, colors[0], colors[1]);
+const currentProjectItem = PROJECTS.find((item) => item.id === project.id);
+
+const mainContentEntry = await getEntry("projectContent", project.id);
+const MainContent = mainContentEntry ? (await render(mainContentEntry)).Content : null;
+
+// Selector rápido de proyectos (037): tarjetas con imagen+título+fecha de los
+// demás proyectos, mismo formato de fecha que el listado de `/proyectos`.
+const monthFormatter = new Intl.DateTimeFormat("es", { month: "short" });
+function dateLabel(date: string): string {
+  const [year, month] = date.split("-").map(Number);
+  const label = monthFormatter.format(new Date(year, month - 1, 1)).replace(".", "");
+  return `${label.charAt(0).toUpperCase()}${label.slice(1)} ${year}`;
+}
+
+const otherProjects = PROJECTS.filter((item) => item.id !== project.id).map((item) => ({
+  href: `/proyectos/${item.id}`,
+  title: item.title,
+  date: dateLabel(item.date),
+  imageSrc: item.imageKey ? getCloudinaryUrl(item.imageKey, "w_240,h_160,c_fill,q_auto,f_auto") : undefined,
+}));
 ---
 
 <BaseLayout title={`${title} · Proyectos`} description={summary} showHeader={false}>
   <ProjectPageBackground colors={colors} />
-  <ProjectScene3D client:load colorA={colors[0]} colorB={colors[1]} zoneStops={resolvedProjectZoneStops} />
+  <ProjectScene3D client:load zoneStops={coloredZoneStops} />
 
   <div id="project-zone-header" class="mx-auto w-full px-4 pt-12 md:w-[70%]">
     <ProjectDetailNav
       prevHref={prevSlug ? `/proyectos/${prevSlug}` : undefined}
       nextHref={nextSlug ? `/proyectos/${nextSlug}` : undefined}
       colors={colors}
+      otherProjects={otherProjects}
     />
 
     <div class="mt-6">
       <ProjectHeader
         title={title}
-        coverSrc={cover.src}
+        coverSrc={cover}
         techStack={techStack}
         platforms={platforms}
         repoHref={links.repo}
         colors={colors}
+        date={currentProjectItem?.date}
       />
     </div>
   </div>
@@ -79,10 +100,20 @@ const galleryImages = await Promise.all(
         <div id="project-zone-gallery" class="mt-12">
           <ProjectGallery
             client:load
-            images={galleryImages.map((img) => ({ src: img.src, alt: title }))}
+            images={galleryImages}
             colorLeft={`var(--project-left-color, ${colors[0]})`}
             colorRight={`var(--project-right-color, ${colors[1]})`}
           />
+        </div>
+      )
+    }
+
+    {
+      MainContent && (
+        <div class="mt-12">
+          <ProjectMainContent>
+            <MainContent />
+          </ProjectMainContent>
         </div>
       )
     }

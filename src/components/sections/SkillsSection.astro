@@ -1,9 +1,10 @@
 ---
-import { Image } from "astro:assets";
 import { leftSkills, rightSkills, skillsByCategory, MOBILE_CATEGORY_ORDER } from "../../data/skills";
-import persona from "../../assets/skills/persona02.png";
+import { getCloudinaryUrl } from "../../utils/cloudinaryManifest";
 import SkillColumn from "./skills/SkillColumn.astro";
 import SkillGroup from "./skills/SkillGroup.astro";
+
+const personaUrl = getCloudinaryUrl("skills/persona02", "q_auto,f_auto");
 ---
 
 <section id="habilidades" class="flex min-h-screen w-full flex-col px-[5vw] py-[2vh] md:h-screen">
@@ -24,11 +25,12 @@ import SkillGroup from "./skills/SkillGroup.astro";
   <div class="hidden min-h-0 flex-1 items-center justify-center gap-[2vw] md:flex short:gap-[1vw]">
     <SkillColumn skills={leftSkills} side="left" />
     <div class="flex h-full max-w-[30vw] shrink-0 items-center justify-center">
-      <Image
-        src={persona}
+      <img
+        src={personaUrl}
         alt="Retrato ilustrado del autor"
         class="h-full w-auto object-contain object-center"
-        sizes="22vw"
+        loading="lazy"
+        decoding="async"
       />
     </div>
     <SkillColumn skills={rightSkills} side="right" />

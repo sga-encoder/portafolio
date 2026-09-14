@@ -1,9 +1,12 @@
 ---
 title: "Práctica de estilos"
 summary: "Segundo proyecto de aprendizaje: practiqué mucho CSS con React, siguiendo tutoriales de YouTube."
-coverImage: "../../assets/projects/proyecto-01.jpg"
+coverImage: "projects/practica-estilos/cover"
 gallery:
-  - "../../assets/projects/proyecto-01.jpg"
+  - "projects/practica-estilos/gallery-principal-menu"
+  - "projects/practica-estilos/gallery-example-01"
+  - "projects/practica-estilos/gallery-example-02"
+  - "projects/practica-estilos/gallery-example-03"
 techStack:
   - "React"
   - "CSS"

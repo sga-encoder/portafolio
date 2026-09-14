@@ -99,6 +99,13 @@ html {
   animation: dot-nav-label-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+/* Equivalente táctil del hover/focus de arriba: en mobile no hay `:hover`
+   fiable, así que `holdToNavigate.ts` marca esta clase en `pointerdown` (label
+   visible, sin navegar aún) y la quita en `pointerup`/`pointercancel`. */
+.is-pressed .scroll-dot-label {
+  animation: dot-nav-label-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
 /* Tarjeta de contenido del carrusel de Proyectos (ProjectCarousel): borde con
    degradado dinámico entre el color de la esfera izquierda/derecha, publicado
    por el propio componente vía la custom property `--project-frame-gradient`. */
@@ -110,6 +117,62 @@ html {
     --project-frame-gradient,
     linear-gradient(135deg, var(--color-brand), var(--color-accent-2))
   );
+}
+
+/* Borde animado de los 3 dot-nav (ScrollDotNav/YearDotNav/ProjectDetailNav,
+   riel desktop + barra mobile, vía navRailClasses.ts): un brillo recorre el
+   anillo del borde de izquierda a derecha lento ("cargando"), y al llegar al
+   final vuelve rápido con rebote elástico, en loop infinito. Truco de
+   "animated gradient border": un ::before con inset negativo pinta un
+   gradiente en movimiento y `mask-composite: exclude` deja visible solo el
+   anillo del borde (no el interior). Neutralizado automáticamente bajo
+   `prefers-reduced-motion: reduce` por la regla global de arriba, que fuerza
+   `animation-duration: 0.01ms` en todo el sitio. */
+@keyframes nav-rail-glow-sweep {
+  0% {
+    background-position: 0% 0%;
+    animation-timing-function: linear;
+  }
+  70% {
+    background-position: 100% 0%;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  83% {
+    background-position: 108% 0%;
+  }
+  92% {
+    background-position: -6% 0%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.nav-rail-glow {
+  position: relative;
+}
+
+.nav-rail-glow::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 40%,
+    var(--sphere-left-color, var(--project-left-color, var(--color-brand))) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-size: 260% 100%;
+  animation: nav-rail-glow-sweep 3.6s infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 body {

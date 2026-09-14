@@ -1,0 +1,509 @@
+{
+  "$schemaVersion": 1,
+  "images": {
+    "about/persona03": {
+      "publicId": "portafolio/about/persona03",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399653/portafolio/about/persona03.png",
+      "hash": "sha1:c7441e7f6dbb563d6b9bbb92cec2c60c3722c2b2",
+      "width": 652,
+      "height": 979,
+      "format": "png",
+      "colors": [
+        "#532c75",
+        "#e79a67"
+      ],
+      "sourcePath": "about/persona03.png",
+      "uploadedAt": "2026-09-14T15:27:33.936Z"
+    },
+    "header/persona01": {
+      "publicId": "portafolio/header/persona01",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399655/portafolio/header/persona01.png",
+      "hash": "sha1:01edbe29dd5007485742d42fe015252ff761114b",
+      "width": 654,
+      "height": 982,
+      "format": "png",
+      "colors": [
+        "#593678",
+        "#d98958"
+      ],
+      "sourcePath": "header/persona01.png",
+      "uploadedAt": "2026-09-14T15:27:36.168Z"
+    },
+    "projects/pelis/cover": {
+      "publicId": "portafolio/projects/pelis/cover",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405939/portafolio/projects/pelis/cover.png",
+      "hash": "sha1:cef2c36b26319b54fbcb99c1d27142c1dcbdcdbd",
+      "width": 1600,
+      "height": 1000,
+      "format": "png",
+      "colors": [
+        "#fac955",
+        "#aa853c"
+      ],
+      "sourcePath": "projects/pelis/cover.png",
+      "uploadedAt": "2026-09-14T17:12:20.595Z"
+    },
+    "projects/pelis/gallery-article": {
+      "publicId": "portafolio/projects/pelis/gallery-article",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399662/portafolio/projects/pelis/gallery-article.png",
+      "hash": "sha1:43a91f805700539a15dd80006e9cbc5ddd1c16ca",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#028cfc",
+        "#354a5a"
+      ],
+      "sourcePath": "projects/pelis/gallery-article.png",
+      "uploadedAt": "2026-09-14T15:27:43.497Z"
+    },
+    "projects/pelis/gallery-header": {
+      "publicId": "portafolio/projects/pelis/gallery-header",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399664/portafolio/projects/pelis/gallery-header.png",
+      "hash": "sha1:4468ae89b0b7d615766e87de8c8ec73abfabb12b",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#028dfe",
+        "#285878"
+      ],
+      "sourcePath": "projects/pelis/gallery-header.png",
+      "uploadedAt": "2026-09-14T15:27:44.802Z"
+    },
+    "projects/practica-estilos/cover": {
+      "publicId": "portafolio/projects/practica-estilos/cover",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405941/portafolio/projects/practica-estilos/cover.png",
+      "hash": "sha1:52a8cc8038f3ef626e25bd3579f6d5a87535eaa3",
+      "width": 1600,
+      "height": 1000,
+      "format": "png",
+      "colors": [
+        "#412967",
+        "#f5a459"
+      ],
+      "sourcePath": "projects/practica-estilos/cover.png",
+      "uploadedAt": "2026-09-14T17:12:22.023Z"
+    },
+    "projects/practica-estilos/gallery-example-01": {
+      "publicId": "portafolio/projects/practica-estilos/gallery-example-01",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399666/portafolio/projects/practica-estilos/gallery-example-01.png",
+      "hash": "sha1:8bb1b5b74c240a7bc889e2362225de2e2f2dedb9",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#49b6d6",
+        "#a5f34a"
+      ],
+      "sourcePath": "projects/practica-estilos/gallery-example-01.png",
+      "uploadedAt": "2026-09-14T15:27:46.736Z"
+    },
+    "projects/practica-estilos/gallery-example-02": {
+      "publicId": "portafolio/projects/practica-estilos/gallery-example-02",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399666/portafolio/projects/practica-estilos/gallery-example-02.png",
+      "hash": "sha1:6df57ad6e82d55aa9b3a565170e939bd24a0682a",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#C0009D",
+        "#0033FF"
+      ],
+      "sourcePath": "projects/practica-estilos/gallery-example-02.png",
+      "uploadedAt": "2026-09-14T15:27:47.341Z"
+    },
+    "projects/practica-estilos/gallery-example-03": {
+      "publicId": "portafolio/projects/practica-estilos/gallery-example-03",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399667/portafolio/projects/practica-estilos/gallery-example-03.png",
+      "hash": "sha1:982b214f89c3fadfd9b2875d67593b809ffec14a",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#937ca5",
+        "#c4a4d9"
+      ],
+      "sourcePath": "projects/practica-estilos/gallery-example-03.png",
+      "uploadedAt": "2026-09-14T15:27:48.913Z"
+    },
+    "projects/practica-estilos/gallery-principal-menu": {
+      "publicId": "portafolio/projects/practica-estilos/gallery-principal-menu",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399669/portafolio/projects/practica-estilos/gallery-principal-menu.png",
+      "hash": "sha1:36fd1c453f142c5f9cabe11886a5f2dbe48bd438",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#252972",
+        "#666992"
+      ],
+      "sourcePath": "projects/practica-estilos/gallery-principal-menu.png",
+      "uploadedAt": "2026-09-14T15:27:50.247Z"
+    },
+    "projects/proyecto-01": {
+      "publicId": "portafolio/projects/proyecto-01",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399670/portafolio/projects/proyecto-01.jpg",
+      "hash": "sha1:654383daa8bf6c25fbf5dd9d674b5d6de3cebe32",
+      "width": 1920,
+      "height": 1280,
+      "format": "jpg",
+      "colors": [
+        "#455564",
+        "#637996"
+      ],
+      "sourcePath": "projects/proyecto-01.jpg",
+      "uploadedAt": "2026-09-14T15:27:51.276Z"
+    },
+    "skills/css": {
+      "publicId": "portafolio/skills/css",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399671/portafolio/skills/css.png",
+      "hash": "sha1:8a5ceafec789f5b3e9eb775f9ccbabe2882070d1",
+      "width": 55,
+      "height": 55,
+      "format": "png",
+      "colors": [
+        "#0276bc",
+        "#00ffff"
+      ],
+      "sourcePath": "skills/css.png",
+      "uploadedAt": "2026-09-14T15:27:52.008Z"
+    },
+    "skills/figma": {
+      "publicId": "portafolio/skills/figma",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399672/portafolio/skills/figma.png",
+      "hash": "sha1:38cc732f317bd429dc121d85b464508407798b4b",
+      "width": 36,
+      "height": 54,
+      "format": "png",
+      "colors": [
+        "#a259ff",
+        "#1abcfe"
+      ],
+      "sourcePath": "skills/figma.png",
+      "uploadedAt": "2026-09-14T15:27:52.738Z"
+    },
+    "skills/java": {
+      "publicId": "portafolio/skills/java",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399672/portafolio/skills/java.png",
+      "hash": "sha1:3257adcc141127241fac0258c9408e85c21b7b83",
+      "width": 55,
+      "height": 55,
+      "format": "png",
+      "colors": [
+        "#84b9fc",
+        "#e73b0e"
+      ],
+      "sourcePath": "skills/java.png",
+      "uploadedAt": "2026-09-14T15:27:53.347Z"
+    },
+    "skills/javascript": {
+      "publicId": "portafolio/skills/javascript",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399673/portafolio/skills/javascript.png",
+      "hash": "sha1:dcd1bba2ebf5a005d27a4395dcb97fa3a19fe6fb",
+      "width": 55,
+      "height": 55,
+      "format": "png",
+      "colors": [
+        "#f0db4f",
+        "#ada044"
+      ],
+      "sourcePath": "skills/javascript.png",
+      "uploadedAt": "2026-09-14T15:27:53.956Z"
+    },
+    "skills/nextjs": {
+      "publicId": "portafolio/skills/nextjs",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399674/portafolio/skills/nextjs.png",
+      "hash": "sha1:172427968f582479356ba7d6aaebe616b19ac9f4",
+      "width": 55,
+      "height": 55,
+      "format": "png",
+      "colors": [
+        "#C0009D",
+        "#0033FF"
+      ],
+      "sourcePath": "skills/nextjs.png",
+      "uploadedAt": "2026-09-14T15:27:55.083Z"
+    },
+    "skills/nodejs": {
+      "publicId": "portafolio/skills/nodejs",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399675/portafolio/skills/nodejs.png",
+      "hash": "sha1:7313b39d43e37565dc5e609cbb963434e16f3589",
+      "width": 55,
+      "height": 55,
+      "format": "png",
+      "colors": [
+        "#8ac64a",
+        "#ffff00"
+      ],
+      "sourcePath": "skills/nodejs.png",
+      "uploadedAt": "2026-09-14T15:27:55.907Z"
+    },
+    "skills/persona02": {
+      "publicId": "portafolio/skills/persona02",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399676/portafolio/skills/persona02.png",
+      "hash": "sha1:5ba5af72908bce2a572318c6c82f25a29e5a5906",
+      "width": 535,
+      "height": 803,
+      "format": "png",
+      "colors": [
+        "#572977",
+        "#c7825a"
+      ],
+      "sourcePath": "skills/persona02.png",
+      "uploadedAt": "2026-09-14T15:27:57.161Z"
+    },
+    "skills/python": {
+      "publicId": "portafolio/skills/python",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399677/portafolio/skills/python.png",
+      "hash": "sha1:65663b78c2fecc39b823c0143f47f352ade43e66",
+      "width": 55,
+      "height": 55,
+      "format": "png",
+      "colors": [
+        "#f8c63d",
+        "#377ef0"
+      ],
+      "sourcePath": "skills/python.png",
+      "uploadedAt": "2026-09-14T15:27:57.947Z"
+    },
+    "skills/react": {
+      "publicId": "portafolio/skills/react",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399678/portafolio/skills/react.png",
+      "hash": "sha1:fd3720e5c39fe2f7eedc26d9137e668f6be32c72",
+      "width": 55,
+      "height": 49,
+      "format": "png",
+      "colors": [
+        "#15a8d7",
+        "#00ffff"
+      ],
+      "sourcePath": "skills/react.png",
+      "uploadedAt": "2026-09-14T15:27:58.670Z"
+    },
+    "skills/tailwind": {
+      "publicId": "portafolio/skills/tailwind",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399678/portafolio/skills/tailwind.png",
+      "hash": "sha1:effa036f6c7003948b9a01836fcfbb1fc5c12a14",
+      "width": 90,
+      "height": 55,
+      "format": "png",
+      "colors": [
+        "#38bdf8",
+        "#00ffff"
+      ],
+      "sourcePath": "skills/tailwind.png",
+      "uploadedAt": "2026-09-14T15:27:59.385Z"
+    },
+    "skills/typescript": {
+      "publicId": "portafolio/skills/typescript",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789399679/portafolio/skills/typescript.png",
+      "hash": "sha1:7a09c799027d765c2a902f87cd3ea4163c102ee5",
+      "width": 55,
+      "height": 49,
+      "format": "png",
+      "colors": [
+        "#3278c6",
+        "#77a6d8"
+      ],
+      "sourcePath": "skills/typescript.png",
+      "uploadedAt": "2026-09-14T15:28:00.007Z"
+    },
+    "projects/blog-semillero/cover": {
+      "publicId": "portafolio/projects/blog-semillero/cover",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405948/portafolio/projects/blog-semillero/cover.png",
+      "hash": "sha1:888a0b6456c5c705d8dd521daf4ced4145637726",
+      "width": 1600,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#f2ebd6",
+        "#8ab374"
+      ],
+      "sourcePath": "projects/blog-semillero/cover.png",
+      "uploadedAt": "2026-09-14T17:12:28.880Z"
+    },
+    "projects/blog-semillero/gallery-admin-panel": {
+      "publicId": "portafolio/projects/blog-semillero/gallery-admin-panel",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405949/portafolio/projects/blog-semillero/gallery-admin-panel.png",
+      "hash": "sha1:c96eed257b614b0822b5292de7b6b855a0e2b930",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#C0009D",
+        "#0033FF"
+      ],
+      "sourcePath": "projects/blog-semillero/gallery-admin-panel.png",
+      "uploadedAt": "2026-09-14T17:12:29.899Z"
+    },
+    "projects/city-builder/gallery-menu": {
+      "publicId": "portafolio/projects/city-builder/gallery-menu",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405951/portafolio/projects/city-builder/gallery-menu.png",
+      "hash": "sha1:525b628197b7a616197f3898faded06b621c3478",
+      "width": 1920,
+      "height": 1198,
+      "format": "png",
+      "colors": [
+        "#56493d",
+        "#b67c4a"
+      ],
+      "sourcePath": "projects/city-builder/gallery-menu.png",
+      "uploadedAt": "2026-09-14T17:12:32.259Z"
+    },
+    "projects/class-manager/cover": {
+      "publicId": "portafolio/projects/class-manager/cover",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405953/portafolio/projects/class-manager/cover.png",
+      "hash": "sha1:1a25a0896ff7e376f52f24616a9c4a6bfe39a12e",
+      "width": 1600,
+      "height": 1000,
+      "format": "png",
+      "colors": [
+        "#2a2c76",
+        "#c8c7d9"
+      ],
+      "sourcePath": "projects/class-manager/cover.png",
+      "uploadedAt": "2026-09-14T17:12:33.695Z"
+    },
+    "projects/blog-semillero/gallery-blog": {
+      "publicId": "portafolio/projects/blog-semillero/gallery-blog",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405955/portafolio/projects/blog-semillero/gallery-blog.png",
+      "hash": "sha1:e8b38de92696deed5c4cd3b7a5f83943bf51ee75",
+      "width": 1920,
+      "height": 1198,
+      "format": "png",
+      "colors": [
+        "#c3cbb6",
+        "#537776"
+      ],
+      "sourcePath": "projects/blog-semillero/gallery-blog.png",
+      "uploadedAt": "2026-09-14T17:12:36.810Z"
+    },
+    "projects/blog-semillero/gallery-inicio": {
+      "publicId": "portafolio/projects/blog-semillero/gallery-inicio",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405958/portafolio/projects/blog-semillero/gallery-inicio.png",
+      "hash": "sha1:b7bde946818654f5dfc6430d7ed98b674e63b696",
+      "width": 1920,
+      "height": 1198,
+      "format": "png",
+      "colors": [
+        "#3876a6",
+        "#679ac5"
+      ],
+      "sourcePath": "projects/blog-semillero/gallery-inicio.png",
+      "uploadedAt": "2026-09-14T17:12:39.800Z"
+    },
+    "projects/blog-semillero/gallery-map": {
+      "publicId": "portafolio/projects/blog-semillero/gallery-map",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405960/portafolio/projects/blog-semillero/gallery-map.png",
+      "hash": "sha1:15fcfa21b11cd6abf2020ca4f234ec53183f93b7",
+      "width": 1920,
+      "height": 1198,
+      "format": "png",
+      "colors": [
+        "#e1ecd3",
+        "#773738"
+      ],
+      "sourcePath": "projects/blog-semillero/gallery-map.png",
+      "uploadedAt": "2026-09-14T17:12:41.427Z"
+    },
+    "projects/city-builder/cover": {
+      "publicId": "portafolio/projects/city-builder/cover",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405962/portafolio/projects/city-builder/cover.png",
+      "hash": "sha1:198798913287c07f9455a3d5128ef5e6e7ea719e",
+      "width": 1600,
+      "height": 1000,
+      "format": "png",
+      "colors": [
+        "#347b39",
+        "#58b5bd"
+      ],
+      "sourcePath": "projects/city-builder/cover.png",
+      "uploadedAt": "2026-09-14T17:12:43.048Z"
+    },
+    "projects/city-builder/gallery-game": {
+      "publicId": "portafolio/projects/city-builder/gallery-game",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405963/portafolio/projects/city-builder/gallery-game.png",
+      "hash": "sha1:3108a3c08b54530a0b6de55288b46600f0ddb944",
+      "width": 1920,
+      "height": 1198,
+      "format": "png",
+      "colors": [
+        "#58b5bd",
+        "#a9c5c3"
+      ],
+      "sourcePath": "projects/city-builder/gallery-game.png",
+      "uploadedAt": "2026-09-14T17:12:44.372Z"
+    },
+    "projects/city-builder/gallery-score": {
+      "publicId": "portafolio/projects/city-builder/gallery-score",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405964/portafolio/projects/city-builder/gallery-score.png",
+      "hash": "sha1:0484959ce96db3e12055c372e5327561cf630a5b",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#485c66",
+        "#0033FF"
+      ],
+      "sourcePath": "projects/city-builder/gallery-score.png",
+      "uploadedAt": "2026-09-14T17:12:45.682Z"
+    },
+    "projects/class-manager/gallery-dashboard-admin": {
+      "publicId": "portafolio/projects/class-manager/gallery-dashboard-admin",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405966/portafolio/projects/class-manager/gallery-dashboard-admin.png",
+      "hash": "sha1:aa65fe12612833aa3aa913adece142d5511092b4",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#6965f4",
+        "#2898e8"
+      ],
+      "sourcePath": "projects/class-manager/gallery-dashboard-admin.png",
+      "uploadedAt": "2026-09-14T17:12:46.739Z"
+    },
+    "projects/class-manager/gallery-dashboard-student": {
+      "publicId": "portafolio/projects/class-manager/gallery-dashboard-student",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405967/portafolio/projects/class-manager/gallery-dashboard-student.png",
+      "hash": "sha1:5a3602b22f8756cb1e4d7ed85153d673f75120ee",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#17a877",
+        "#54b998"
+      ],
+      "sourcePath": "projects/class-manager/gallery-dashboard-student.png",
+      "uploadedAt": "2026-09-14T17:12:47.925Z"
+    },
+    "projects/class-manager/gallery-dashboard-teachers": {
+      "publicId": "portafolio/projects/class-manager/gallery-dashboard-teachers",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405968/portafolio/projects/class-manager/gallery-dashboard-teachers.png",
+      "hash": "sha1:d675ab89eff712a817a82ca1f56c03508f4cbe23",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#9369fa",
+        "#6652c8"
+      ],
+      "sourcePath": "projects/class-manager/gallery-dashboard-teachers.png",
+      "uploadedAt": "2026-09-14T17:12:49.251Z"
+    },
+    "projects/class-manager/gallery-login": {
+      "publicId": "portafolio/projects/class-manager/gallery-login",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1789405969/portafolio/projects/class-manager/gallery-login.png",
+      "hash": "sha1:e4ba772f43b14f21ac86d6166d5b2b1613d95970",
+      "width": 1920,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#475ce4",
+        "#0033FF"
+      ],
+      "sourcePath": "projects/class-manager/gallery-login.png",
+      "uploadedAt": "2026-09-14T17:12:49.774Z"
+    }
+  }
+}

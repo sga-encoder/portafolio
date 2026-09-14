@@ -1,4 +1,3 @@
-import type { Camera, Vector3 } from "three";
 import { sceneStops } from "./sceneStops";
 
 interface SphereScreenVar {
@@ -31,12 +30,6 @@ const VAR_NAMES = {
   a: { x: "--sphere-a-x", y: "--sphere-a-y", color: "--sphere-a-color" },
   b: { x: "--sphere-b-x", y: "--sphere-b-y", color: "--sphere-b-color" },
 } as const;
-
-/** Proyecta una posición de mundo a fracción de pantalla [0,1] (y hacia abajo, como CSS). */
-export function projectToScreenFraction(camera: Camera, position: Vector3): { x: number; y: number } {
-  const ndc = position.clone().project(camera);
-  return { x: (ndc.x + 1) / 2, y: (1 - ndc.y) / 2 };
-}
 
 /** Ángulo (grados, convención CSS: 0deg = arriba, aumenta en sentido horario) de A hacia B. */
 function gradientAngleDeg(a: { x: number; y: number }, b: { x: number; y: number }): number {
@@ -85,7 +78,7 @@ export function setSphereFrameVars(
  * usa la posición/color de reposo de la sección "header" en `sceneStops`, una sola vez.
  */
 export function setStaticHeaderFrameVars(root: HTMLElement = document.documentElement): void {
-  const headerStop = sceneStops.find((stop) => stop.sectionId === "header");
+  const headerStop = sceneStops.find((stop) => stop.zoneId === "header");
   if (!headerStop) return;
 
   const toScreenFraction = (position: readonly [number, number, number]) => ({

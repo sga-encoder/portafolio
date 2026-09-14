@@ -1,20 +1,20 @@
 import { useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Color, Vector3, type PerspectiveCamera } from "three";
-import { getGradientTexture } from "./gradientTexture";
-import GradientBlob, { type GradientBlobHandle } from "./GradientBlob";
-import { DEFAULT_COLLISION_MARGIN, resolvedSceneStops, type SphereId } from "./sceneStops";
-import { mobilePortraitSizeScale, normalizedToWorld, radiusForScreenFraction } from "./viewport";
-import { projectToScreenFraction, setSphereFrameVars } from "./headerFrameVars";
+import { getGradientTexture } from "../gradientTexture";
+import GradientBlob, { type GradientBlobHandle } from "../GradientBlob";
+import { DEFAULT_COLLISION_MARGIN, type ResolvedZoneStop } from "./zoneStops";
+import { normalizedToWorld, radiusForScreenFraction } from "../viewport";
+import { projectToScreenFraction } from "./screenProjection";
+import { useZoneScrollRefs } from "./useZoneScrollRefs";
 
-const SPHERE_IDS: readonly SphereId[] = ["a", "b", "c"];
 /** El sprite del degradado tiene medio-ancho 0.5 en reposo: para que `radius` sea el radio visible real, hay que escalar al doble. */
 const SPRITE_SIZE_FACTOR = 2;
 const TRAIL_LENGTH = 5;
 const TRAIL_SAMPLE_EVERY_N_FRAMES = 4;
 const MIN_MOTION_SPEED = 0.02;
 const MAX_MOTION_SPEED = 0.6;
-/** Fracción del scroll de una sección donde termina la transición hacia `end`; el resto del scroll queda en reposo ahí. */
+/** Fracción del scroll de una zona donde termina la transición hacia `end`; el resto del scroll queda en reposo ahí. */
 const TRANSITION_RANGE = 0.25;
 /** Suavizado de posición muy leve (solo para limar el "salto" entre eventos de scroll, no para crear inercia). */
 const POSITION_SMOOTHING_RATE = 14;
@@ -73,17 +73,47 @@ interface SphereRuntime {
   ghostRefs: { current: GradientBlobHandle | null }[];
 }
 
-export default function SceneContent() {
+/** Estado resuelto de una esfera al final de un frame, lo que recibe `onFrame`. */
+export interface SphereFrameState {
+  id: string;
+  x: number;
+  y: number;
+  color: string;
+  active: boolean;
+}
+
+export type OnFrameCallback = (spheres: readonly SphereFrameState[], camera: PerspectiveCamera) => void;
+
+interface Props {
+  sphereIds: readonly string[];
+  zoneStops: readonly ResolvedZoneStop[];
+  /** Factor de escala de tamaño según aspect ratio (ej. `mobilePortraitSizeScale` de Inicio); por defecto no escala. */
+  sizeScale?: (aspect: number) => number;
+  /** Llamado una vez por frame con el estado resuelto de cada esfera — cada escenario decide qué variables CSS publicar. */
+  onFrame?: OnFrameCallback;
+}
+
+const IDENTITY_SCALE = () => 1;
+
+/**
+ * Bucle de animación genérico del fondo 3D: interpola posición/color/tamaño por zona de scroll,
+ * aplica anti-colisión entre esferas, dibuja una estela sutil y una deriva idle de cámara. Sin
+ * conocimiento de cuántas esferas hay ni de dónde sale su color — eso lo define `zoneStops`
+ * (motor compartido por Inicio, detalle de proyecto y listado de proyectos, ver
+ * 034-unificar-escenas-threejs/plan.md).
+ */
+export default function SceneContent({ sphereIds, zoneStops, sizeScale = IDENTITY_SCALE, onFrame }: Props) {
   const { camera } = useThree((state) => ({ camera: state.camera as PerspectiveCamera }));
 
   const texture = useStableRef(() => getGradientTexture());
 
-  const runtime = useStableRef<Record<SphereId, SphereRuntime>>(() => {
-    const build = (id: SphereId): SphereRuntime => {
-      // Arranca directo en la posición inicial de Header (primera sección), sin animación de "vuelo".
-      const initialPose = resolvedSceneStops[0].spheres[id].start;
+  const runtime = useStableRef<Record<string, SphereRuntime>>(() => {
+    const result: Record<string, SphereRuntime> = {};
+    for (const id of sphereIds) {
+      // Arranca directo en la posición inicial de la primera zona, sin animación de "vuelo".
+      const initialPose = zoneStops[0].spheres[id].start;
       const initialPosition = new Vector3(...normalizedToWorld(camera, initialPose.position));
-      return {
+      result[id] = {
         current: initialPosition.clone(),
         previous: initialPosition.clone(),
         displayColor: getColor(initialPose.color).clone(),
@@ -94,78 +124,36 @@ export default function SceneContent() {
         mainRef: { current: null },
         ghostRefs: Array.from({ length: TRAIL_LENGTH }, () => ({ current: null as GradientBlobHandle | null })),
       };
-    };
-    return { a: build("a"), b: build("b"), c: build("c") };
+    }
+    return result;
   });
 
   const frameCount = useStableRef(() => ({ value: 0 }));
-  const activeIndexRef = useStableRef(() => ({ value: 0 }));
-  const progressRef = useStableRef(() => ({ value: 0 }));
+  const { activeIndexRef, progressRef } = useZoneScrollRefs(zoneStops.map((stop) => stop.zoneId));
 
-  // Sección activa vía scroll nativo (se lee del DOM directamente, sin pasar por props de Astro).
-  useEffect(() => {
-    let ticking = false;
-
-    function measure() {
-      ticking = false;
-      const sections = resolvedSceneStops
-        .map((stop) => document.getElementById(stop.sectionId))
-        .filter((el): el is HTMLElement => el !== null);
-      if (sections.length === 0) return;
-
-      const referenceY = window.scrollY + window.innerHeight / 2;
-      let activeIndex = 0;
-      let progress = 0;
-      sections.forEach((el, index) => {
-        const top = el.offsetTop;
-        if (referenceY >= top) {
-          activeIndex = index;
-          progress = el.offsetHeight > 0 ? (referenceY - top) / el.offsetHeight : 0;
-        }
-      });
-      activeIndexRef.current.value = activeIndex;
-      progressRef.current.value = clamp01(progress);
-    }
-
-    function onScrollOrResize() {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(measure);
-      }
-    }
-
-    measure();
-    window.addEventListener("scroll", onScrollOrResize, { passive: true });
-    window.addEventListener("resize", onScrollOrResize);
-    return () => {
-      window.removeEventListener("scroll", onScrollOrResize);
-      window.removeEventListener("resize", onScrollOrResize);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const frameStates = useStableRef<SphereFrameState[]>(() =>
+    sphereIds.map((id) => ({ id, x: 0, y: 0, color: "#000000", active: true })),
+  );
 
   useFrame((state, delta) => {
-    const activeIndex = activeIndexRef.current.value;
-    const progress = progressRef.current.value;
-    const stop = resolvedSceneStops[activeIndex];
+    const stop = zoneStops[activeIndexRef.current];
+    const progress = progressRef.current;
 
     frameCount.current.value += 1;
     const shouldSampleTrail = frameCount.current.value % TRAIL_SAMPLE_EVERY_N_FRAMES === 0;
 
-    // La transición de `start` a `end` ocurre rápido, en el primer tramo del scroll de la sección;
-    // el resto del scroll se queda en reposo exactamente en `end` (no en tránsito todo el tiempo).
-    const sectionProgress = smoothstep(0, TRANSITION_RANGE, progress);
+    // La transición de `start` a `end` ocurre rápido, en el primer tramo del scroll de la zona;
+    // el resto del scroll se queda en reposo exactamente en `end`.
+    const zoneProgress = smoothstep(0, TRANSITION_RANGE, progress);
+    const scale = sizeScale(camera.aspect);
 
-    for (const id of SPHERE_IDS) {
+    for (const id of sphereIds) {
       const sphere = runtime.current[id];
       const { start, end } = stop.spheres[id];
 
       sphere.previous.copy(sphere.current);
 
-      // Posición = casi una función pura del progreso de scroll: el objetivo es siempre el punto
-      // exacto de la línea recta start→end, con un suavizado muy leve (limitado a limar el "salto"
-      // entre eventos de scroll) que converge en ~1/14s, no la inercia lenta de antes.
-      const targetNormalized = lerpPosition(start.position, end.position, sectionProgress);
+      const targetNormalized = lerpPosition(start.position, end.position, zoneProgress);
       const [tx, ty, tz] = normalizedToWorld(camera, targetNormalized);
       const positionSmoothing = 1 - Math.exp(-POSITION_SMOOTHING_RATE * delta);
       sphere.current.lerp(new Vector3(tx, ty, tz), positionSmoothing);
@@ -173,12 +161,12 @@ export default function SceneContent() {
       const speed = delta > 0 ? sphere.previous.distanceTo(sphere.current) / delta : 0;
       sphere.motionFactor = smoothstep(MIN_MOTION_SPEED, MAX_MOTION_SPEED, speed);
 
-      const targetColor = getColor(start.color).clone().lerp(getColor(end.color), sectionProgress);
+      const targetColor = getColor(start.color).clone().lerp(getColor(end.color), zoneProgress);
       sphere.displayColor.copy(targetColor);
 
-      const rawScreenFraction = lerp(start.screenFraction, end.screenFraction, sectionProgress);
+      const rawScreenFraction = lerp(start.screenFraction, end.screenFraction, zoneProgress);
       sphere.active = rawScreenFraction > 0;
-      const screenFraction = rawScreenFraction * mobilePortraitSizeScale(camera.aspect);
+      const screenFraction = rawScreenFraction * scale;
       sphere.radius = radiusForScreenFraction(camera, sphere.current.z, screenFraction) + 0.001;
     }
 
@@ -186,12 +174,10 @@ export default function SceneContent() {
     // ANTES de aplicar las posiciones a los sprites (si no, el render de este frame
     // usa la posición sin corregir y el solapamiento nunca desaparece visualmente).
     const collisionMargin = stop.collisionMargin ?? DEFAULT_COLLISION_MARGIN;
-    for (let i = 0; i < SPHERE_IDS.length; i += 1) {
-      for (let j = i + 1; j < SPHERE_IDS.length; j += 1) {
-        const idA = SPHERE_IDS[i];
-        const idB = SPHERE_IDS[j];
-        const sphereA = runtime.current[idA];
-        const sphereB = runtime.current[idB];
+    for (let i = 0; i < sphereIds.length; i += 1) {
+      for (let j = i + 1; j < sphereIds.length; j += 1) {
+        const sphereA = runtime.current[sphereIds[i]];
+        const sphereB = runtime.current[sphereIds[j]];
         const minDistance = (sphereA.radius + sphereB.radius) * (1 + collisionMargin);
         const delta3 = sphereB.current.clone().sub(sphereA.current);
         const distance = delta3.length();
@@ -204,7 +190,7 @@ export default function SceneContent() {
       }
     }
 
-    for (const id of SPHERE_IDS) {
+    sphereIds.forEach((id, index) => {
       const sphere = runtime.current[id];
       const { radius, motionFactor } = sphere;
 
@@ -221,43 +207,29 @@ export default function SceneContent() {
         sphere.trail.unshift(sphere.current.clone());
       }
 
-      sphere.ghostRefs.forEach((ghostRef, index) => {
+      sphere.ghostRefs.forEach((ghostRef, ghostIndex) => {
         const ghostHandle = ghostRef.current;
         if (!ghostHandle?.group || !ghostHandle.material) return;
-        const trailPos = sphere.trail[index];
-        const fade = 1 - (index + 1) / (TRAIL_LENGTH + 1);
+        const trailPos = sphere.trail[ghostIndex];
+        const fade = 1 - (ghostIndex + 1) / (TRAIL_LENGTH + 1);
         ghostHandle.group.position.copy(trailPos);
         ghostHandle.group.scale.setScalar(radius * SPRITE_SIZE_FACTOR * (0.55 + 0.35 * fade));
         ghostHandle.material.color.copy(sphere.displayColor);
         ghostHandle.material.opacity = 0.35 * fade * motionFactor;
       });
-    }
 
-    // Marco dinámico de HeaderSection: publica posición en pantalla + color de A/B/C como CSS vars.
-    // C también participa en izquierda/derecha (ver `setSphereFrameVars`): en Proyectos/Sobre-mí
-    // es la que está realmente en pantalla mientras A o B salen de cuadro.
-    if (typeof document !== "undefined") {
-      const sphereA = runtime.current.a;
-      const sphereB = runtime.current.b;
-      const sphereC = runtime.current.c;
-      setSphereFrameVars(
-        document.documentElement,
-        {
-          ...projectToScreenFraction(camera, sphereA.current),
-          color: `#${sphereA.displayColor.getHexString()}`,
-          active: sphereA.active,
-        },
-        {
-          ...projectToScreenFraction(camera, sphereB.current),
-          color: `#${sphereB.displayColor.getHexString()}`,
-          active: sphereB.active,
-        },
-        {
-          ...projectToScreenFraction(camera, sphereC.current),
-          color: `#${sphereC.displayColor.getHexString()}`,
-          active: sphereC.active,
-        },
-      );
+      if (onFrame) {
+        const screen = projectToScreenFraction(camera, sphere.current);
+        const frameState = frameStates.current[index];
+        frameState.x = screen.x;
+        frameState.y = screen.y;
+        frameState.color = `#${sphere.displayColor.getHexString()}`;
+        frameState.active = sphere.active;
+      }
+    });
+
+    if (onFrame) {
+      onFrame(frameStates.current, camera);
     }
 
     // Deriva idle muy sutil de cámara, para que la escena no se sienta congelada entre scrolls.
@@ -269,7 +241,7 @@ export default function SceneContent() {
 
   return (
     <>
-      {SPHERE_IDS.map((id) => (
+      {sphereIds.map((id) => (
         <group key={id}>
           <GradientBlob ref={runtime.current[id].mainRef} texture={texture.current} color="#ffffff" />
           {runtime.current[id].ghostRefs.map((ghostRef, index) => (
