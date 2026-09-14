@@ -1,0 +1,425 @@
+---
+// Corazón + contador de likes por proyecto (feature 040), Firebase Firestore.
+// A diferencia del resto de scripts del sitio (`is:inline data-astro-rerun`,
+// ver ProjectLiveSteps/ThemeToggle), este necesita `import` del SDK de
+// Firebase (npm) y por eso va como <script> módulo normal (bundleado por
+// Vite). Como un módulo solo ejecuta su top-level una vez por navegación
+// (el navegador no re-ejecuta el mismo módulo en soft-nav de View
+// Transitions), la re-inicialización por página ocurre vía el evento
+// `astro:page-load` de Astro, no por re-ejecución del script en sí.
+interface Props {
+  slug: string;
+  color: string;
+}
+
+const { slug, color } = Astro.props;
+---
+
+<div class="like-widget" data-like-root data-slug={slug} style={`--like-color: ${color};`}>
+  <button type="button" class="like-heart" data-like-heart aria-label="Dar like a este proyecto" aria-pressed="false">
+    <svg viewBox="0 0 24 24" width="26" height="26" role="img" aria-hidden="true">
+      <path
+        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linejoin="round"
+        data-like-heart-path
+      />
+    </svg>
+  </button>
+  <span class="like-count" data-like-count aria-live="polite">0</span>
+
+  <dialog class="like-dialog" data-like-dialog>
+    <form method="dialog" class="like-form" data-like-form novalidate>
+      <h2 class="like-form-title">Dar like a este proyecto</h2>
+
+      <label class="like-field">
+        <span>Nombre</span>
+        <input type="text" name="firstName" required maxlength="50" autocomplete="given-name" />
+      </label>
+
+      <label class="like-field">
+        <span>Apellido <em>(opcional)</em></span>
+        <input type="text" name="lastName" maxlength="50" autocomplete="family-name" />
+      </label>
+
+      <label class="like-field">
+        <span>Link de contacto <em>(opcional)</em></span>
+        <input type="url" name="contactLink" maxlength="300" placeholder="https://…" autocomplete="url" />
+      </label>
+
+      <label class="like-field">
+        <span>Mensaje <em>(opcional)</em></span>
+        <textarea name="message" maxlength="500" rows="3"></textarea>
+      </label>
+
+      <!-- Honeypot: oculto a un humano (fuera de pantalla, no display:none),
+           visible/llenable por bots simples. Si llega con valor, se descarta
+           el envío sin tocar Firestore. -->
+      <label class="like-honeypot" aria-hidden="true">
+        <span>Sitio web</span>
+        <input type="text" name="website" tabindex="-1" autocomplete="off" />
+      </label>
+
+      <div class="like-form-actions">
+        <button type="button" class="like-cancel" data-like-cancel>Cancelar</button>
+        <button type="submit" class="like-submit" data-like-submit>Dar like</button>
+      </div>
+    </form>
+  </dialog>
+</div>
+
+<style>
+  .like-widget {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+  }
+
+  .like-heart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    background-color: color-mix(in srgb, var(--color-surface) 55%, transparent);
+    color: var(--like-color);
+    transition:
+      transform 0.15s,
+      background-color 0.2s;
+  }
+
+  .like-heart:hover:not(:disabled) {
+    transform: scale(1.08);
+  }
+
+  .like-heart:disabled {
+    cursor: default;
+  }
+
+  .like-heart.is-liked [data-like-heart-path] {
+    fill: var(--like-color);
+  }
+
+  .like-count {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    text-shadow: 0 1px 4px color-mix(in srgb, var(--color-surface) 70%, transparent);
+  }
+
+  .like-dialog {
+    /* El preflight de Tailwind resetea `margin: 0` en todos los elementos
+       (`*`), lo que pisa el `margin: auto` que el navegador usa por defecto
+       para centrar un <dialog>:modal (junto a `position: fixed; inset: 0`
+       de su propio UA stylesheet) — sin esto, el modal queda pegado a la
+       esquina superior izquierda en vez de centrado. */
+    margin: auto;
+    border: none;
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    width: min(24rem, calc(100vw - 2rem));
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    /* Entrada: sube desde abajo con un pequeño rebote al llegar. Reinicia
+       sola cada vez que el navegador pasa el <dialog> de display:none a
+       renderizado (showModal()), sin necesitar JS para la apertura. */
+    animation: like-dialog-in 380ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  /* Salida: el cierre real del <dialog> se retrasa desde JS hasta que esta
+     animación termina (animationend), para que se vea deslizar hacia abajo
+     en vez de desaparecer de golpe (limitación nativa de <dialog>: quitar
+     el atributo `open` lo saca del render inmediatamente). */
+  .like-dialog.is-closing {
+    animation: like-dialog-out 220ms ease-in forwards;
+  }
+
+  .like-dialog::backdrop {
+    background-color: color-mix(in srgb, var(--color-surface) 65%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: like-backdrop-in 380ms ease both;
+  }
+
+  .like-dialog.is-closing::backdrop {
+    animation: like-backdrop-out 220ms ease-in forwards;
+  }
+
+  @keyframes like-dialog-in {
+    0% {
+      transform: translateY(70px);
+      opacity: 0;
+    }
+    60% {
+      transform: translateY(-8px);
+      opacity: 1;
+    }
+    80% {
+      transform: translateY(3px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes like-dialog-out {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(70px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes like-backdrop-in {
+    from {
+      background-color: transparent;
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+    }
+    to {
+      background-color: color-mix(in srgb, var(--color-surface) 65%, transparent);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+  }
+
+  @keyframes like-backdrop-out {
+    from {
+      background-color: color-mix(in srgb, var(--color-surface) 65%, transparent);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    to {
+      background-color: transparent;
+      backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+    }
+  }
+
+  .like-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .like-form-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .like-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-ink-muted);
+  }
+
+  .like-field em {
+    font-style: normal;
+    opacity: 0.7;
+  }
+
+  .like-field input,
+  .like-field textarea {
+    border-radius: 0.6rem;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 20%, transparent);
+    background-color: color-mix(in srgb, var(--color-ink) 5%, transparent);
+    padding: 0.5rem 0.7rem;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-ink);
+  }
+
+  .like-honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .like-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .like-cancel {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--color-ink-muted);
+  }
+
+  .like-submit {
+    border-radius: 9999px;
+    padding: 0.5rem 1.25rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    background-color: var(--like-color);
+    color: var(--color-brand-contrast);
+  }
+
+  .like-submit:disabled {
+    opacity: 0.6;
+  }
+</style>
+
+<script>
+  import { db } from "../../../lib/firebase";
+  import { collection, doc, getDoc, runTransaction, serverTimestamp } from "firebase/firestore";
+
+  const TIME_TRAP_MS = 2000;
+
+  function likedKey(slug: string) {
+    return `liked-${slug}`;
+  }
+
+  function initLikeWidget(root: HTMLElement) {
+    if (root.dataset.likeBound === "true") return;
+    root.dataset.likeBound = "true";
+
+    const slug = root.dataset.slug;
+    if (!slug) return;
+
+    const heart = root.querySelector<HTMLButtonElement>("[data-like-heart]");
+    const countEl = root.querySelector<HTMLElement>("[data-like-count]");
+    const dialog = root.querySelector<HTMLDialogElement>("[data-like-dialog]");
+    const form = root.querySelector<HTMLFormElement>("[data-like-form]");
+    const cancelBtn = root.querySelector<HTMLButtonElement>("[data-like-cancel]");
+    const submitBtn = root.querySelector<HTMLButtonElement>("[data-like-submit]");
+    if (!heart || !countEl || !dialog || !form || !cancelBtn || !submitBtn) return;
+
+    let openedAt = 0;
+
+    // Cierre animado: agrega la clase que dispara `like-dialog-out` y espera
+    // a que termine antes de llamar a `dialog.close()` de verdad — así se ve
+    // deslizarse hacia abajo en vez de desaparecer de golpe.
+    function closeAnimated() {
+      if (dialog!.classList.contains("is-closing")) return;
+      dialog!.classList.add("is-closing");
+      const onEnd = () => {
+        dialog!.removeEventListener("animationend", onEnd);
+        dialog!.classList.remove("is-closing");
+        dialog!.close();
+      };
+      dialog!.addEventListener("animationend", onEnd);
+    }
+
+    function markAsLiked() {
+      heart!.classList.add("is-liked");
+      heart!.setAttribute("aria-pressed", "true");
+      heart!.disabled = true;
+    }
+
+    if (localStorage.getItem(likedKey(slug)) === "true") {
+      markAsLiked();
+    }
+
+    getDoc(doc(db, "projectLikes", slug))
+      .then((snap) => {
+        const count = snap.exists() ? (snap.data().count ?? 0) : 0;
+        countEl!.textContent = String(count);
+      })
+      .catch((error) => {
+        console.error("No se pudo leer el contador de likes", error);
+      });
+
+    heart.addEventListener("click", () => {
+      if (heart.disabled) return;
+      openedAt = Date.now();
+      dialog.classList.remove("is-closing");
+      dialog.showModal();
+    });
+
+    cancelBtn.addEventListener("click", () => {
+      closeAnimated();
+    });
+
+    // Escape dispara `cancel` antes de cerrar de golpe — se intercepta para
+    // que también salga con la animación en vez de saltarla.
+    dialog.addEventListener("cancel", (event) => {
+      event.preventDefault();
+      closeAnimated();
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const data = new FormData(form);
+      const website = String(data.get("website") ?? "").trim();
+      const elapsed = Date.now() - openedAt;
+
+      // Spam: honeypot lleno o envío demasiado rápido para ser humano.
+      // Se descarta en silencio, sin tocar Firestore.
+      if (website.length > 0 || elapsed < TIME_TRAP_MS) {
+        closeAnimated();
+        form.reset();
+        return;
+      }
+
+      const firstName = String(data.get("firstName") ?? "").trim();
+      if (!firstName) return;
+
+      const lastName = String(data.get("lastName") ?? "").trim();
+      const contactLink = String(data.get("contactLink") ?? "").trim();
+      const message = String(data.get("message") ?? "").trim();
+
+      const submission: Record<string, unknown> = {
+        firstName,
+        createdAt: serverTimestamp(),
+      };
+      if (lastName) submission.lastName = lastName;
+      if (contactLink) submission.contactLink = contactLink;
+      if (message) submission.message = message;
+
+      submitBtn.disabled = true;
+
+      try {
+        const likeRef = doc(db, "projectLikes", slug);
+        const newCount = await runTransaction(db, async (tx) => {
+          const snap = await tx.get(likeRef);
+          const nextCount = snap.exists() ? (snap.data().count ?? 0) + 1 : 1;
+          const submissionRef = doc(collection(likeRef, "submissions"));
+          tx.set(submissionRef, submission);
+          tx.set(likeRef, { count: nextCount });
+          return nextCount;
+        });
+
+        countEl.textContent = String(newCount);
+        localStorage.setItem(likedKey(slug), "true");
+        markAsLiked();
+        closeAnimated();
+        form.reset();
+      } catch (error) {
+        // Fallo silencioso (sin red, Firestore bloqueado, etc.): el corazón
+        // no cambia de estado y no se muestra ningún error al visitante.
+        console.error("No se pudo registrar el like", error);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  function initAllLikeWidgets() {
+    document.querySelectorAll<HTMLElement>("[data-like-root]").forEach(initLikeWidget);
+  }
+
+  document.addEventListener("astro:page-load", initAllLikeWidgets);
+</script>

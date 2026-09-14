@@ -2,8 +2,10 @@
 import ProjectHeaderFrame from "./ProjectHeaderFrame.astro";
 import PlatformIcon from "./PlatformIcon.astro";
 import ColorLinkButton from "./ColorLinkButton.astro";
+import ProjectLikeButton from "./ProjectLikeButton.astro";
 
 interface Props {
+  slug: string;
   title: string;
   coverSrc: string;
   techStack: string[];
@@ -14,7 +16,7 @@ interface Props {
   date?: string;
 }
 
-const { title, coverSrc, techStack, platforms, repoHref, colors, date } = Astro.props;
+const { slug, title, coverSrc, techStack, platforms, repoHref, colors, date } = Astro.props;
 const [, second] = colors;
 const rightColor = `var(--project-right-color, ${second})`;
 
@@ -27,6 +29,8 @@ function formatProjectDate(value: string): string {
 ---
 
 <ProjectHeaderFrame colors={colors} class="md:h-[40vh]">
+  <ProjectLikeButton slug={slug} color={rightColor} />
+
   <div class="aspect-video w-full shrink-0 overflow-hidden rounded-2xl md:aspect-auto md:h-full md:w-[42%]">
     <img src={coverSrc} alt={title} class="h-full w-full object-cover" />
   </div>

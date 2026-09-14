@@ -10,12 +10,14 @@ interface Props {
   title: string;
   description?: string;
   showHeader?: boolean;
+  noindex?: boolean;
 }
 
 const {
   title,
   description = "Portafolio personal: hoja de vida y blog.",
   showHeader = true,
+  noindex = false,
 } = Astro.props;
 ---
 
@@ -28,6 +30,7 @@ const {
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <script is:inline data-astro-rerun>
       // Modo claro desactivado temporalmente (feature 011) — siempre oscuro.
       // `data-astro-rerun`: sin esto, el script no se re-ejecuta en navegaciones

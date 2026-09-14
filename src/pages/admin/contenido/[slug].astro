@@ -1,0 +1,16 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ContentEditor from "../../../components/admin/ContentEditor";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((project) => ({ params: { slug: project.id }, props: { slug: project.id } }));
+}
+
+const { slug } = Astro.props;
+---
+
+<BaseLayout title={`Admin · ${slug}`} showHeader={false} noindex>
+  <ContentEditor client:load slug={slug} />
+</BaseLayout>

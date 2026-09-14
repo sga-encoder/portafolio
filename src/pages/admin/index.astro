@@ -1,0 +1,12 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import DashboardPanel from "../../components/admin/DashboardPanel";
+
+const projects = await getCollection("projects");
+const slugs = projects.map((project) => project.id);
+---
+
+<BaseLayout title="Admin · Panel" showHeader={false} noindex>
+  <DashboardPanel client:load slugs={slugs} />
+</BaseLayout>

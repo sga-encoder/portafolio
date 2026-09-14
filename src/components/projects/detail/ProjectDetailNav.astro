@@ -1,17 +1,23 @@
 ---
 // Reemplaza a ProjectPager (3 botones de texto en fila) por un menú de
 // navegación tipo dot-nav (mismo mecanismo visual que ScrollDotNav/YearDotNav:
-// fijo al lateral, label en hover, oculto en mobile). A diferencia de esos dos
-// -que son scroll-spy entre secciones equivalentes-, aquí las 4 acciones son
-// distintas (retroceder/avanzar/inicio/ver todos), así que cada ítem se
-// distingue por forma/ícono además de color, y el "activo" no existe: en su
-// lugar hay un estado deshabilitado para anterior/siguiente en los extremos.
+// fijo al lateral, label en hover, oculto en mobile). A diferencia de esos
+// dos -que son scroll-spy entre secciones equivalentes-, aquí las 4 acciones
+// son distintas (retroceder/avanzar/inicio/cambiar de proyecto), así que
+// cada ítem se distingue por forma/ícono además de color, y el "activo" no
+// existe: en su lugar hay un estado deshabilitado para anterior/siguiente en
+// los extremos.
 // (037) El riel/barra ganan un borde animado (`NAV_RAIL_FRAME`/`.nav-rail-glow`)
 // y, en mobile, mantener presionado un botón muestra su label sin navegar
 // hasta soltar (mismo mecanismo que ScrollDotNav/YearDotNav, pero aquí los
-// ítems son `<a href>` en vez de `<button onClick>`, así que el gating vive en
-// un script inline en vez de React). El botón "Ver todos" se agrupa junto al
-// nuevo selector rápido de proyectos (`ProjectSwitcherPanel`).
+// ítems son `<a href>` en vez de `<button onClick>`, así que el gating vive
+// en un script inline en vez de React).
+// (041) "Ver todos los proyectos" ya NO es un ítem de este menú — pasó a ser
+// un botón companion *dentro* del panel del selector rápido
+// (`ProjectSwitcherPanel`), visible solo mientras ese panel está abierto (ver
+// ese componente). El menú principal queda simétrico en desktop y mobile: 4
+// ítems — anterior, inicio, selector rápido (ícono capas), siguiente —, sin
+// pestañas ni botones flotantes aparte.
 import NavIcon from "./NavIcon.astro";
 import ProjectSwitcherPanel from "./ProjectSwitcherPanel.astro";
 import {
@@ -41,6 +47,7 @@ const { prevHref, nextHref, colors, otherProjects } = Astro.props;
 const [first, second] = colors;
 const leftColor = `var(--project-left-color, ${first})`;
 const rightColor = `var(--project-right-color, ${second})`;
+const hasSwitcher = otherProjects.length > 0;
 
 interface NavItem {
   key: string;
@@ -48,35 +55,42 @@ interface NavItem {
   href?: string;
   color: string;
   disabled: boolean;
-  icon: "chevron-left" | "home" | "grid" | "chevron-right";
+  icon: "chevron-left" | "home" | "chevron-right";
 }
 
-const items: NavItem[] = [
-  {
-    key: "prev",
-    label: "Proyecto anterior",
-    href: prevHref,
-    color: leftColor,
-    disabled: !prevHref,
-    icon: "chevron-left",
-  },
-  { key: "home", label: "Volver al inicio", href: "/", color: leftColor, disabled: false, icon: "home" },
-  {
-    key: "all",
-    label: "Ver todos los proyectos",
-    href: "/proyectos",
-    color: rightColor,
-    disabled: false,
-    icon: "grid",
-  },
-  {
-    key: "next",
-    label: "Próximo proyecto",
-    href: nextHref,
-    color: rightColor,
-    disabled: !nextHref,
-    icon: "chevron-right",
-  },
+const prevItem: NavItem = {
+  key: "prev",
+  label: "Proyecto anterior",
+  href: prevHref,
+  color: leftColor,
+  disabled: !prevHref,
+  icon: "chevron-left",
+};
+const homeItem: NavItem = {
+  key: "home",
+  label: "Volver al inicio",
+  href: "/",
+  color: leftColor,
+  disabled: false,
+  icon: "home",
+};
+const nextItem: NavItem = {
+  key: "next",
+  label: "Próximo proyecto",
+  href: nextHref,
+  color: rightColor,
+  disabled: !nextHref,
+  icon: "chevron-right",
+};
+
+type RailEntry = { kind: "item"; item: NavItem } | { kind: "switcher" };
+
+// Mismo orden en desktop y mobile: ya no hay asimetría entre riel y barra.
+const entries: RailEntry[] = [
+  { kind: "item", item: prevItem },
+  { kind: "item", item: homeItem },
+  ...(hasSwitcher ? [{ kind: "switcher" } as const] : []),
+  { kind: "item", item: nextItem },
 ];
 
 const circleStyle = (color: string) =>
@@ -90,41 +104,42 @@ const circleStyle = (color: string) =>
   <div class={NAV_RAIL_FRAME}>
     <ul class={NAV_RAIL_LIST}>
       {
-        items.map((item) => (
-          <li class="relative flex items-center gap-2">
-            <span class="group relative flex items-center">
-              {item.disabled ? (
+        entries.map((entry) =>
+          entry.kind === "switcher" ? (
+            <li class="relative flex items-center">
+              <ProjectSwitcherPanel items={otherProjects} color={rightColor} />
+            </li>
+          ) : (
+            <li class="group relative flex items-center">
+              {entry.item.disabled ? (
                 <span
                   aria-hidden="true"
                   class="relative z-10 flex h-9 w-9 items-center justify-center rounded-full opacity-30"
-                  style={circleStyle(item.color)}
+                  style={circleStyle(entry.item.color)}
                 >
-                  <NavIcon icon={item.icon} />
+                  <NavIcon icon={entry.item.icon} />
                 </span>
               ) : (
                 <>
                   <a
-                    href={item.href}
-                    aria-label={item.label}
+                    href={entry.item.href}
+                    aria-label={entry.item.label}
                     class="relative z-10 flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-brand)"
-                    style={circleStyle(item.color)}
+                    style={circleStyle(entry.item.color)}
                   >
-                    <NavIcon icon={item.icon} />
+                    <NavIcon icon={entry.item.icon} />
                   </a>
                   <span
                     class="scroll-dot-label pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg px-3 py-1.5 font-body text-base font-semibold"
-                    style={`background-color: #000622; color: ${item.color}; box-shadow: 0 4px 16px -2px ${item.color};`}
+                    style={`background-color: #000622; color: ${entry.item.color}; box-shadow: 0 4px 16px -2px ${entry.item.color};`}
                   >
-                    {item.label}
+                    {entry.item.label}
                   </span>
                 </>
               )}
-            </span>
-            {item.key === "all" && otherProjects.length > 0 && (
-              <ProjectSwitcherPanel items={otherProjects} color={rightColor} />
-            )}
-          </li>
-        ))
+            </li>
+          ),
+        )
       }
     </ul>
   </div>
@@ -133,52 +148,55 @@ const circleStyle = (color: string) =>
 {
   /* Mobile: barra fija inferior. Mantener presionado muestra el label
      (`.scroll-dot-label`/`is-pressed`, ver `holdToNavigate.ts`); la
-     navegación solo se dispara al soltar encima del botón (037). */
+     navegación solo se dispara al soltar encima del botón (037). El
+     selector rápido vive acá también (no aparte, 041) — su panel se
+     posiciona `fixed`/centrado vía CSS en `ProjectSwitcherPanel.astro`. */
 }
 <nav aria-label="Navegación entre proyectos" class={NAV_BAR_MOBILE}>
   <ul class={`${NAV_BAR_MOBILE_LIST} hold-to-navigate-list`}>
     {
-      items.map((item) => (
-        <li class="relative flex items-center gap-2">
-          <span class="group relative flex items-center">
-            {item.disabled ? (
+      entries.map((entry) =>
+        entry.kind === "switcher" ? (
+          <li class="relative flex items-center">
+            <ProjectSwitcherPanel items={otherProjects} color={rightColor} />
+          </li>
+        ) : (
+          <li class="group relative flex items-center">
+            {entry.item.disabled ? (
               <span aria-hidden="true" class={`${NAV_ITEM_HIT_AREA} opacity-30`}>
                 <span
                   class="flex h-9 w-9 items-center justify-center rounded-full"
-                  style={circleStyle(item.color)}
+                  style={circleStyle(entry.item.color)}
                 >
-                  <NavIcon icon={item.icon} />
+                  <NavIcon icon={entry.item.icon} />
                 </span>
               </span>
             ) : (
               <>
                 <a
-                  href={item.href}
-                  aria-label={item.label}
-                  data-hold-nav={item.href}
+                  href={entry.item.href}
+                  aria-label={entry.item.label}
+                  data-hold-nav={entry.item.href}
                   class={NAV_ITEM_HIT_AREA}
                 >
                   <span
                     class="flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 active:scale-95"
-                    style={circleStyle(item.color)}
+                    style={circleStyle(entry.item.color)}
                   >
-                    <NavIcon icon={item.icon} />
+                    <NavIcon icon={entry.item.icon} />
                   </span>
                 </a>
                 <span
                   class="scroll-dot-label pointer-events-none absolute bottom-full left-0 mb-2 whitespace-nowrap rounded-lg px-3 py-1.5 font-body text-base font-semibold"
-                  style={`background-color: #000622; color: ${item.color}; box-shadow: 0 4px 16px -2px ${item.color};`}
+                  style={`background-color: #000622; color: ${entry.item.color}; box-shadow: 0 4px 16px -2px ${entry.item.color};`}
                 >
-                  {item.label}
+                  {entry.item.label}
                 </span>
               </>
             )}
-          </span>
-          {item.key === "all" && otherProjects.length > 0 && (
-            <ProjectSwitcherPanel items={otherProjects} color={rightColor} />
-          )}
-        </li>
-      ))
+          </li>
+        ),
+      )
     }
   </ul>
 </nav>

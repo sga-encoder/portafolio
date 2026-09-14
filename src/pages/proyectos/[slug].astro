@@ -51,12 +51,20 @@ function dateLabel(date: string): string {
   return `${label.charAt(0).toUpperCase()}${label.slice(1)} ${year}`;
 }
 
-const otherProjects = PROJECTS.filter((item) => item.id !== project.id).map((item) => ({
-  href: `/proyectos/${item.id}`,
-  title: item.title,
-  date: dateLabel(item.date),
-  imageSrc: item.imageKey ? getCloudinaryUrl(item.imageKey, "w_240,h_160,c_fill,q_auto,f_auto") : undefined,
-}));
+// La portada del selector debe ser la misma que ya usa cada proyecto en su
+// propio encabezado (`coverImage` del content collection), no el `imageKey`
+// de `src/data/projects.ts` — ese es un placeholder compartido entre varios
+// proyectos (026) y no corresponde a la portada real de cada Markdown.
+const allProjectEntries = await getCollection("projects");
+const otherProjects = PROJECTS.filter((item) => item.id !== project.id).map((item) => {
+  const entry = allProjectEntries.find((other) => other.id === item.id);
+  return {
+    href: `/proyectos/${item.id}`,
+    title: item.title,
+    date: dateLabel(item.date),
+    imageSrc: entry ? getCloudinaryUrl(entry.data.coverImage, "w_240,h_160,c_fill,q_auto,f_auto") : undefined,
+  };
+});
 ---
 
 <BaseLayout title={`${title} · Proyectos`} description={summary} showHeader={false}>
@@ -73,6 +81,7 @@ const otherProjects = PROJECTS.filter((item) => item.id !== project.id).map((ite
 
     <div class="mt-6">
       <ProjectHeader
+        slug={project.id}
         title={title}
         coverSrc={cover}
         techStack={techStack}

@@ -1,0 +1,62 @@
+rules_version = '2';
+
+// Reglas de los features 040 (likes por proyecto) y 043 (panel /admin).
+// Despliegue manual: copiar/pegar en Firestore -> Rules en la consola de
+// Firebase, o `firebase deploy --only firestore:rules` si se usa el CLI.
+// Ver .claude/spec/features/040-likes-proyectos/plan.md y
+// .claude/spec/features/043-panel-administrativo/plan.md.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // TODO(043): reemplazar por el UID real del único usuario admin —
+    // Firebase Console -> Authentication -> Users, tras crear la cuenta a
+    // mano (email/password). Hasta completarlo, isAdmin() nunca es true y
+    // /admin queda sin datos (fail-closed), no sin seguridad.
+    function isAdmin() {
+      return request.auth != null && request.auth.uid == "ADMIN_UID_AQUI";
+    }
+
+    match /projectLikes/{slug} {
+      allow read: if true;
+
+      // Alta del contador: solo puede nacer en 1.
+      allow create: if request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == 1;
+
+      // El contador nunca puede saltar más de 1 por escritura, ni bajar.
+      allow update: if request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == resource.data.count + 1;
+
+      allow delete: if false;
+
+      match /submissions/{submissionId} {
+        // Sin lectura pública: ni listar la colección ni leer un doc suelto.
+        // El admin autenticado (043, panel /admin/likes) sí puede leer.
+        allow read: if isAdmin();
+        allow update, delete: if false;
+
+        allow create: if request.resource.data.keys().hasOnly(['firstName', 'lastName', 'contactLink', 'message', 'createdAt'])
+          && request.resource.data.firstName is string
+          && request.resource.data.firstName.size() > 0
+          && request.resource.data.firstName.size() <= 50
+          && (!('lastName' in request.resource.data) || (request.resource.data.lastName is string && request.resource.data.lastName.size() <= 50))
+          && (!('contactLink' in request.resource.data) || (request.resource.data.contactLink is string && request.resource.data.contactLink.size() <= 300))
+          && (!('message' in request.resource.data) || (request.resource.data.message is string && request.resource.data.message.size() <= 500))
+          && request.resource.data.createdAt == request.time;
+      }
+    }
+
+    // 043 · Panel /admin — borrador de Markdown por proyecto (autoguardado,
+    // no toca el repo hasta "Publicar", ver plan.md de 043).
+    match /adminDrafts/{slug} {
+      allow read, write: if isAdmin();
+    }
+
+    // 043 · Panel /admin — tokens de terceros (GitHub, Cloudinary Admin
+    // API). Nunca se escriben desde el cliente, ni siquiera autenticado: el
+    // autor los pega a mano desde la consola de Firebase.
+    match /adminSecrets/{secretId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+  }
+}
