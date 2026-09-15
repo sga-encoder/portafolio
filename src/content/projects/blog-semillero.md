@@ -1,5 +1,5 @@
 ---
-title: Blog del Semillero 2
+title: Blog del Semillero 3
 summary: Blog hecho para un semillero de investigación universitario, para mostrar sus avances (Next.js + Strapi).
 coverImage: projects/blog-semillero/cover
 gallery:
