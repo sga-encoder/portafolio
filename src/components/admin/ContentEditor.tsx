@@ -186,7 +186,7 @@ function ContentEditorContent({ slug }: Props) {
 
 export default function ContentEditor({ slug }: Props) {
   return (
-    <AdminGate active="contenido">
+    <AdminGate active="proyectos" wide>
       <ContentEditorContent slug={slug} />
     </AdminGate>
   );

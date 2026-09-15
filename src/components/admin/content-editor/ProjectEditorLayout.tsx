@@ -5,8 +5,7 @@ import TagListEditor from "./TagListEditor";
 import PlatformsCheckboxes from "./PlatformsCheckboxes";
 import StepsEditor from "./StepsEditor";
 import GalleryEditor from "./GalleryEditor";
-import SphereConfigPanel from "./SphereConfigPanel";
-import ServersEditor from "./ServersEditor";
+import EditorSidePanel from "./EditorSidePanel";
 import type { ProjectServer } from "../../../lib/admin/servers";
 
 interface CopyItem {
@@ -174,16 +173,18 @@ export default function ProjectEditorLayout({ data, body, onChangeData, onChange
         <GalleryEditor value={data.gallery} onChange={(gallery) => patch({ gallery })} alt={data.title} />
       </div>
 
-      <SphereConfigPanel
-        sphereColors={data.sphereColors}
-        autoColors={autoColors}
-        onChangeColors={(sphereColors) => patch({ sphereColors })}
-        sphereMovement={data.sphereMovement}
-        onChangeMovement={(sphereMovement) => patch({ sphereMovement })}
-        defaults={ZONE_DEFAULTS}
+      <EditorSidePanel
+        sphereConfigProps={{
+          sphereColors: data.sphereColors,
+          autoColors,
+          onChangeColors: (sphereColors) => patch({ sphereColors }),
+          sphereMovement: data.sphereMovement,
+          onChangeMovement: (sphereMovement) => patch({ sphereMovement }),
+          defaults: ZONE_DEFAULTS,
+        }}
+        serversValue={data.servers ?? []}
+        onChangeServers={(servers) => patch({ servers })}
       />
-
-      <ServersEditor value={data.servers ?? []} onChange={(servers) => patch({ servers })} />
     </div>
   );
 }

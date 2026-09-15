@@ -3,21 +3,23 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 
 interface Props {
-  active: "dashboard" | "likes" | "contenido" | "imagenes" | "servidores";
+  active: "dashboard" | "likes" | "proyectos" | "imagenes" | "servidores";
+  /** `true`: contenedor a `75vw` desde `md:` en vez de `max-w-4xl` (053, solo editor de detalle). */
+  wide?: boolean;
   children: ReactNode;
 }
 
 const NAV_ITEMS: { key: Props["active"]; label: string; href: string }[] = [
   { key: "dashboard", label: "Panel", href: "/admin" },
   { key: "likes", label: "Likes", href: "/admin/likes" },
-  { key: "contenido", label: "Contenido", href: "/admin/contenido" },
+  { key: "proyectos", label: "Proyectos", href: "/admin/proyectos" },
   { key: "imagenes", label: "Imágenes", href: "/admin/imagenes" },
   { key: "servidores", label: "Servidores", href: "/admin/servidores" },
 ];
 
-export default function AdminLayout({ active, children }: Props) {
+export default function AdminLayout({ active, wide, children }: Props) {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <div className={`mx-auto px-4 py-8 ${wide ? "w-full md:w-[75vw]" : "max-w-4xl"}`}>
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <nav className="flex flex-wrap gap-2">
           {NAV_ITEMS.map((item) => (

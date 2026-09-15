@@ -7,6 +7,6 @@ const entries = await getCollection("projects");
 const projects = entries.map((project) => ({ slug: project.id, title: project.data.title }));
 ---
 
-<BaseLayout title="Admin · Contenido" showHeader={false} noindex>
+<BaseLayout title="Admin · Proyectos" showHeader={false} noindex>
   <ContentList client:load projects={projects} />
 </BaseLayout>

@@ -6,13 +6,13 @@ interface Props {
 
 export default function ContentList({ projects }: Props) {
   return (
-    <AdminGate active="contenido">
-      <h1 className="mb-6 text-2xl font-display font-bold">Contenido</h1>
+    <AdminGate active="proyectos">
+      <h1 className="mb-6 text-2xl font-display font-bold">Proyectos</h1>
       <ul className="space-y-2">
         {projects.map((project) => (
           <li key={project.slug}>
             <a
-              href={`/admin/contenido/${project.slug}`}
+              href={`/admin/proyectos/${project.slug}`}
               className="block rounded-xl bg-surface-muted p-4 hover:bg-surface-muted/70"
             >
               <span className="font-medium">{project.title}</span>
