@@ -1,3 +1,5 @@
+import profileJson from "./profile.json";
+
 export interface Cta {
   label: string;
   href: string;
@@ -40,30 +42,9 @@ export interface ProfileData {
   about: AboutData;
 }
 
-/** Contenido placeholder — reemplázalo poco a poco, sin tocar los componentes de sección. */
-export const profile: ProfileData = {
-  header: {
-    nameLines: ["Sebastián Garzón", "Arias"],
-    initials: "SGA",
-    tagline: "Estudiante de Ingeniería de Sistemas",
-    // 026: apunta al listado /proyectos (todos los proyectos), no al ancla de esta misma página.
-    primaryCta: { label: "Proyectos", href: "/proyectos" },
-    secondaryCta: { label: "Blog", href: "/blog" },
-  },
-  about: {
-    bio: "Me presento, soy Sebastián Garzón Arias, un estudiante de Ingeniería en Sistemas Computacionales de la Universidad de Caldas, con una formación previa a través de la curiosidad y mi pasión por la programación. Conocimiento que he adquirido de manera autodidacta; así descubrí que tengo habilidades para aprender y enseñar, y también me dio la habilidad de resolver de forma más eficiente y creativa los obstáculos que se presentan en este tipo de aprendizaje. Soy paciente en los procesos creativos, me gusta la innovación y el crecimiento constante, seguir de cerca la evolución de las tecnologías y crecer con ellas con seguridad. Lo que más me caracteriza es la constancia, la perseverancia y mi constante proceso de aprender nuevas habilidades.",
-    study: {
-      institution: "Universidad de Caldas",
-      period: "2024-2 — Actualidad",
-    },
-    social: [
-      { platform: "instagram", label: "@sga_28_", href: "https://instagram.com/sga_28_" },
-      { platform: "linkedin", label: "Pendiente", href: "#" },
-      {
-        platform: "email",
-        label: "sebastian.garzon54795@ucaldas.edu.co",
-        href: "mailto:sebastian.garzon54795@ucaldas.edu.co",
-      },
-    ],
-  },
-};
+/**
+ * Editable desde `/admin/contenido` (pestaña "Secciones", 064): este archivo solo tipa e
+ * importa `profile.json` — "Publicar" en el panel reescribe ese `.json` vía un commit real de
+ * GitHub, este `.ts` no cambia. Ver .claude/spec/features/064-panel-contenido-secciones/plan.md.
+ */
+export const profile: ProfileData = profileJson as ProfileData;

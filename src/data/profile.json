@@ -1,0 +1,25 @@
+{
+  "header": {
+    "nameLines": ["Sebastián Garzón", "Arias"],
+    "initials": "SGA",
+    "tagline": "Estudiante de Ingeniería de Sistemas",
+    "primaryCta": { "label": "Proyectos", "href": "/proyectos" },
+    "secondaryCta": { "label": "Blog", "href": "/blog" }
+  },
+  "about": {
+    "bio": "Me presento, soy Sebastián Garzón Arias, un estudiante de Ingeniería en Sistemas Computacionales de la Universidad de Caldas, con una formación previa a través de la curiosidad y mi pasión por la programación. Conocimiento que he adquirido de manera autodidacta; así descubrí que tengo habilidades para aprender y enseñar, y también me dio la habilidad de resolver de forma más eficiente y creativa los obstáculos que se presentan en este tipo de aprendizaje. Soy paciente en los procesos creativos, me gusta la innovación y el crecimiento constante, seguir de cerca la evolución de las tecnologías y crecer con ellas con seguridad. Lo que más me caracteriza es la constancia, la perseverancia y mi constante proceso de aprender nuevas habilidades.",
+    "study": {
+      "institution": "Universidad de Caldas",
+      "period": "2024-2 — Actualidad"
+    },
+    "social": [
+      { "platform": "instagram", "label": "@sga_28_", "href": "https://instagram.com/sga_28_" },
+      { "platform": "linkedin", "label": "Pendiente", "href": "#" },
+      {
+        "platform": "email",
+        "label": "sebastian.garzon54795@ucaldas.edu.co",
+        "href": "mailto:sebastian.garzon54795@ucaldas.edu.co"
+      }
+    ]
+  }
+}

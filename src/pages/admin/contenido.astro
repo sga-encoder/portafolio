@@ -1,0 +1,11 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ContentPanel from "../../components/admin/ContentPanel";
+import { buildProjectCards } from "../../lib/admin/projectCards";
+
+const switcherProjects = await buildProjectCards();
+---
+
+<BaseLayout title="Admin · Contenido" noindex>
+  <ContentPanel client:load switcherProjects={switcherProjects} />
+</BaseLayout>

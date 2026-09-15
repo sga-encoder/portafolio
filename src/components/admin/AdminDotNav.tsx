@@ -15,13 +15,13 @@ import {
   NAV_RAIL_LIST,
 } from "../nav/navRailClasses";
 
-export type AdminSection = "dashboard" | "estadisticas" | "proyectos" | "imagenes" | "servidores";
+export type AdminSection = "dashboard" | "estadisticas" | "proyectos" | "contenido" | "imagenes" | "servidores";
 
 interface AdminNavItem {
   key: AdminSection;
   href: string;
   label: string;
-  icon: "home" | "heart" | "folder" | "image" | "server";
+  icon: "home" | "heart" | "folder" | "image" | "server" | "grid";
 }
 
 // "proyectos" no vive acá: en vez de un link directo, ese ítem despliega
@@ -33,6 +33,7 @@ const BEFORE_PROYECTOS: readonly AdminNavItem[] = [
   { key: "estadisticas", href: "/admin/estadisticas", label: "Estadísticas", icon: "heart" },
 ];
 const AFTER_PROYECTOS: readonly AdminNavItem[] = [
+  { key: "contenido", href: "/admin/contenido", label: "Contenido", icon: "grid" },
   { key: "imagenes", href: "/admin/imagenes", label: "Imágenes", icon: "image" },
   { key: "servidores", href: "/admin/servidores", label: "Servidores", icon: "server" },
 ];

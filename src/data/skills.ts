@@ -1,3 +1,5 @@
+import skillsJson from "./skills.json";
+
 export type SkillCategory = "lenguajes" | "herramientas" | "diseño" | "frameworks";
 
 export interface Skill {
@@ -10,18 +12,7 @@ export interface Skill {
 }
 
 /** Orden exacto de `spec.md`: define tanto el orden vertical/chevron dentro de su columna en desktop como el orden dentro de su categoría en mobile. */
-export const skills: Skill[] = [
-  { name: "JavaScript", percentage: 85, imageKey: "skills/javascript", side: "left", category: "lenguajes" },
-  { name: "Python", percentage: 60, imageKey: "skills/python", side: "left", category: "lenguajes" },
-  { name: "Java", percentage: 55, imageKey: "skills/java", side: "left", category: "lenguajes" },
-  { name: "TypeScript", percentage: 65, imageKey: "skills/typescript", side: "left", category: "lenguajes" },
-  { name: "Figma", percentage: 90, imageKey: "skills/figma", side: "left", category: "herramientas" },
-  { name: "Tailwind", percentage: 70, imageKey: "skills/tailwind", side: "right", category: "diseño" },
-  { name: "CSS", percentage: 80, imageKey: "skills/css", side: "right", category: "diseño" },
-  { name: "Node.js", percentage: 75, imageKey: "skills/nodejs", side: "right", category: "frameworks" },
-  { name: "Next.js", percentage: 65, imageKey: "skills/nextjs", side: "right", category: "frameworks" },
-  { name: "React", percentage: 70, imageKey: "skills/react", side: "right", category: "frameworks" },
-];
+export const skills: Skill[] = skillsJson as Skill[];
 
 export const leftSkills = skills.filter((skill) => skill.side === "left");
 export const rightSkills = skills.filter((skill) => skill.side === "right");

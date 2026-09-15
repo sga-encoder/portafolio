@@ -3,7 +3,7 @@ import { getCloudinaryUrl } from "../../utils/cloudinaryManifest";
 import { PROJECTS } from "../../data/projects";
 import ProjectCarousel from "../projects/ProjectCarousel";
 
-const projects = PROJECTS.map((project) => ({
+const projects = PROJECTS.filter((project) => project.featuredOnHome !== false).map((project) => ({
   id: project.id,
   title: project.title,
   description: project.description,
