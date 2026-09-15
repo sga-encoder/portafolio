@@ -1,11 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import LikesPanel from "../../components/admin/LikesPanel";
+import StatsPanel from "../../components/admin/StatsPanel";
 import { buildProjectCards } from "../../lib/admin/projectCards";
 
 const projects = await buildProjectCards();
 ---
 
 <BaseLayout title="Admin · Estadísticas" noindex>
-  <LikesPanel client:load projects={projects} />
+  <StatsPanel client:load projects={projects} />
 </BaseLayout>

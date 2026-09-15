@@ -15,7 +15,7 @@ import {
   NAV_RAIL_LIST,
 } from "../nav/navRailClasses";
 
-export type AdminSection = "dashboard" | "likes" | "proyectos" | "imagenes" | "servidores";
+export type AdminSection = "dashboard" | "estadisticas" | "proyectos" | "imagenes" | "servidores";
 
 interface AdminNavItem {
   key: AdminSection;
@@ -27,10 +27,10 @@ interface AdminNavItem {
 // "proyectos" no vive acá: en vez de un link directo, ese ítem despliega
 // `ProjectSwitcherPanel` (mismo componente compartido con `ProjectDetailNav`
 // del sitio público, ver `projectSwitcherItems` abajo), en su misma posición
-// entre "likes" e "imagenes".
+// entre "estadisticas" e "imagenes".
 const BEFORE_PROYECTOS: readonly AdminNavItem[] = [
   { key: "dashboard", href: "/admin", label: "Panel", icon: "home" },
-  { key: "likes", href: "/admin/likes", label: "Estadísticas", icon: "heart" },
+  { key: "estadisticas", href: "/admin/estadisticas", label: "Estadísticas", icon: "heart" },
 ];
 const AFTER_PROYECTOS: readonly AdminNavItem[] = [
   { key: "imagenes", href: "/admin/imagenes", label: "Imágenes", icon: "image" },

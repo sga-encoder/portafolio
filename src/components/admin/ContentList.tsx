@@ -78,7 +78,7 @@ function saveCollapsedYears(years: Set<string>) {
   }
 }
 
-// Ver DashboardPanel.tsx/LikesPanel.tsx: separado de ContentList para que el
+// Ver DashboardPanel.tsx/StatsPanel.tsx: separado de ContentList para que el
 // fetch de estadísticas solo corra una vez que AdminGate confirmó sesión.
 function ContentListContent({ groups }: Props) {
   const [stats, setStats] = useState<Record<string, ProjectStats>>({});

@@ -34,7 +34,7 @@ service cloud.firestore {
 
       match /submissions/{submissionId} {
         // Sin lectura pública: ni listar la colección ni leer un doc suelto.
-        // El admin autenticado (043, panel /admin/likes) sí puede leer.
+        // El admin autenticado (043, panel /admin/estadisticas) sí puede leer.
         allow read: if isAdmin();
         allow update, delete: if false;
 
@@ -68,7 +68,7 @@ service cloud.firestore {
       allow delete: if false;
 
       // 057 · Desglose diario para "visitas del último mes" en
-      // /admin/likes. Mismo patrón anti-abuso que el contador total, pero
+      // /admin/estadisticas. Mismo patrón anti-abuso que el contador total, pero
       // sin lectura pública: es un dato interno del panel admin, no algo
       // que el sitio público necesite mostrar.
       match /days/{date} {

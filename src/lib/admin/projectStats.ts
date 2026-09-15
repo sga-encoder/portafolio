@@ -1,7 +1,7 @@
 import { collection, doc, documentId, getDoc, getDocs, query, where, type Timestamp } from "firebase/firestore";
 import { db } from "../firebase";
 
-// Estadísticas por proyecto para /admin/likes (057): junta likes (040),
+// Estadísticas por proyecto para /admin/estadisticas (057): junta likes (040),
 // visitas totales/última visita (055) y 2 datos nuevos — visitas del
 // último mes (subcolección projectViews/{slug}/days) y fecha de
 // creación/actualización (adminDrafts/{slug}, ya existente desde 043).
