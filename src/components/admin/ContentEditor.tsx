@@ -70,7 +70,7 @@ function normalizeFrontmatter(raw: Record<string, unknown>): ProjectFrontmatter 
     title: raw.title,
     summary: typeof raw.summary === "string" ? raw.summary : "",
     coverImage: typeof raw.coverImage === "string" ? raw.coverImage : "",
-    // Compat: un borrador en Firestore guardado antes de la migración de 064 puede seguir en el
+    // Compat: un borrador en Firestore guardado antes de la migración de 070 puede seguir en el
     // formato viejo (`gallery` como `string[]` de claves de Cloudinary, sin `label`) — se
     // normaliza acá en vez de perderlo silenciosamente.
     gallery: Array.isArray(raw.gallery)

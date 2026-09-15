@@ -25,7 +25,7 @@ function ChevronIcon({ direction }: { direction: "left" | "right" }) {
 /**
  * Vista principal tipo carrusel (réplica visual de `ProjectGallery.tsx`, el carrusel real de
  * `/proyectos/[slug]`) + pila de miniaturas a la derecha para elegir cuál mostrar como principal
- * (044, rediseño estético 063). Cada imagen es `{ image, label? }` (064): la imagen principal
+ * (044, rediseño estético 063). Cada imagen es `{ image, label? }` (070): la imagen principal
  * lleva además `ImageLabelControl` para agregar/editar/quitar su etiqueta; cada miniatura
  * conserva ✎/✕ de `EditableImage` y, si ya tiene etiqueta, un badge de solo lectura con el texto.
  */

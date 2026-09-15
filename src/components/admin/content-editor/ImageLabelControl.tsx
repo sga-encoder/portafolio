@@ -6,7 +6,7 @@ interface Props {
 }
 
 /**
- * Etiqueta opcional por imagen de la galería (064), superpuesta en la esquina superior izquierda
+ * Etiqueta opcional por imagen de la galería (070), superpuesta en la esquina superior izquierda
  * de la imagen principal — `EditableImage` ya ocupa inferior-derecha (✎) y superior-derecha (✕),
  * así que esta esquina queda libre. Sin `label`: botón "+". Con `label`: pastilla + editar/quitar.
  */
