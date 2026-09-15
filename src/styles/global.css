@@ -113,21 +113,68 @@ html {
    gradiente en movimiento y `mask-composite: exclude` deja visible solo el
    anillo del borde (no el interior). Neutralizado automáticamente bajo
    `prefers-reduced-motion: reduce` por la regla global de arriba, que fuerza
-   `animation-duration: 0.01ms` en todo el sitio. */
-@keyframes nav-rail-glow-sweep {
-  0% {
+   `animation-duration: 0.01ms` en todo el sitio.
+   Sincronizada con la animación idle de desplazamiento de abajo
+   (`nav-rail-idle-x`/`-y`, 049): mismos 6s de duración y mismos puntos de
+   porcentaje/`animation-timing-function` (pausa 0-20%, barrido lento
+   20-70%, rebote elástico 70-100%) — sin esto, al tener duraciones
+   distintas (antes 3.6s vs 6s), las dos animaciones se iban desfasando con
+   el tiempo en vez de "respirar" juntas. Arrancan ambas al mismo tiempo (se
+   definen en el mismo elemento/pseudo-elemento sin `animation-delay`), así
+   que compartir el mismo timeline las mantiene en fase indefinidamente.
+   También sigue el mismo eje por breakpoint que el desplazamiento (antes el
+   brillo siempre corría en horizontal aunque en mobile el riel se mueve en
+   vertical): `-x` anima `background-position` en X sobre un gradiente
+   horizontal (`90deg`, `background-size: 260% 100%`), `-y` lo mismo pero en
+   Y sobre un gradiente vertical (`180deg`, `background-size: 100% 260%`). */
+@keyframes nav-rail-glow-sweep-x {
+  0%,
+  20% {
     background-position: 0% 0%;
-    animation-timing-function: linear;
+    animation-timing-function: ease-in-out;
   }
   70% {
     background-position: 100% 0%;
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-timing-function: cubic-bezier(0.6, 0, 1, 1);
   }
   83% {
     background-position: 108% 0%;
+    animation-timing-function: ease-out;
   }
-  92% {
-    background-position: -6% 0%;
+  90% {
+    background-position: -4% 0%;
+    animation-timing-function: ease-in-out;
+  }
+  96% {
+    background-position: 1.5% 0%;
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+@keyframes nav-rail-glow-sweep-y {
+  0%,
+  20% {
+    background-position: 0% 0%;
+    animation-timing-function: ease-in-out;
+  }
+  70% {
+    background-position: 0% 100%;
+    animation-timing-function: cubic-bezier(0.6, 0, 1, 1);
+  }
+  83% {
+    background-position: 0% 108%;
+    animation-timing-function: ease-out;
+  }
+  90% {
+    background-position: 0% -4%;
+    animation-timing-function: ease-in-out;
+  }
+  96% {
+    background-position: 0% 1.5%;
+    animation-timing-function: ease-in-out;
   }
   100% {
     background-position: 0% 0%;
@@ -145,20 +192,126 @@ html {
   border-radius: inherit;
   padding: 2px;
   background-image: linear-gradient(
-    90deg,
+    180deg,
     transparent 0%,
     transparent 40%,
     var(--sphere-left-color, var(--project-left-color, var(--color-brand))) 50%,
     transparent 60%,
     transparent 100%
   );
-  background-size: 260% 100%;
-  animation: nav-rail-glow-sweep 3.6s infinite;
+  background-size: 100% 260%;
+  animation: nav-rail-glow-sweep-y 6s infinite;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .nav-rail-glow::before {
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 40%,
+      var(--sphere-left-color, var(--project-left-color, var(--color-brand))) 50%,
+      transparent 60%,
+      transparent 100%
+    );
+    background-size: 260% 100%;
+    animation-name: nav-rail-glow-sweep-x;
+  }
+}
+
+/* Animación idle del propio riel/barra (049, independiente del borde de
+   arriba): reposo -> desplazamiento lento hasta la mitad de su propio tamaño
+   -> vuelta rápida con rebote elástico (2 oscilaciones, bien marcado) ->
+   reposo, en loop infinito. Desktop usa el eje horizontal (el riel vive
+   anclado a la izquierda: lento hacia la derecha, rápido de vuelta a la
+   izquierda). Mobile usa el eje vertical, en el sentido opuesto (la píldora
+   vive anclada abajo: lento hacia ARRIBA alejándose del reposo, rápido de
+   vuelta hacia abajo, rebote de más recorriendo un poco más abajo del
+   reposo) — mismo breakpoint `768px`/`md` que ya separa riel de barra en
+   `navRailClasses.ts`. `translateX/Y(%)` ya es relativo al tamaño del propio
+   elemento, sin medir nada en JS. Pausable por interacción vía la clase
+   `.is-paused` (ver script en `BaseLayout.astro`). Neutralizada bajo
+   `prefers-reduced-motion: reduce` por la regla global de arriba, igual que
+   `nav-rail-glow-sweep`. */
+@keyframes nav-rail-idle-x {
+  0%,
+  20% {
+    transform: translateX(0%);
+    animation-timing-function: ease-in-out;
+  }
+  70% {
+    transform: translateX(50%);
+    animation-timing-function: cubic-bezier(0.6, 0, 1, 1);
+  }
+  83% {
+    transform: translateX(-9%);
+    animation-timing-function: ease-out;
+  }
+  90% {
+    transform: translateX(4%);
+    animation-timing-function: ease-in-out;
+  }
+  96% {
+    transform: translateX(-1.5%);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes nav-rail-idle-y {
+  0%,
+  20% {
+    transform: translateY(0%);
+    animation-timing-function: ease-in-out;
+  }
+  70% {
+    transform: translateY(-50%);
+    animation-timing-function: cubic-bezier(0.6, 0, 1, 1);
+  }
+  83% {
+    transform: translateY(9%);
+    animation-timing-function: ease-out;
+  }
+  90% {
+    transform: translateY(-4%);
+    animation-timing-function: ease-in-out;
+  }
+  96% {
+    transform: translateY(1.5%);
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+.nav-rail-glow {
+  animation: nav-rail-idle-y 6s infinite;
+  will-change: transform;
+}
+
+@media (min-width: 768px) {
+  .nav-rail-glow {
+    animation-name: nav-rail-idle-x;
+  }
+}
+
+/* El borde (::before) tiene su propia `animation` independiente de la de
+   arriba — sin esta regla, pausar el desplazamiento al interactuar dejaría
+   el borde sweep corriendo solo, y al reanudar quedarían desfasados otra
+   vez pese a compartir el mismo timeline de 6s. */
+.nav-rail-glow.is-paused::before {
+  animation-play-state: paused;
+}
+
+.nav-rail-glow.is-paused {
+  animation-play-state: paused;
 }
 
 body {

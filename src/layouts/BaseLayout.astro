@@ -37,6 +37,43 @@ const {
       // por View Transitions (ClientRouter) y la clase se pierde al navegar.
       document.documentElement.classList.add("dark");
     </script>
+    <script is:inline>
+      // Pausa/reanuda la animación idle (049) de los 3 dot-nav (ScrollDotNav/
+      // YearDotNav/ProjectDetailNav) mientras alguien interactúa con ellos —
+      // comparten `.nav-rail-glow` como único punto de enganche, así que un
+      // solo script global cubre los 3 sin tocar cada componente. Este script
+      // vive en <head>, antes de que exista el <body>, y ninguno de los 3
+      // navs usa `transition:persist` (se remontan en cada navegación), así
+      // que se engancha a `astro:page-load` (dispara en la carga inicial y en
+      // cada transición) en vez de correr una sola vez al parsear — mismo
+      // patrón que `ProjectLikeButton.astro`. El guard por `dataset` evita
+      // doble-bind si el nodo persiste entre dos disparos del evento.
+      function initNavRailIdlePause() {
+        document.querySelectorAll(".nav-rail-glow").forEach((el) => {
+          if (el.dataset.idleBound === "true") return;
+          el.dataset.idleBound = "true";
+
+          let activeInteractions = 0;
+          const pause = () => {
+            activeInteractions++;
+            el.classList.add("is-paused");
+          };
+          const resume = () => {
+            activeInteractions = Math.max(0, activeInteractions - 1);
+            if (activeInteractions === 0) el.classList.remove("is-paused");
+          };
+
+          el.addEventListener("pointerenter", pause);
+          el.addEventListener("pointerleave", resume);
+          el.addEventListener("focusin", pause);
+          el.addEventListener("focusout", resume);
+          el.addEventListener("touchstart", pause, { passive: true });
+          el.addEventListener("touchend", resume);
+          el.addEventListener("touchcancel", resume);
+        });
+      }
+      document.addEventListener("astro:page-load", initNavRailIdlePause);
+    </script>
     <ClientRouter />
   </head>
   <body class="flex min-h-screen flex-col bg-surface text-ink antialiased">
