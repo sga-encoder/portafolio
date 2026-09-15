@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
@@ -23,10 +23,10 @@ const app = initializeApp({
 // (reCAPTCHA v3) y explota ahí si no se filtra por entorno.
 //
 // Proveedor debug en dev (agregado con 043, al probar el login del panel en
-// local): la site key de reCAPTCHA v3 está atada al dominio de producción,
-// así que en `localhost` la validación real siempre falla — y como este
-// proyecto tiene App Check EXIGIDO para Authentication (no solo para
-// Firestore), sin ningún token el login de /admin lo rechaza con
+// local): la site key está atada al dominio de producción, así que en
+// `localhost` la validación real siempre falla — y como este proyecto tiene
+// App Check EXIGIDO para Authentication (no solo para Firestore), sin ningún
+// token el login de /admin lo rechaza con
 // `auth/firebase-app-check-token-is-invalid` (confirmado probando el panel
 // en local). Saltarse `initializeAppCheck` por completo en dev, como se
 // intentó primero, rompe el login en vez de arreglarlo. La solución oficial
@@ -34,9 +34,14 @@ const app = initializeApp({
 // con el dominio, que hay que registrar UNA VEZ en Firebase Console → Project
 // Settings → App Check → esta app web → "Manage debug tokens" → pegar
 // exactamente este valor. Solo corre en dev (`import.meta.env.DEV`) — el
-// build de producción sigue usando reCAPTCHA v3 real, sin cambios.
+// build de producción sigue usando reCAPTCHA real, sin cambios.
 const DEV_APP_CHECK_DEBUG_TOKEN = "db1315f7-042d-41dc-a249-5f30ec17389b";
 
+// Enterprise, no el reCAPTCHA v3 clásico (045): Firebase dejó de ofrecer
+// registrar el proveedor clásico para apps nuevas en App Check, así que la
+// site key viene de Google Cloud Console → Security → reCAPTCHA Enterprise
+// (no de google.com/recaptcha/admin) y debe coincidir con la que está
+// registrada en Firebase Console → App Check → esta app web.
 const recaptchaSiteKey = import.meta.env.PUBLIC_FIREBASE_RECAPTCHA_SITE_KEY;
 if (recaptchaSiteKey && typeof document !== "undefined") {
   if (import.meta.env.DEV) {
@@ -44,7 +49,7 @@ if (recaptchaSiteKey && typeof document !== "undefined") {
       DEV_APP_CHECK_DEBUG_TOKEN;
   }
   initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(recaptchaSiteKey),
+    provider: new ReCaptchaEnterpriseProvider(recaptchaSiteKey),
     isTokenAutoRefreshEnabled: true,
   });
 }
