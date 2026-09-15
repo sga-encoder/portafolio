@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import AdminGate from "./AdminGate";
+import CloudinaryUsageCard from "./CloudinaryUsageCard";
 import type { ProjectCardData } from "../../lib/admin/projectCards";
 
 interface Props {
@@ -45,6 +46,9 @@ function DashboardContent({ slugs }: { slugs: string[] }) {
           <p className="text-3xl font-display font-bold">{totalLikes ?? "…"}</p>
         </div>
       </div>
+
+      <h2 className="mb-4 mt-8 text-lg font-display font-semibold">Cloudinary</h2>
+      <CloudinaryUsageCard />
     </>
   );
 }

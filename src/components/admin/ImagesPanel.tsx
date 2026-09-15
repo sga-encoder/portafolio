@@ -2,21 +2,20 @@ import { useState } from "react";
 import AdminGate from "./AdminGate";
 import PortfolioImagesTab from "./images/PortfolioImagesTab";
 import OtherProjectsTab from "./images/OtherProjectsTab";
-import StatsTab from "./images/StatsTab";
 import type { ProjectCardData } from "../../lib/admin/projectCards";
 
-type Tab = "portafolio" | "otros" | "estadisticas";
+type Tab = "portafolio" | "otros";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "portafolio", label: "Portafolio" },
   { key: "otros", label: "Otros proyectos" },
-  { key: "estadisticas", label: "Estadísticas" },
 ];
 
-// Separado en 3 pestañas independientes (feature 045): cada una hace su
+// Separado en pestañas independientes (feature 045): cada una hace su
 // propio fetch en su propio efecto, así cambiar de pestaña no repite
-// llamadas innecesarias a GitHub/Cloudinary. Ver
-// .claude/spec/features/045-imagenes-multiproyecto-estadisticas/plan.md.
+// llamadas innecesarias a GitHub/Cloudinary. La pestaña "Estadísticas"
+// se movió al panel principal de /admin en 061 (ver
+// .claude/spec/features/061-estadisticas-cloudinary-panel-principal/plan.md).
 function ImagesContent() {
   const [tab, setTab] = useState<Tab>("portafolio");
 
@@ -41,7 +40,6 @@ function ImagesContent() {
 
       {tab === "portafolio" && <PortfolioImagesTab />}
       {tab === "otros" && <OtherProjectsTab />}
-      {tab === "estadisticas" && <StatsTab />}
     </>
   );
 }

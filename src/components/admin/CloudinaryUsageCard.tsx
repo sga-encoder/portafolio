@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { getUsage, type CloudinaryUsage } from "../../../lib/admin/cloudinaryAccount";
+import { getUsage, type CloudinaryUsage } from "../../lib/admin/cloudinaryAccount";
+
+const GB = 1024 ** 3;
 
 type Status = "loading" | "idle" | "error";
 
@@ -24,7 +26,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default function StatsTab() {
+export default function CloudinaryUsageCard() {
   const [usage, setUsage] = useState<CloudinaryUsage | null>(null);
   const [status, setStatus] = useState<Status>("loading");
   const [error, setError] = useState<string | null>(null);
@@ -64,21 +66,38 @@ export default function StatsTab() {
 
       {status === "error" && <p className="text-red-400">{error}</p>}
 
-      {usage && (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-          <StatCard label="Plan" value={usage.plan} />
-          {usage.credits && (
-            <StatCard label="Créditos" value={`${usage.credits.usage.toFixed(1)} / ${usage.credits.limit}`} />
-          )}
-          <StatCard label="Almacenamiento" value={formatBytes(usage.storage.usage)} />
-          {usage.bandwidth && <StatCard label="Ancho de banda (mes)" value={formatBytes(usage.bandwidth.usage)} />}
-          <StatCard label="Recursos" value={String(usage.resources)} />
-          <StatCard label="Recursos derivados" value={String(usage.derived_resources)} />
-          {usage.transformations && (
-            <StatCard label="Transformaciones (mes)" value={String(usage.transformations.usage)} />
-          )}
-        </div>
-      )}
+      {usage && (() => {
+        const remainingCredits = usage.credits ? usage.credits.limit - usage.credits.usage : null;
+        return (
+          <>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <StatCard label="Plan" value={usage.plan} />
+              {usage.credits && (
+                <StatCard label="Créditos" value={`${usage.credits.usage.toFixed(1)} / ${usage.credits.limit}`} />
+              )}
+              <StatCard label="Almacenamiento" value={formatBytes(usage.storage.usage)} />
+              {remainingCredits !== null && (
+                <StatCard
+                  label="Espacio disponible (estimado)"
+                  value={formatBytes(Math.max(0, remainingCredits) * GB)}
+                />
+              )}
+              {usage.bandwidth && <StatCard label="Ancho de banda (mes)" value={formatBytes(usage.bandwidth.usage)} />}
+              <StatCard label="Recursos" value={String(usage.resources)} />
+              <StatCard label="Recursos derivados" value={String(usage.derived_resources)} />
+              {usage.transformations && (
+                <StatCard label="Transformaciones (mes)" value={String(usage.transformations.usage)} />
+              )}
+            </div>
+            {remainingCredits !== null && (
+              <p className="mt-3 text-xs text-ink-muted">
+                Estimado a partir de los créditos restantes del plan (1 crédito ≈ 1 GB) — se comparten con ancho de
+                banda y transformaciones, no es un límite exclusivo de almacenamiento.
+              </p>
+            )}
+          </>
+        );
+      })()}
     </>
   );
 }
