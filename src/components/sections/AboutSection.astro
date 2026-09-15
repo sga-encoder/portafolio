@@ -16,8 +16,10 @@ const personaUrl = getCloudinaryUrl("about/persona03", "q_auto,f_auto");
   </div>
 
   <div class="flex min-w-0 flex-1 flex-col justify-center gap-[3vh] px-[6vw] py-[3vh] short:gap-[1vh] short:py-[1vh] md:px-[4vw]">
-    <AboutFrame class="flex-[2]">
-      <p class="font-body text-ink-muted text-sm short:text-xs short:line-clamp-3">{about.bio}</p>
+    <AboutFrame>
+      <p class="font-body text-ink-muted text-[clamp(0.9rem,1.2vw,1.125rem)] short:text-xs short:line-clamp-3">
+        {about.bio}
+      </p>
     </AboutFrame>
 
     <AboutInfoBlock about={about} class="hidden md:flex md:flex-col md:gap-[3vh] short:gap-[1vh]" />
