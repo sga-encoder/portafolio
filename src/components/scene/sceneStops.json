@@ -1,0 +1,154 @@
+[
+  {
+    "zoneId": "header",
+    "spheres": {
+      "a": {
+        "end": {
+          "position": [
+            -1,
+            1,
+            0.1
+          ],
+          "screenFraction": 1.7,
+          "color": "#ff0000"
+        }
+      },
+      "b": {
+        "end": {
+          "position": [
+            1,
+            -1,
+            0.1
+          ],
+          "screenFraction": 1.7,
+          "color": "#0033ff"
+        }
+      },
+      "c": {
+        "end": {
+          "position": [
+            1,
+            -1,
+            0.15
+          ],
+          "screenFraction": 0,
+          "color": "#00C080"
+        }
+      }
+    }
+  },
+  {
+    "zoneId": "habilidades",
+    "spheres": {
+      "a": {
+        "end": {
+          "position": [
+            1,
+            1,
+            0.1
+          ],
+          "screenFraction": 1.7,
+          "color": "#6a00ff"
+        }
+      },
+      "b": {
+        "end": {
+          "position": [
+            -1,
+            -1,
+            0.1
+          ],
+          "screenFraction": 1.7,
+          "color": "#0033ff"
+        }
+      },
+      "c": {
+        "end": {
+          "position": [
+            1,
+            -1,
+            0.15
+          ],
+          "screenFraction": 0,
+          "color": "#00C080"
+        }
+      }
+    }
+  },
+  {
+    "zoneId": "proyectos",
+    "spheres": {
+      "a": {
+        "end": {
+          "position": [
+            2.4,
+            1,
+            0.1
+          ],
+          "screenFraction": 1.7,
+          "color": "#c0009d"
+        }
+      },
+      "b": {
+        "end": {
+          "position": [
+            -1,
+            1,
+            0.1
+          ],
+          "screenFraction": 1.7,
+          "color": "#0033ff"
+        }
+      },
+      "c": {
+        "end": {
+          "position": [
+            1,
+            -1,
+            0.15
+          ],
+          "screenFraction": 1.7,
+          "color": "#00C080"
+        }
+      }
+    }
+  },
+  {
+    "zoneId": "sobre-mi",
+    "spheres": {
+      "a": {
+        "end": {
+          "position": [
+            1,
+            -1,
+            0.1
+          ],
+          "screenFraction": 1.7,
+          "color": "#6a00ff"
+        }
+      },
+      "b": {
+        "end": {
+          "position": [
+            -2.4,
+            1,
+            0.1
+          ],
+          "screenFraction": 1.7,
+          "color": "#0033ff"
+        }
+      },
+      "c": {
+        "end": {
+          "position": [
+            -1,
+            1,
+            0.15
+          ],
+          "screenFraction": 1.7,
+          "color": "#00C080"
+        }
+      }
+    }
+  }
+]
