@@ -126,9 +126,10 @@ function ContentEditorContent({ slug }: Props) {
       setIsDraft(true);
       setStatus("idle");
       setMessage("Borrador guardado.");
-    } catch {
+    } catch (err) {
+      console.error(err);
       setStatus("error");
-      setMessage("No se pudo guardar el borrador.");
+      setMessage(`No se pudo guardar el borrador: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -140,9 +141,10 @@ function ContentEditorContent({ slug }: Props) {
       setIsDraft(false);
       setStatus("idle");
       setMessage("Publicado.");
-    } catch {
+    } catch (err) {
+      console.error(err);
       setStatus("error");
-      setMessage("No se pudo publicar.");
+      setMessage(`No se pudo publicar: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
