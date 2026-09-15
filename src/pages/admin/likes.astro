@@ -1,12 +1,11 @@
 ---
-import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import LikesPanel from "../../components/admin/LikesPanel";
+import { buildProjectCards } from "../../lib/admin/projectCards";
 
-const projects = await getCollection("projects");
-const slugs = projects.map((project) => project.id);
+const projects = await buildProjectCards();
 ---
 
-<BaseLayout title="Admin · Likes" showHeader={false} noindex>
-  <LikesPanel client:load slugs={slugs} />
+<BaseLayout title="Admin · Estadísticas" noindex>
+  <LikesPanel client:load projects={projects} />
 </BaseLayout>

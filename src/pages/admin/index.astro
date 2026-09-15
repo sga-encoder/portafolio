@@ -1,12 +1,12 @@
 ---
-import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import DashboardPanel from "../../components/admin/DashboardPanel";
+import { buildProjectCards } from "../../lib/admin/projectCards";
 
-const projects = await getCollection("projects");
-const slugs = projects.map((project) => project.id);
+const switcherProjects = await buildProjectCards();
+const slugs = switcherProjects.map((project) => project.slug);
 ---
 
-<BaseLayout title="Admin · Panel" showHeader={false} noindex>
-  <DashboardPanel client:load slugs={slugs} />
+<BaseLayout title="Admin · Panel" noindex>
+  <DashboardPanel client:load slugs={slugs} switcherProjects={switcherProjects} />
 </BaseLayout>

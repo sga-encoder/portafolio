@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import ContentEditor from "../../../components/admin/ContentEditor";
+import { buildProjectCards } from "../../../lib/admin/projectCards";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -9,8 +10,9 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.props;
+const switcherProjects = await buildProjectCards();
 ---
 
-<BaseLayout title={`Admin · ${slug}`} showHeader={false} noindex>
-  <ContentEditor client:load slug={slug} />
+<BaseLayout title={`Admin · ${slug}`} noindex>
+  <ContentEditor client:load slug={slug} switcherProjects={switcherProjects} />
 </BaseLayout>

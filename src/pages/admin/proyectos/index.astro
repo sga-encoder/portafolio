@@ -1,12 +1,12 @@
 ---
-import { getCollection } from "astro:content";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import ContentList from "../../../components/admin/ContentList";
+import { buildProjectCardGroups } from "../../../lib/admin/projectCards";
 
-const entries = await getCollection("projects");
-const projects = entries.map((project) => ({ slug: project.id, title: project.data.title }));
+const groups = await buildProjectCardGroups();
+const switcherProjects = groups.flatMap((group) => group.projects);
 ---
 
-<BaseLayout title="Admin · Proyectos" showHeader={false} noindex>
-  <ContentList client:load projects={projects} />
+<BaseLayout title="Admin · Proyectos" noindex>
+  <ContentList client:load groups={groups} switcherProjects={switcherProjects} />
 </BaseLayout>

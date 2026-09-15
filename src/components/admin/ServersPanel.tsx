@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { loadContent } from "../../lib/admin/drafts";
 import { parseFrontmatter } from "../../lib/admin/frontmatter";
 import type { ProjectServer } from "../../lib/admin/servers";
+import type { ProjectCardData } from "../../lib/admin/projectCards";
 import AdminGate from "./AdminGate";
 import ServerStatusCard from "./servers/ServerStatusCard";
 
@@ -18,6 +19,10 @@ interface ProjectServers {
 
 interface Props {
   projects: ProjectMeta[];
+}
+
+interface PanelProps extends Props {
+  switcherProjects: ProjectCardData[];
 }
 
 // Ver DashboardPanel.tsx: separado de ServersPanel para que el fetch a GitHub solo corra una vez
@@ -87,9 +92,9 @@ function ServersContent({ projects }: Props) {
   );
 }
 
-export default function ServersPanel({ projects }: Props) {
+export default function ServersPanel({ projects, switcherProjects }: PanelProps) {
   return (
-    <AdminGate active="servidores">
+    <AdminGate active="servidores" switcherProjects={switcherProjects}>
       <ServersContent projects={projects} />
     </AdminGate>
   );

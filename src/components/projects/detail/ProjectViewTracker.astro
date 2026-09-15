@@ -1,0 +1,64 @@
+---
+// Contador de visitas por proyecto (feature 055), Firestore. Sin UI visible
+// — solo registra la visita, `/admin/proyectos` es quien muestra el dato.
+// Mismo mecanismo de import/`runTransaction` que ProjectLikeButton.astro
+// (módulo normal, no `is:inline`, reinicializado por página vía
+// `astro:page-load` en vez de re-ejecución del módulo en soft-nav).
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<span data-view-tracker-root data-slug={slug} hidden></span>
+
+<script>
+  import { db } from "../../../lib/firebase";
+  import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
+
+  function todayKey(): string {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function visitedKey(slug: string): string {
+    return `visited-${slug}-${todayKey()}`;
+  }
+
+  function initViewTracker(root: HTMLElement) {
+    if (root.dataset.viewBound === "true") return;
+    root.dataset.viewBound = "true";
+
+    const slug = root.dataset.slug;
+    if (!slug) return;
+
+    const key = visitedKey(slug);
+    if (localStorage.getItem(key) === "true") return;
+
+    const viewRef = doc(db, "projectViews", slug);
+    const dayRef = doc(db, "projectViews", slug, "days", todayKey());
+    runTransaction(db, async (tx) => {
+      // Firestore exige todas las lecturas de una transacción antes de
+      // cualquier escritura, por eso los 2 `get` van juntos arriba.
+      const [snap, daySnap] = await Promise.all([tx.get(viewRef), tx.get(dayRef)]);
+      const nextCount = snap.exists() ? (snap.data().count ?? 0) + 1 : 1;
+      const nextDayCount = daySnap.exists() ? (daySnap.data().count ?? 0) + 1 : 1;
+      tx.set(viewRef, { count: nextCount, lastVisit: serverTimestamp() });
+      tx.set(dayRef, { count: nextDayCount });
+    })
+      .then(() => {
+        localStorage.setItem(key, "true");
+      })
+      .catch((error) => {
+        // Fallo silencioso para el visitante (sin red, Firestore bloqueado,
+        // etc.) — mismo criterio que ProjectLikeButton.
+        console.error("No se pudo registrar la visita", error);
+      });
+  }
+
+  function initAllViewTrackers() {
+    document.querySelectorAll<HTMLElement>("[data-view-tracker-root]").forEach(initViewTracker);
+  }
+
+  document.addEventListener("astro:page-load", initAllViewTrackers);
+</script>

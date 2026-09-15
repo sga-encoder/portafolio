@@ -1,5 +1,17 @@
+export type NavIconName =
+  | "home"
+  | "gear"
+  | "folder"
+  | "user"
+  | "heart"
+  | "image"
+  | "server"
+  | "logout"
+  | "layers"
+  | "grid";
+
 interface Props {
-  icon: "home" | "gear" | "folder" | "user";
+  icon: NavIconName;
 }
 
 /**
@@ -53,15 +65,106 @@ export default function NavIcon({ icon }: Props) {
     );
   }
 
+  if (icon === "user") {
+    return (
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+        <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth={2} />
+        <path
+          d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (icon === "heart") {
+    return (
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+        <path
+          d="M12 20s-7-4.35-9.5-8.8C1 8.1 2.4 5 5.6 5c1.9 0 3.3 1 4.4 2.6C11.1 6 12.5 5 14.4 5 17.6 5 19 8.1 21.5 11.2 19 15.65 12 20 12 20z"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (icon === "image") {
+    return (
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth={2} />
+        <circle cx="8.5" cy="9.5" r="1.5" stroke="currentColor" strokeWidth={2} />
+        <path
+          d="m4 17 5-5 4 4 3-3 4 4"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (icon === "server") {
+    return (
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="6" rx="1.5" stroke="currentColor" strokeWidth={2} />
+        <rect x="3" y="14" width="18" height="6" rx="1.5" stroke="currentColor" strokeWidth={2} />
+        <circle cx="7" cy="7" r="1" fill="currentColor" />
+        <circle cx="7" cy="17" r="1" fill="currentColor" />
+      </svg>
+    );
+  }
+
+  if (icon === "logout") {
+    return (
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+        <path
+          d="M15 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h9"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M20 12H10m10 0-3.5-3.5M20 12l-3.5 3.5"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  // "layers"/"grid": mismos paths que `NavIcon.astro` (usado por
+  // `ProjectDetailNav`) — icónos del selector rápido de proyectos
+  // (`ProjectSwitcherPanel`, compartido entre el sitio público y `/admin`).
+  if (icon === "layers") {
+    return (
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+        <polygon points="12 4 21 9 12 14 3 9" stroke="currentColor" strokeWidth={2} strokeLinejoin="round" />
+        <polyline
+          points="3 14 12 19 21 14"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
-      <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth={2} />
-      <path
-        d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"
-        stroke="currentColor"
-        strokeWidth={2}
-        strokeLinecap="round"
-      />
+      <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth={2} />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth={2} />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth={2} />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth={2} />
     </svg>
   );
 }

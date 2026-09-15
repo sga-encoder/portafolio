@@ -3,20 +3,17 @@ import "../styles/global.css";
 import "@fontsource/space-grotesk/700.css";
 import "@fontsource/montserrat/400.css";
 import { ClientRouter } from "astro:transitions";
-import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 
 interface Props {
   title: string;
   description?: string;
-  showHeader?: boolean;
   noindex?: boolean;
 }
 
 const {
   title,
   description = "Portafolio personal: hoja de vida y blog.",
-  showHeader = true,
   noindex = false,
 } = Astro.props;
 ---
@@ -77,7 +74,6 @@ const {
     <ClientRouter />
   </head>
   <body class="flex min-h-screen flex-col bg-surface text-ink antialiased">
-    {showHeader && <Header />}
     <main class="flex-1">
       <slot />
     </main>

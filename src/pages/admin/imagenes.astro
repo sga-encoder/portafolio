@@ -1,8 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ImagesPanel from "../../components/admin/ImagesPanel";
+import { buildProjectCards } from "../../lib/admin/projectCards";
+
+const switcherProjects = await buildProjectCards();
 ---
 
-<BaseLayout title="Admin · Imágenes" showHeader={false} noindex>
-  <ImagesPanel client:load />
+<BaseLayout title="Admin · Imágenes" noindex>
+  <ImagesPanel client:load switcherProjects={switcherProjects} />
 </BaseLayout>

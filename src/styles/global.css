@@ -314,7 +314,246 @@ html {
   animation-play-state: paused;
 }
 
+/* Selector rápido de proyectos (`ProjectSwitcherPanel.tsx`, `src/components/nav/`):
+   botón-ícono que abre un panel con tarjetas de otros proyectos + un botón
+   companion "Ver todos". Un solo componente React compartido por el sitio
+   público (`ProjectDetailNav.astro`, dentro de un `client:load`) y por
+   `/admin` (`AdminDotNav.tsx`) — 054 — así que estas reglas viven acá en vez
+   de en un `<style>` scoped de un `.astro` (antes en
+   `ProjectSwitcherPanel.astro`, antes de unificarse). `<details>` nativo
+   (sin JS de estado) + un `useEffect` mínimo en el propio componente para
+   cerrar al hacer click fuera / Escape.
+   (041) "Ver todos los proyectos" es un botón *companion*, separado del
+   grid de tarjetas por un `gap: 2vw` — al compartir el `display: none` de
+   `.project-switcher:not([open]) .project-switcher-shell`, aparece y
+   desaparece junto con el resto sin JS ni estado adicional. El trigger vive
+   siempre dentro del menú principal (riel desktop / barra mobile), y el
+   conjunto se posiciona distinto por breakpoint vía CSS
+   (`@media (max-width: 767px)`) — en mobile usa `position: fixed` centrado,
+   no relativo al botón de 36px.
+   (050) "Ver todos" es hermano de `.project-switcher-panel` (la caja con
+   fondo/borde/blur del grid) dentro de `.project-switcher-shell` — dos
+   tarjetas visualmente separadas en vez de una compartida.
+   `overflow-x: visible` + `overflow-y: auto` es una combinación que CSS no
+   permite (el navegador fuerza el eje "visible" a "auto"), así que con
+   `md:w-full` en las tarjetas el eje X pasa a `md:overflow-x-hidden`. */
+.project-switcher > summary {
+  list-style: none;
+}
+
+.project-switcher > summary::-webkit-details-marker {
+  display: none;
+}
+
+.project-switcher:not([open]) .project-switcher-shell {
+  display: none;
+}
+
+.project-switcher-label {
+  left: 100%;
+  margin-left: 0.75rem;
+}
+
+/* El label ("Cambiar de proyecto") comparte la regla global `.group:hover
+   .scroll-dot-label, .group:focus-within .scroll-dot-label { opacity: 1;
+   ... }` con el resto de labels del sitio — el `:focus-within` está ahí
+   para que un usuario de teclado (tab) también lo vea. Pero en `<details>`
+   el `<summary>` queda enfocado en cuanto se abre (clic o tap) y no se
+   desenfoca solo por eso, así que en mobile (sin hover real) el label se
+   quedaba visible todo el tiempo que el panel estuviera abierto en vez de
+   solo al pasar el mouse. Se anula acá específicamente el `:focus-within`
+   (con más especificidad que la regla global, sumando `.project-switcher`)
+   para que este label dependa solo de `:hover`. */
+.project-switcher.group:focus-within .project-switcher-label {
+  opacity: 0;
+  transform: translateX(-8px) scale(0.5);
+}
+
+/* Panel (solo el grid, 050): ya no lleva posición/tamaño propios — los
+   hereda del `.project-switcher-shell` que lo envuelve — solo necesita
+   poder encogerse a la altura que le da ese padre para que el
+   `overflow-y-auto` del `<ul>` interno se active (gotcha de flex anidado:
+   sin `min-height: 0`, un flex item crece a la altura de su contenido en
+   vez de respetar la del padre). */
+.project-switcher-panel {
+  min-height: 0;
+}
+
+/* Desktop: el riel siempre está a la izquierda con espacio de sobra a la
+   derecha, así que un ancho fijo + shell abriéndose hacia la derecha del
+   botón nunca se sale de pantalla. */
+.project-switcher-shell {
+  left: 100%;
+  top: 50%;
+  margin-left: calc(0.75rem + 1vw);
+  transform: translateY(-50%);
+  gap: 1vw;
+  /* Ancho: el contenedor de posicionamiento (`<details>`) mide solo 36px
+     (el botón), así que el "shrink-to-fit" por defecto de un absolute con
+     `left` fijo pero sin `width` calcula el espacio disponible sobre esos
+     36px y colapsa el shell al mínimo — hay que fijar el ancho a mano.
+     27.5rem = grid (2 tarjetas de 10rem + gap-3) + botón companion (w-20) +
+     padding; se suma el `1vw` del gap aparte para que no se lo coma el
+     ancho fijo en viewports grandes. */
+  width: calc(27.5rem + 1vw);
+  max-height: 20rem;
+}
+
+/* Scrollbar del grid en escritorio (donde scrollea en Y, `md:overflow-y-auto`):
+   delgada y del color del propio proyecto (`--switcher-scroll-color`, seteada
+   inline en `.project-switcher-panel` y heredada) en vez del scrollbar
+   genérico del navegador — Firefox vía `scrollbar-width`/`scrollbar-color`,
+   Chrome/Safari vía `::-webkit-scrollbar*`. En mobile el grid scrollea en X
+   dentro de una barra fija inferior (carrusel de tarjetas, con inercia
+   táctil) y se deja el scrollbar nativo del sistema, sin estilizar. */
+@media (min-width: 768px) {
+  .project-switcher-grid {
+    scrollbar-width: thin;
+    scrollbar-color: var(--switcher-scroll-color, var(--color-brand)) transparent;
+  }
+
+  .project-switcher-grid::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .project-switcher-grid::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .project-switcher-grid::-webkit-scrollbar-thumb {
+    background-color: var(--switcher-scroll-color, var(--color-brand));
+    border-radius: 9999px;
+  }
+
+  .project-switcher-grid::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--switcher-scroll-color, var(--color-brand)) 80%, white);
+  }
+}
+
+@media (max-width: 767px) {
+  .project-switcher-label {
+    left: auto;
+    right: 0;
+    margin-left: 0;
+    bottom: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  /* El trigger vive dentro de la barra inferior y puede caer en cualquier
+     punto de la fila — posicionar el shell relativo a esos 36px del botón
+     lo dejaba parcial o totalmente fuera de pantalla según dónde cayera.
+     `position: fixed` + centrado horizontal, anclado arriba de la barra,
+     es robusto sin importar la posición del botón. */
+  .project-switcher-shell {
+    position: fixed;
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: calc(6rem + env(safe-area-inset-bottom));
+    margin: 0;
+    transform: translateX(-50%);
+    /* Columna en vez de fila: "Ver todos" (reordenado arriba con
+       `order: -1` en `.project-switcher-all`) queda arriba del panel en vez
+       de al lado. */
+    flex-direction: column;
+    width: min(20rem, calc(100vw - 2rem));
+    max-height: 60vh;
+    gap: 2vw;
+  }
+
+  .project-switcher-all {
+    order: -1;
+    width: 100%;
+    flex-direction: row;
+    padding-block: 1rem;
+  }
+}
+
 body {
   background-color: var(--color-surface);
   color: var(--color-ink);
+}
+
+/* Modal de confirmación del panel /admin (058, PublishDraftButton.tsx) —
+   calco de `.like-dialog`/`.like-backdrop` de ProjectLikeButton.astro
+   (mismos tiempos/curvas), duplicado a propósito: el CSS scoped de un
+   componente Astro no es accesible desde un island React. */
+.admin-confirm-dialog {
+  margin: auto;
+  border: none;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  width: min(24rem, calc(100vw - 2rem));
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  animation: admin-confirm-dialog-in 380ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.admin-confirm-dialog.is-closing {
+  animation: admin-confirm-dialog-out 220ms ease-in forwards;
+}
+
+.admin-confirm-dialog::backdrop {
+  background-color: color-mix(in srgb, var(--color-surface) 65%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: admin-confirm-backdrop-in 380ms ease both;
+}
+
+.admin-confirm-dialog.is-closing::backdrop {
+  animation: admin-confirm-backdrop-out 220ms ease-in forwards;
+}
+
+@keyframes admin-confirm-dialog-in {
+  0% {
+    transform: translateY(70px);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(3px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes admin-confirm-dialog-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(70px);
+    opacity: 0;
+  }
+}
+
+@keyframes admin-confirm-backdrop-in {
+  from {
+    background-color: transparent;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  to {
+    background-color: color-mix(in srgb, var(--color-surface) 65%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+}
+
+@keyframes admin-confirm-backdrop-out {
+  from {
+    background-color: color-mix(in srgb, var(--color-surface) 65%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  to {
+    background-color: transparent;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
 }

@@ -18,8 +18,11 @@
 // ese componente). El menú principal queda simétrico en desktop y mobile: 4
 // ítems — anterior, inicio, selector rápido (ícono capas), siguiente —, sin
 // pestañas ni botones flotantes aparte.
+// (054) `ProjectSwitcherPanel` vive en `src/components/nav/` como componente
+// React compartido con `/admin` (`AdminDotNav.tsx`), en vez del `.astro`
+// propio de este directorio que tenía antes — montado acá como `client:load`.
 import NavIcon from "./NavIcon.astro";
-import ProjectSwitcherPanel from "./ProjectSwitcherPanel.astro";
+import ProjectSwitcherPanel from "../../nav/ProjectSwitcherPanel";
 import {
   NAV_BAR_MOBILE,
   NAV_BAR_MOBILE_LIST,
@@ -107,7 +110,7 @@ const circleStyle = (color: string) =>
         entries.map((entry) =>
           entry.kind === "switcher" ? (
             <li class="relative flex items-center">
-              <ProjectSwitcherPanel items={otherProjects} color={rightColor} />
+              <ProjectSwitcherPanel client:load items={otherProjects} color={rightColor} allHref="/proyectos" />
             </li>
           ) : (
             <li class="group relative flex items-center">
@@ -150,7 +153,8 @@ const circleStyle = (color: string) =>
      (`.scroll-dot-label`/`is-pressed`, ver `holdToNavigate.ts`); la
      navegación solo se dispara al soltar encima del botón (037). El
      selector rápido vive acá también (no aparte, 041) — su panel se
-     posiciona `fixed`/centrado vía CSS en `ProjectSwitcherPanel.astro`. */
+     posiciona `fixed`/centrado vía CSS global (`.project-switcher-shell`,
+     `global.css`), no un `<style>` scoped (054, ver `ProjectSwitcherPanel.tsx`). */
 }
 <nav aria-label="Navegación entre proyectos" class={NAV_BAR_MOBILE}>
   <ul class={`${NAV_BAR_MOBILE_LIST} hold-to-navigate-list`}>
@@ -158,7 +162,7 @@ const circleStyle = (color: string) =>
       entries.map((entry) =>
         entry.kind === "switcher" ? (
           <li class="relative flex items-center">
-            <ProjectSwitcherPanel items={otherProjects} color={rightColor} />
+            <ProjectSwitcherPanel client:load items={otherProjects} color={rightColor} allHref="/proyectos" />
           </li>
         ) : (
           <li class="group relative flex items-center">

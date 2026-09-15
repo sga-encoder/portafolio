@@ -3,9 +3,11 @@ import { loadContent, publish, saveDraft } from "../../lib/admin/drafts";
 import { parseFrontmatter, serializeFrontmatter } from "../../lib/admin/frontmatter";
 import ProjectEditorLayout, { type ProjectFrontmatter } from "./content-editor/ProjectEditorLayout";
 import AdminGate from "./AdminGate";
+import type { ProjectCardData } from "../../lib/admin/projectCards";
 
 interface Props {
   slug: string;
+  switcherProjects: ProjectCardData[];
 }
 
 type Status = "idle" | "loading" | "saving" | "publishing" | "error";
@@ -80,7 +82,7 @@ function cleanFrontmatter(data: ProjectFrontmatter): ProjectFrontmatter {
 
 // Ver DashboardPanel.tsx: separado de ContentEditor para que la carga desde
 // GitHub/Firestore solo corra una vez que AdminGate confirmó sesión.
-function ContentEditorContent({ slug }: Props) {
+function ContentEditorContent({ slug }: { slug: string }) {
   const [data, setData] = useState<ProjectFrontmatter | null>(null);
   const [body, setBody] = useState("");
   const [sha, setSha] = useState<string | null>(null);
@@ -184,9 +186,9 @@ function ContentEditorContent({ slug }: Props) {
   );
 }
 
-export default function ContentEditor({ slug }: Props) {
+export default function ContentEditor({ slug, switcherProjects }: Props) {
   return (
-    <AdminGate active="proyectos" wide>
+    <AdminGate active="proyectos" wide switcherProjects={switcherProjects} currentSlug={slug}>
       <ContentEditorContent slug={slug} />
     </AdminGate>
   );

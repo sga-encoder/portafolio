@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import AdminGate from "./AdminGate";
+import type { ProjectCardData } from "../../lib/admin/projectCards";
 
 interface Props {
   slugs: string[];
+  switcherProjects: ProjectCardData[];
 }
 
 // Separado de DashboardPanel a propósito: sus hooks (y el fetch a
@@ -12,7 +14,7 @@ interface Props {
 // montar este componente como hijo de AdminGate logra eso; si el fetch
 // viviera en el propio DashboardPanel (el que monta la página), se
 // dispararía en cuanto carga la página, sin esperar el login.
-function DashboardContent({ slugs }: Props) {
+function DashboardContent({ slugs }: { slugs: string[] }) {
   const [totalLikes, setTotalLikes] = useState<number | null>(null);
 
   useEffect(() => {
@@ -47,9 +49,9 @@ function DashboardContent({ slugs }: Props) {
   );
 }
 
-export default function DashboardPanel({ slugs }: Props) {
+export default function DashboardPanel({ slugs, switcherProjects }: Props) {
   return (
-    <AdminGate active="dashboard">
+    <AdminGate active="dashboard" switcherProjects={switcherProjects}>
       <DashboardContent slugs={slugs} />
     </AdminGate>
   );

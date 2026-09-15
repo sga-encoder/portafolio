@@ -4,6 +4,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectHeader from "../../components/projects/detail/ProjectHeader.astro";
 import ProjectDetailNav from "../../components/projects/detail/ProjectDetailNav.astro";
 import ProjectPageBackground from "../../components/projects/detail/ProjectPageBackground.astro";
+import ProjectViewTracker from "../../components/projects/detail/ProjectViewTracker.astro";
 import ProjectScene3D from "../../components/projects/detail/scene/ProjectScene3D";
 import ProjectDescriptionContext from "../../components/projects/detail/ProjectDescriptionContext.astro";
 import ProjectDivider from "../../components/projects/detail/ProjectDivider.astro";
@@ -11,6 +12,7 @@ import ProjectLiveSteps from "../../components/projects/detail/ProjectLiveSteps.
 import ProjectGallery from "../../components/projects/detail/ProjectGallery.tsx";
 import ProjectMainContent from "../../components/projects/detail/ProjectMainContent.astro";
 import { getCloudinaryUrl, getCloudinaryColors } from "../../utils/cloudinaryManifest";
+import { formatProjectDate } from "../../utils/projectDateLabel";
 import { PROJECTS } from "../../data/projects";
 import {
   mergeSphereMovementOverride,
@@ -50,15 +52,9 @@ const currentProjectItem = PROJECTS.find((item) => item.id === project.id);
 const mainContentEntry = await getEntry("projectContent", project.id);
 const MainContent = mainContentEntry ? (await render(mainContentEntry)).Content : null;
 
-// Selector rápido de proyectos (037): tarjetas con imagen+título+fecha de los
-// demás proyectos, mismo formato de fecha que el listado de `/proyectos`.
-const monthFormatter = new Intl.DateTimeFormat("es", { month: "short" });
-function dateLabel(date: string): string {
-  const [year, month] = date.split("-").map(Number);
-  const label = monthFormatter.format(new Date(year, month - 1, 1)).replace(".", "");
-  return `${label.charAt(0).toUpperCase()}${label.slice(1)} ${year}`;
-}
-
+// Selector rápido de proyectos (037/054): tarjetas con imagen+título+fecha de
+// los demás proyectos, mismo formato de fecha que el listado de `/proyectos`
+// y que `/admin` (`formatProjectDate`, compartido).
 // La portada del selector debe ser la misma que ya usa cada proyecto en su
 // propio encabezado (`coverImage` del content collection), no el `imageKey`
 // de `src/data/projects.ts` — ese es un placeholder compartido entre varios
@@ -69,14 +65,15 @@ const otherProjects = PROJECTS.filter((item) => item.id !== project.id).map((ite
   return {
     href: `/proyectos/${item.id}`,
     title: item.title,
-    date: dateLabel(item.date),
+    date: formatProjectDate(item.date),
     imageSrc: entry ? getCloudinaryUrl(entry.data.coverImage, "w_240,h_160,c_fill,q_auto,f_auto") : undefined,
   };
 });
 ---
 
-<BaseLayout title={`${title} - Sebastián Garzón Arias`} description={summary} showHeader={false}>
+<BaseLayout title={`${title} - Sebastián Garzón Arias`} description={summary}>
   <ProjectPageBackground colors={colors} />
+  <ProjectViewTracker slug={project.id} />
   <ProjectScene3D client:load zoneStops={coloredZoneStops} />
 
   <div id="project-zone-header" class="mx-auto w-full px-4 pt-12 md:w-[70%]">

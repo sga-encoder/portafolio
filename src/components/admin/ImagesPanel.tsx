@@ -3,6 +3,7 @@ import AdminGate from "./AdminGate";
 import PortfolioImagesTab from "./images/PortfolioImagesTab";
 import OtherProjectsTab from "./images/OtherProjectsTab";
 import StatsTab from "./images/StatsTab";
+import type { ProjectCardData } from "../../lib/admin/projectCards";
 
 type Tab = "portafolio" | "otros" | "estadisticas";
 
@@ -45,9 +46,13 @@ function ImagesContent() {
   );
 }
 
-export default function ImagesPanel() {
+interface Props {
+  switcherProjects: ProjectCardData[];
+}
+
+export default function ImagesPanel({ switcherProjects }: Props) {
   return (
-    <AdminGate active="imagenes">
+    <AdminGate active="imagenes" switcherProjects={switcherProjects}>
       <ImagesContent />
     </AdminGate>
   );

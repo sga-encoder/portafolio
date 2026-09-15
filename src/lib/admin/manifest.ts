@@ -74,6 +74,36 @@ export async function addImage(
   return next;
 }
 
+// Reemplaza la clave por un asset de Cloudinary que ya existe (subido antes,
+// sin usar en ningún otro lugar del manifest) — no sube ni borra nada en
+// Cloudinary, solo reescribe el manifest. Ver 060.
+export async function replaceImageWithExisting(
+  manifest: CloudinaryManifest,
+  sha: string | null,
+  key: string,
+  resource: { public_id: string; secure_url: string; width: number; height: number; format: string },
+): Promise<CloudinaryManifest> {
+  const next: CloudinaryManifest = {
+    ...manifest,
+    images: {
+      ...manifest.images,
+      [key]: {
+        publicId: resource.public_id,
+        url: resource.secure_url,
+        hash: "",
+        width: resource.width,
+        height: resource.height,
+        format: resource.format,
+        colors: FALLBACK_COLORS,
+        sourcePath: "admin:replace-existing",
+        uploadedAt: new Date().toISOString(),
+      },
+    },
+  };
+  await saveManifest(next, sha, `admin: reemplazar imagen ${key} (existente)`);
+  return next;
+}
+
 export async function removeImage(manifest: CloudinaryManifest, sha: string | null, key: string): Promise<CloudinaryManifest> {
   const entry = manifest.images[key];
   if (!entry) return manifest;

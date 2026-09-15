@@ -1,10 +1,14 @@
 rules_version = '2';
 
-// Reglas de los features 040 (likes por proyecto) y 043 (panel /admin).
+// Reglas de los features 040 (likes por proyecto), 043 (panel /admin), 055
+// (contador de visitas por proyecto) y 057 (desglose diario de visitas +
+// fecha de creación en adminDrafts).
 // Despliegue manual: copiar/pegar en Firestore -> Rules en la consola de
 // Firebase, o `firebase deploy --only firestore:rules` si se usa el CLI.
-// Ver .claude/spec/features/040-likes-proyectos/plan.md y
-// .claude/spec/features/043-panel-administrativo/plan.md.
+// Ver .claude/spec/features/040-likes-proyectos/plan.md,
+// .claude/spec/features/043-panel-administrativo/plan.md,
+// .claude/spec/features/055-panel-proyectos-tarjetas-estadisticas/plan.md y
+// .claude/spec/features/057-panel-likes-estadisticas-completas/plan.md.
 service cloud.firestore {
   match /databases/{database}/documents {
     // TODO(043): reemplazar por el UID real del único usuario admin —
@@ -42,6 +46,41 @@ service cloud.firestore {
           && (!('contactLink' in request.resource.data) || (request.resource.data.contactLink is string && request.resource.data.contactLink.size() <= 300))
           && (!('message' in request.resource.data) || (request.resource.data.message is string && request.resource.data.message.size() <= 500))
           && request.resource.data.createdAt == request.time;
+      }
+    }
+
+    // 055 · Contador de visitas por proyecto (mismo mecanismo anti-abuso que
+    // projectLikes de 040: escritura directa desde el cliente, sin backend
+    // propio). El contador se deduplica por visitante+día en el propio
+    // cliente (localStorage, ver ProjectViewTracker.astro) — estas reglas
+    // solo garantizan que ninguna escritura pueda saltar más de 1 ni bajar.
+    match /projectViews/{slug} {
+      allow read: if true;
+
+      allow create: if request.resource.data.keys().hasOnly(['count', 'lastVisit'])
+        && request.resource.data.count == 1
+        && request.resource.data.lastVisit == request.time;
+
+      allow update: if request.resource.data.keys().hasOnly(['count', 'lastVisit'])
+        && request.resource.data.count == resource.data.count + 1
+        && request.resource.data.lastVisit == request.time;
+
+      allow delete: if false;
+
+      // 057 · Desglose diario para "visitas del último mes" en
+      // /admin/likes. Mismo patrón anti-abuso que el contador total, pero
+      // sin lectura pública: es un dato interno del panel admin, no algo
+      // que el sitio público necesite mostrar.
+      match /days/{date} {
+        allow read: if isAdmin();
+
+        allow create: if request.resource.data.keys().hasOnly(['count'])
+          && request.resource.data.count == 1;
+
+        allow update: if request.resource.data.keys().hasOnly(['count'])
+          && request.resource.data.count == resource.data.count + 1;
+
+        allow delete: if false;
       }
     }
 
