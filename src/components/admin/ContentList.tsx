@@ -115,6 +115,20 @@ function ContentListContent({ groups }: Props) {
   return (
     <>
       <h1 className="mb-6 text-center text-2xl font-display font-bold">Editor de Proyectos</h1>
+      <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
+        <a
+          href="/admin/proyectos/nuevo"
+          className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+        >
+          + Agregar nuevo proyecto
+        </a>
+        <a
+          href="/proyectos"
+          className="rounded-lg bg-surface-muted px-4 py-2 text-sm font-medium transition hover:bg-surface-muted/70"
+        >
+          Ver todos los proyectos
+        </a>
+      </div>
       <div className="flex flex-col gap-10">
         {groups.map((group) => {
           const isCollapsed = collapsedYears.has(group.year);

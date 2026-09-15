@@ -1,0 +1,11 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ContentEditor from "../../../components/admin/ContentEditor";
+import { buildProjectCards } from "../../../lib/admin/projectCards";
+
+const switcherProjects = await buildProjectCards();
+---
+
+<BaseLayout title="Admin · Nuevo proyecto" noindex>
+  <ContentEditor client:load slug="" switcherProjects={switcherProjects} isNew />
+</BaseLayout>

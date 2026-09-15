@@ -8,9 +8,45 @@ import type { ProjectCardData } from "../../lib/admin/projectCards";
 interface Props {
   slug: string;
   switcherProjects: ProjectCardData[];
+  /** `/admin/proyectos/nuevo` (062): arranca vacío, sin cargar contenido, con slug editable. */
+  isNew?: boolean;
 }
 
 type Status = "idle" | "loading" | "saving" | "publishing" | "error";
+
+const EMPTY_FRONTMATTER: ProjectFrontmatter = {
+  title: "",
+  summary: "",
+  coverImage: "",
+  gallery: [],
+  techStack: [],
+  platforms: [],
+  links: {},
+  steps: [],
+};
+
+const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+/**
+ * Usada en `onChange`: NO recorta el guion final, para no borrar el separador de palabra que el
+ * usuario acaba de escribir (ej. tras un espacio) antes de que teclee la siguiente — si se recortara
+ * en cada tecla, "Prueba Slug" quedaría "pruebaslug" en vez de "prueba-slug" porque el guion
+ * intermedio desaparecería justo antes de escribir la letra siguiente. `finalizeSlug` (onBlur) hace
+ * la limpieza completa.
+ */
+function slugifyLive(raw: string): string {
+  return raw
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+/g, "");
+}
+
+function finalizeSlug(raw: string): string {
+  return slugifyLive(raw).replace(/-+$/g, "");
+}
 
 /**
  * El editor visual trabaja con YAML crudo, sin pasar por el schema Zod de `content.config.ts` (eso
@@ -82,15 +118,17 @@ function cleanFrontmatter(data: ProjectFrontmatter): ProjectFrontmatter {
 
 // Ver DashboardPanel.tsx: separado de ContentEditor para que la carga desde
 // GitHub/Firestore solo corra una vez que AdminGate confirmó sesión.
-function ContentEditorContent({ slug }: { slug: string }) {
-  const [data, setData] = useState<ProjectFrontmatter | null>(null);
+function ContentEditorContent({ slug: initialSlug, isNew }: { slug: string; isNew?: boolean }) {
+  const [slug, setSlug] = useState(initialSlug);
+  const [data, setData] = useState<ProjectFrontmatter | null>(isNew ? EMPTY_FRONTMATTER : null);
   const [body, setBody] = useState("");
   const [sha, setSha] = useState<string | null>(null);
   const [isDraft, setIsDraft] = useState(false);
-  const [status, setStatus] = useState<Status>("loading");
+  const [status, setStatus] = useState<Status>(isNew ? "idle" : "loading");
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isNew) return; // arranca vacío, nada que traer de GitHub/Firestore todavía.
     let cancelled = false;
     setStatus("loading");
     loadContent(slug)
@@ -113,14 +151,27 @@ function ContentEditorContent({ slug }: { slug: string }) {
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNew ? null : slug]);
 
   function currentContent(): string {
     if (!data) return "";
     return serializeFrontmatter({ data: cleanFrontmatter(data), body });
   }
 
+  function slugError(): string | null {
+    if (!isNew) return null;
+    if (!slug.trim()) return "Elegí un identificador (slug) antes de guardar.";
+    if (!SLUG_RE.test(slug)) return "El slug solo puede tener minúsculas, números y guiones (ej. mi-proyecto-nuevo).";
+    return null;
+  }
+
   async function handleSaveDraft() {
+    const err = slugError();
+    if (err) {
+      setMessage(err);
+      return;
+    }
     setStatus("saving");
     setMessage(null);
     try {
@@ -136,6 +187,11 @@ function ContentEditorContent({ slug }: { slug: string }) {
   }
 
   async function handlePublish() {
+    const err = slugError();
+    if (err) {
+      setMessage(err);
+      return;
+    }
     setStatus("publishing");
     setMessage(null);
     try {
@@ -150,12 +206,32 @@ function ContentEditorContent({ slug }: { slug: string }) {
     }
   }
 
+  const disabled = status === "loading" || status === "saving" || status === "publishing" || (isNew && slugError() != null);
+
   return (
     <>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold">{slug}</h1>
+        <h1 className="text-2xl font-display font-bold">{isNew ? slug || "Nuevo proyecto" : slug}</h1>
         {isDraft && <span className="rounded-full bg-brand/20 px-3 py-1 text-xs text-brand">Borrador sin publicar</span>}
       </div>
+
+      {isNew && (
+        <div className="mb-6">
+          <label htmlFor="new-project-slug" className="mb-1 block text-sm font-medium text-ink-muted">
+            Identificador (slug)
+          </label>
+          <input
+            id="new-project-slug"
+            type="text"
+            value={slug}
+            onChange={(e) => setSlug(slugifyLive(e.target.value))}
+            onBlur={(e) => setSlug(finalizeSlug(e.target.value))}
+            placeholder="mi-proyecto-nuevo"
+            className="w-full max-w-sm rounded-lg border border-ink-muted/30 bg-surface px-3 py-2 text-sm"
+          />
+          <p className="mt-1 text-xs text-ink-muted">Define el archivo `src/content/projects/{slug || "…"}.md` al publicar.</p>
+        </div>
+      )}
 
       {status === "loading" && <p className="text-ink-muted">Cargando…</p>}
 
@@ -167,7 +243,7 @@ function ContentEditorContent({ slug }: { slug: string }) {
         <button
           type="button"
           onClick={handleSaveDraft}
-          disabled={status === "loading" || status === "saving" || status === "publishing"}
+          disabled={disabled}
           className="rounded-lg bg-surface-muted px-4 py-2 text-sm font-medium disabled:opacity-50"
         >
           {status === "saving" ? "Guardando…" : "Guardar borrador"}
@@ -175,7 +251,7 @@ function ContentEditorContent({ slug }: { slug: string }) {
         <button
           type="button"
           onClick={handlePublish}
-          disabled={status === "loading" || status === "saving" || status === "publishing"}
+          disabled={disabled}
           className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
           {status === "publishing" ? "Publicando…" : "Publicar"}
@@ -186,10 +262,10 @@ function ContentEditorContent({ slug }: { slug: string }) {
   );
 }
 
-export default function ContentEditor({ slug, switcherProjects }: Props) {
+export default function ContentEditor({ slug, switcherProjects, isNew }: Props) {
   return (
-    <AdminGate active="proyectos" wide switcherProjects={switcherProjects} currentSlug={slug}>
-      <ContentEditorContent slug={slug} />
+    <AdminGate active="proyectos" wide switcherProjects={switcherProjects} currentSlug={isNew ? undefined : slug}>
+      <ContentEditorContent slug={slug} isNew={isNew} />
     </AdminGate>
   );
 }
