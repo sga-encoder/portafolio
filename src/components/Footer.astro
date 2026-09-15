@@ -14,7 +14,12 @@ const leftColor = "var(--sphere-left-color, var(--project-left-color, var(--colo
 const rightColor = "var(--sphere-right-color, var(--project-right-color, var(--color-accent-2)))";
 ---
 
-<footer class="py-12 text-sm text-ink-muted">
+<footer
+  class="pt-12 pb-[calc(6rem+env(safe-area-inset-bottom))] text-sm text-ink-muted md:pb-12"
+>
+  <!-- pb en mobile (052): la barra flotante NAV_BAR_MOBILE (navRailClasses.ts) es
+       `fixed bottom-0`, ~70px + safe-area, y tapa el footer si no se le deja este
+       espacio libre debajo. `md:pb-12` porque desde md ese nav pasa a riel lateral. -->
   <div
     class="mx-auto flex max-w-5xl flex-col items-center gap-4 px-4 text-center sm:flex-row sm:justify-between sm:text-left"
   >
