@@ -70,7 +70,19 @@ function normalizeFrontmatter(raw: Record<string, unknown>): ProjectFrontmatter 
     title: raw.title,
     summary: typeof raw.summary === "string" ? raw.summary : "",
     coverImage: typeof raw.coverImage === "string" ? raw.coverImage : "",
-    gallery: Array.isArray(raw.gallery) ? raw.gallery : [],
+    // Compat: un borrador en Firestore guardado antes de la migración de 064 puede seguir en el
+    // formato viejo (`gallery` como `string[]` de claves de Cloudinary, sin `label`) — se
+    // normaliza acá en vez de perderlo silenciosamente.
+    gallery: Array.isArray(raw.gallery)
+      ? raw.gallery.map((item) => {
+          if (typeof item === "string") return { image: item };
+          const g = item && typeof item === "object" ? (item as Record<string, unknown>) : {};
+          return {
+            image: typeof g.image === "string" ? g.image : "",
+            label: typeof g.label === "string" && g.label.trim() ? g.label : undefined,
+          };
+        })
+      : [],
     techStack: Array.isArray(raw.techStack) ? raw.techStack : [],
     platforms: Array.isArray(raw.platforms) ? raw.platforms : [],
     links: { repo: typeof links.repo === "string" ? links.repo : undefined, demo: typeof links.demo === "string" ? links.demo : undefined },
@@ -106,7 +118,9 @@ function normalizeFrontmatter(raw: Record<string, unknown>): ProjectFrontmatter 
 function cleanFrontmatter(data: ProjectFrontmatter): ProjectFrontmatter {
   return {
     ...data,
-    gallery: data.gallery.filter(Boolean),
+    gallery: data.gallery
+      .filter((item) => item.image.trim())
+      .map((item) => ({ image: item.image, label: item.label?.trim() || undefined })),
     steps: data.steps.map((step) => ({
       ...step,
       buttons: step.buttons?.filter((button) => button.label.trim() && button.href.trim()),

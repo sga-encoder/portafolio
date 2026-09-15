@@ -3,10 +3,10 @@ title: Blog del Semillero 3
 summary: Blog hecho para un semillero de investigación universitario, para mostrar sus avances (Next.js + Strapi).
 coverImage: projects/blog-semillero/cover
 gallery:
-  - projects/blog-semillero/gallery-inicio
-  - projects/blog-semillero/gallery-blog
-  - projects/blog-semillero/gallery-admin-panel
-  - projects/blog-semillero/gallery-map
+  - image: projects/blog-semillero/gallery-inicio
+  - image: projects/blog-semillero/gallery-blog
+  - image: projects/blog-semillero/gallery-admin-panel
+  - image: projects/blog-semillero/gallery-map
 techStack:
   - JavaScript
   - Next.js

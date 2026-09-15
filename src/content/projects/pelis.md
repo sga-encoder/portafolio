@@ -3,8 +3,8 @@ title: "Pelis"
 summary: "Mi primera web: la hice siguiendo un curso de YouTube (HTML, CSS y JS puro). La subo para mostrar mi evolución con el tiempo."
 coverImage: "projects/pelis/cover"
 gallery:
-  - "projects/pelis/gallery-header"
-  - "projects/pelis/gallery-article"
+  - image: "projects/pelis/gallery-header"
+  - image: "projects/pelis/gallery-article"
 techStack:
   - "HTML"
   - "CSS"

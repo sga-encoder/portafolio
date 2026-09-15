@@ -24,11 +24,16 @@ interface Step {
   buttons?: ProjectButton[];
 }
 
+interface GalleryImageItem {
+  image: string;
+  label?: string;
+}
+
 export interface ProjectFrontmatter {
   title: string;
   summary: string;
   coverImage: string;
-  gallery: string[];
+  gallery: GalleryImageItem[];
   techStack: string[];
   platforms: ("mobile" | "desktop")[];
   links?: { repo?: string; demo?: string };

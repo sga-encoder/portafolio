@@ -44,7 +44,11 @@ const { title, summary, coverImage, gallery, techStack, platforms, links, steps,
 
 const cover = getCloudinaryUrl(coverImage, "w_900,q_auto,f_auto");
 const colors = sphereColors ?? getCloudinaryColors(coverImage);
-const galleryImages = gallery.map((key) => ({ src: getCloudinaryUrl(key, "w_800,q_auto,f_auto"), alt: title }));
+const galleryImages = gallery.map((item) => ({
+  src: getCloudinaryUrl(item.image, "w_800,q_auto,f_auto"),
+  alt: title,
+  label: item.label,
+}));
 const resolvedZoneStops = resolveStarts(PROJECT_SPHERE_IDS, mergeSphereMovementOverride(projectZoneStops, sphereMovement));
 const coloredZoneStops = withProjectColors(resolvedZoneStops, colors[0], colors[1]);
 const currentProjectItem = PROJECTS.find((item) => item.id === project.id);

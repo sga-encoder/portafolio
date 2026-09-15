@@ -3,7 +3,7 @@ title: Territorial
 summary: Proyecto frontend hecho para la universidad, con un mapa interactivo (Next.js + Tailwind CSS).
 coverImage: projects/proyecto-01
 gallery:
-  - projects/proyecto-01
+  - image: projects/proyecto-01
 techStack:
   - Next.js
   - Tailwind CSS

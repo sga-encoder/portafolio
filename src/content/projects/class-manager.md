@@ -3,10 +3,10 @@ title: "Class Manager"
 summary: "Aplicación para gestionar clases, cursos y estudiantes — solo frontend, hecha con React."
 coverImage: "projects/class-manager/cover"
 gallery:
-  - "projects/class-manager/gallery-login"
-  - "projects/class-manager/gallery-dashboard-admin"
-  - "projects/class-manager/gallery-dashboard-teachers"
-  - "projects/class-manager/gallery-dashboard-student"
+  - image: "projects/class-manager/gallery-login"
+  - image: "projects/class-manager/gallery-dashboard-admin"
+  - image: "projects/class-manager/gallery-dashboard-teachers"
+  - image: "projects/class-manager/gallery-dashboard-student"
 techStack:
   - "React"
 platforms:

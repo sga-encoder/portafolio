@@ -66,8 +66,11 @@ const projects = defineCollection({
       }),
       gallery: z
         .array(
-          z.string().refine(hasCloudinaryImage, {
-            message: "cada elemento de gallery debe ser una clave existente en cloudinaryManifest.json",
+          z.object({
+            image: z.string().refine(hasCloudinaryImage, {
+              message: "cada imagen de gallery debe ser una clave existente en cloudinaryManifest.json",
+            }),
+            label: z.string().optional(),
           }),
         )
         .default([]),

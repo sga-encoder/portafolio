@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 interface GalleryImage {
   src: string;
   alt: string;
+  label?: string;
 }
 
 interface Props {
@@ -185,6 +186,8 @@ export default function ProjectGallery({ images, colorLeft, colorRight }: Props)
         <img src={image.src} alt={image.alt} className="h-full w-full object-cover" />
       </button>
 
+      {image.label && <p className="mt-2 text-center text-sm text-ink-muted">{image.label}</p>}
+
       {images.length > 1 && (
         <div className="mt-3 flex justify-center gap-2">
           {images.map((img, index) => (
@@ -250,6 +253,8 @@ export default function ProjectGallery({ images, colorLeft, colorRight }: Props)
                 </button>
               )}
             </div>
+
+            {image.label && <p className="text-center text-sm text-white/80">{image.label}</p>}
 
             {/* Cerrar + voltear, agrupados debajo de la imagen (no encima ni a los costados). */}
             <div className="flex items-center gap-3">
