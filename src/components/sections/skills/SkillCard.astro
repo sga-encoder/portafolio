@@ -1,18 +1,20 @@
 ---
 import SkillRing from "./SkillRing.astro";
-import type { Skill } from "../../../data/skills";
+import type { Skill } from "../../../data/skillsPages";
 
 interface Props {
   skill: Skill;
+  /** El dato ya no lleva `side` (069) — lo define la columna que contiene al skill. */
+  side: "left" | "right";
 }
 
-const { skill } = Astro.props;
+const { skill, side } = Astro.props;
 const textColor =
-  skill.side === "left" ? "var(--sphere-left-color, var(--color-brand))" : "var(--sphere-right-color, var(--color-accent-2))";
+  side === "left" ? "var(--sphere-left-color, var(--color-brand))" : "var(--sphere-right-color, var(--color-accent-2))";
 ---
 
 <div class="skill-card">
-  <SkillRing percentage={skill.percentage} side={skill.side} imageKey={skill.imageKey} alt={skill.name} />
+  <SkillRing percentage={skill.percentage} side={side} imageKey={skill.imageKey} alt={skill.name} />
   <p class="skill-card__percentage font-display font-bold" style={`color: ${textColor};`}>{skill.percentage}%</p>
   <p class="skill-card__name font-body text-ink-muted">{skill.name}</p>
 </div>

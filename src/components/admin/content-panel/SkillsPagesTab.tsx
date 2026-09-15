@@ -1,29 +1,36 @@
 import { useEffect, useState } from "react";
 import { loadJsonContent, publishJson, saveJsonDraft } from "../../../lib/admin/jsonContent";
-import { skills as fallbackSkills, type Skill } from "../../../data/skills";
-import SkillRow from "./SkillRow";
+import { skillsPages as fallbackSkillsPages, type SkillsPage } from "../../../data/skillsPages";
+import SkillsPageCard from "./SkillsPageCard";
 
-const DRAFT_ID = "home:skills";
-const FILE_PATH = "src/data/skills.json";
+const DRAFT_ID = "home:skillsPages";
+const FILE_PATH = "src/data/skillsPages.json";
 
 type Status = "loading" | "idle" | "saving" | "publishing" | "error";
 
-function newSkill(): Skill {
-  return { name: "", percentage: 50, imageKey: "", side: "left", category: "lenguajes" };
+function newSkillsPage(): SkillsPage {
+  return { columns: [{ type: "skills", skills: [] }] };
 }
 
-/** Recorta filas a medio llenar antes de guardar — mismo criterio que `cleanProfile` en `SectionsTab.tsx`. */
-function cleanSkills(input: Skill[]): Skill[] {
-  return input.filter((skill) => skill.name.trim());
+/** Recorta filas de skills a medio llenar antes de guardar — mismo criterio que `cleanSkills` en `065`. */
+function cleanSkillsPages(input: SkillsPage[]): SkillsPage[] {
+  return input.map((page) => ({
+    columns: page.columns.map((column) =>
+      column.type === "skills"
+        ? { ...column, skills: (column.skills ?? []).filter((skill) => skill.name.trim()) }
+        : column,
+    ),
+  }));
 }
 
 /**
- * Pestaña "Habilidades" del panel de Contenido (065): CRUD completo sobre `src/data/skills.json`
- * — agregar/quitar, editar nombre/porcentaje/lado/categoría/ícono, y reordenar dentro del array
- * (el orden define el chevron desktop y el orden por categoría en mobile, ver `skills.ts`).
+ * Pestaña "Habilidades" del panel de Contenido (069): reemplaza a `SkillsTab.tsx` (065) —
+ * CRUD sobre `src/data/skillsPages.json`, un array de páginas de carrusel, cada una con 1 a 3
+ * columnas de tipo "skills" o "image". Mismo par borrador(Firestore)/publicar(GitHub) que el
+ * resto de pestañas de `jsonContent.ts`.
  */
-export default function SkillsTab() {
-  const [data, setData] = useState<Skill[] | null>(null);
+export default function SkillsPagesTab() {
+  const [data, setData] = useState<SkillsPage[] | null>(null);
   const [sha, setSha] = useState<string | null>(null);
   const [isDraft, setIsDraft] = useState(false);
   const [status, setStatus] = useState<Status>("loading");
@@ -31,7 +38,7 @@ export default function SkillsTab() {
 
   useEffect(() => {
     let cancelled = false;
-    loadJsonContent<Skill[]>(DRAFT_ID, FILE_PATH)
+    loadJsonContent<SkillsPage[]>(DRAFT_ID, FILE_PATH)
       .then((loaded) => {
         if (cancelled) return;
         setData(loaded.data);
@@ -42,7 +49,7 @@ export default function SkillsTab() {
       .catch((err) => {
         console.error(err);
         if (cancelled) return;
-        setData(fallbackSkills);
+        setData(fallbackSkillsPages);
         setSha(null);
         setStatus("idle");
       });
@@ -51,9 +58,9 @@ export default function SkillsTab() {
     };
   }, []);
 
-  function updateAt(index: number, next: Skill) {
+  function updateAt(index: number, next: SkillsPage) {
     if (!data) return;
-    setData(data.map((skill, i) => (i === index ? next : skill)));
+    setData(data.map((page, i) => (i === index ? next : page)));
   }
 
   function removeAt(index: number) {
@@ -70,9 +77,9 @@ export default function SkillsTab() {
     setData(next);
   }
 
-  function addSkill() {
+  function addPage() {
     if (!data) return;
-    setData([...data, newSkill()]);
+    setData([...data, newSkillsPage()]);
   }
 
   async function handleSaveDraft() {
@@ -80,7 +87,7 @@ export default function SkillsTab() {
     setStatus("saving");
     setMessage(null);
     try {
-      await saveJsonDraft(DRAFT_ID, cleanSkills(data));
+      await saveJsonDraft(DRAFT_ID, cleanSkillsPages(data));
       setIsDraft(true);
       setStatus("idle");
       setMessage("Borrador guardado.");
@@ -96,7 +103,7 @@ export default function SkillsTab() {
     setStatus("publishing");
     setMessage(null);
     try {
-      await publishJson(DRAFT_ID, FILE_PATH, cleanSkills(data), sha);
+      await publishJson(DRAFT_ID, FILE_PATH, cleanSkillsPages(data), sha);
       setIsDraft(false);
       setStatus("idle");
       setMessage("Publicado.");
@@ -119,11 +126,12 @@ export default function SkillsTab() {
         <span className="w-fit rounded-full bg-brand/20 px-3 py-1 text-xs text-brand">Borrador sin publicar</span>
       )}
 
-      <div className="flex flex-col gap-3 rounded-2xl bg-surface-muted p-4">
-        {data.map((skill, index) => (
-          <SkillRow
+      <div className="flex flex-col gap-4">
+        {data.map((page, index) => (
+          <SkillsPageCard
             key={index}
-            skill={skill}
+            page={page}
+            index={index}
             onChange={(next) => updateAt(index, next)}
             onRemove={() => removeAt(index)}
             onMoveUp={() => moveBy(index, -1)}
@@ -135,10 +143,10 @@ export default function SkillsTab() {
 
         <button
           type="button"
-          onClick={addSkill}
+          onClick={addPage}
           className="rounded-lg border-2 border-dashed border-ink-muted/30 px-4 py-2 text-sm text-ink-muted hover:border-ink-muted hover:text-ink"
         >
-          + Agregar habilidad
+          + Agregar página
         </button>
       </div>
 

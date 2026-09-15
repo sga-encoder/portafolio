@@ -1,0 +1,54 @@
+---
+import { getCloudinaryUrl } from "../../../utils/cloudinaryManifest";
+
+interface Props {
+  imageKey: string;
+}
+
+const { imageKey } = Astro.props;
+const imageUrl = getCloudinaryUrl(imageKey, "q_auto,f_auto");
+---
+
+<div class="skills-image-column">
+  <img
+    src={imageUrl}
+    alt="Retrato ilustrado del autor"
+    class="skills-image-column__img"
+    loading="lazy"
+    decoding="async"
+  />
+</div>
+
+<style>
+  .skills-image-column {
+    display: flex;
+    height: 100%;
+    max-width: 30vw;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .skills-image-column__img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  @media (max-width: 767px) {
+    .skills-image-column {
+      max-width: none;
+      height: auto;
+      max-height: 40vh;
+      width: 100%;
+    }
+
+    .skills-image-column__img {
+      height: auto;
+      max-height: 40vh;
+      width: auto;
+      max-width: 100%;
+    }
+  }
+</style>

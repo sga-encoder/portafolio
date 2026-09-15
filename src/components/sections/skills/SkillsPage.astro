@@ -1,0 +1,45 @@
+---
+import SkillColumn from "./SkillColumn.astro";
+import SkillsImageColumn from "./SkillsImageColumn.astro";
+import type { SkillsColumn } from "../../../data/skillsPages";
+
+interface Props {
+  columns: SkillsColumn[];
+}
+
+const { columns } = Astro.props;
+
+/** Sin campo `side` propio (069): la mitad izquierda del array de columnas queda "left", la
+ * derecha "right" — define color de anillo/porcentaje y, en desktop, dirección del chevron. */
+function sideFor(index: number, total: number): "left" | "right" {
+  return index < total / 2 ? "left" : "right";
+}
+---
+
+<div class="skills-page flex h-full w-full shrink-0 flex-col">
+  {/* Desktop/tablet (≥768px): columnas lado a lado, chevron. */}
+  <div class="hidden min-h-0 flex-1 items-center justify-center gap-[2vw] md:flex short:gap-[1vw]">
+    {
+      columns.map((column, index) =>
+        column.type === "image" ? (
+          <SkillsImageColumn imageKey={column.imageKey ?? ""} />
+        ) : (
+          <SkillColumn skills={column.skills ?? []} side={sideFor(index, columns.length)} variant="desktop" />
+        ),
+      )
+    }
+  </div>
+
+  {/* Mobile (<768px): columnas apiladas verticalmente, sin chevron. */}
+  <div class="flex flex-1 flex-col items-center justify-center gap-8 py-6 md:hidden">
+    {
+      columns.map((column, index) =>
+        column.type === "image" ? (
+          <SkillsImageColumn imageKey={column.imageKey ?? ""} />
+        ) : (
+          <SkillColumn skills={column.skills ?? []} side={sideFor(index, columns.length)} variant="mobile" />
+        ),
+      )
+    }
+  </div>
+</div>

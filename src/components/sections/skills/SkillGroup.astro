@@ -1,12 +1,13 @@
 ---
 import SkillCard from "./SkillCard.astro";
-import type { Skill, SkillCategory } from "../../../data/skills";
+import type { Skill, SkillCategory } from "../../../data/skillsPages";
 
 interface Props {
   category: SkillCategory;
   items: { skill: Skill; offset?: number }[];
   variant: "desktop" | "mobile";
-  side?: "left" | "right";
+  /** Define el color de anillo/porcentaje (`--sphere-left/right-color`) y, en desktop, la dirección del chevron. */
+  side: "left" | "right";
   align?: "start" | "end";
 }
 
@@ -21,7 +22,7 @@ const { category, items, variant, side, align } = Astro.props;
     {
       items.map(({ skill, offset }) => (
         <div class="skill-group__item" style={`--chevron-offset: ${offset ?? 0};`}>
-          <SkillCard skill={skill} />
+          <SkillCard skill={skill} side={side} />
         </div>
       ))
     }

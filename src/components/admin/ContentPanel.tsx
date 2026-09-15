@@ -1,7 +1,7 @@
 import { useState } from "react";
 import AdminGate from "./AdminGate";
 import SectionsTab from "./content-panel/SectionsTab";
-import SkillsTab from "./content-panel/SkillsTab";
+import SkillsPagesTab from "./content-panel/SkillsPagesTab";
 import CarouselTab from "./content-panel/CarouselTab";
 import AnimationTab from "./content-panel/AnimationTab";
 import type { ProjectCardData } from "../../lib/admin/projectCards";
@@ -16,9 +16,10 @@ const TABS: { key: Tab; label: string; enabled: boolean }[] = [
 ];
 
 // Pestañas de "Contenido" (064): cada una edita un archivo de datos de Inicio distinto
-// (profile.ts/skills.ts/projects.ts/sceneStops.ts, todos migrados a JSON + wrapper TypeScript)
-// vía el mismo par borrador(Firestore)/publicar(GitHub) de `jsonContent.ts`. Las 4 pestañas ya
-// están activas ("Secciones"/"Habilidades"/"Carrusel"/"Animación 3D": `064`/`065`/`066`/`067`).
+// (profile.ts/skillsPages.ts/projects.ts/sceneStops.ts, todos migrados a JSON + wrapper
+// TypeScript) vía el mismo par borrador(Firestore)/publicar(GitHub) de `jsonContent.ts`. Las 4
+// pestañas ya están activas ("Secciones"/"Habilidades"/"Carrusel"/"Animación 3D":
+// `064`/`069`/`066`/`067`; "Habilidades" pasó de `SkillsTab` (`065`) a `SkillsPagesTab` en `069`).
 function ContentPanelContent() {
   const [tab, setTab] = useState<Tab>("secciones");
 
@@ -49,7 +50,7 @@ function ContentPanelContent() {
       </div>
 
       {tab === "secciones" && <SectionsTab />}
-      {tab === "habilidades" && <SkillsTab />}
+      {tab === "habilidades" && <SkillsPagesTab />}
       {tab === "carrusel" && <CarouselTab />}
       {tab === "animacion" && <AnimationTab />}
     </>

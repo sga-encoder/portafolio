@@ -1,5 +1,5 @@
 import EditableImage from "../content-editor/EditableImage";
-import type { Skill, SkillCategory } from "../../../data/skills";
+import type { Skill, SkillCategory } from "../../../data/skillsPages";
 
 const CATEGORY_OPTIONS: { value: SkillCategory; label: string }[] = [
   { value: "lenguajes", label: "Lenguajes" },
@@ -18,7 +18,7 @@ interface Props {
   canMoveDown: boolean;
 }
 
-/** Fila editable de una skill (065): imagen a la izquierda, campos a la derecha, reordenar/quitar. */
+/** Fila editable de una skill (065, sin `side` desde 069): imagen a la izquierda, campos a la derecha, reordenar/quitar. */
 export default function SkillRow({ skill, onChange, onRemove, onMoveUp, onMoveDown, canMoveUp, canMoveDown }: Props) {
   return (
     <div className="flex items-start gap-4 rounded-xl bg-surface p-3">
@@ -29,14 +29,14 @@ export default function SkillRow({ skill, onChange, onRemove, onMoveUp, onMoveDo
         className="h-16 w-16 shrink-0"
       />
 
-      <div className="grid flex-1 gap-3 sm:grid-cols-2">
+      <div className="flex min-w-0 flex-1 flex-col gap-3">
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-ink-muted">Nombre</span>
           <input
             type="text"
             value={skill.name}
             onChange={(event) => onChange({ ...skill, name: event.target.value })}
-            className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
+            className="w-full rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
           />
         </label>
 
@@ -48,20 +48,8 @@ export default function SkillRow({ skill, onChange, onRemove, onMoveUp, onMoveDo
             max={100}
             value={skill.percentage}
             onChange={(event) => onChange({ ...skill, percentage: Number(event.target.value) })}
-            className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
+            className="w-full rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
           />
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-ink-muted">Lado</span>
-          <select
-            value={skill.side}
-            onChange={(event) => onChange({ ...skill, side: event.target.value as Skill["side"] })}
-            className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
-          >
-            <option value="left">Izquierda</option>
-            <option value="right">Derecha</option>
-          </select>
         </label>
 
         <label className="flex flex-col gap-1 text-sm">
@@ -69,7 +57,7 @@ export default function SkillRow({ skill, onChange, onRemove, onMoveUp, onMoveDo
           <select
             value={skill.category}
             onChange={(event) => onChange({ ...skill, category: event.target.value as SkillCategory })}
-            className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
+            className="w-full rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
           >
             {CATEGORY_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
