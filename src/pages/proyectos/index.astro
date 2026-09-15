@@ -59,7 +59,7 @@ const zoneStops = buildTimelineZoneStops(
 );
 ---
 
-<BaseLayout title="Proyectos · Línea de tiempo" description="Todos los proyectos, organizados por año y mes." showHeader={false}>
+<BaseLayout title="Proyectos - Sebastián Garzón Arias" description="Todos los proyectos, organizados por año y mes." showHeader={false}>
   <ProjectsListBackground />
   <ProjectScene3D client:load zoneStops={zoneStops} />
   <YearDotNav client:load years={yearGroups.map((group) => group.year)} />

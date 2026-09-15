@@ -33,18 +33,27 @@ export const PROJECTS: ProjectItem[] = [
     title: "Blog del Semillero",
     description:
       "Blog hecho para un semillero de investigación universitario, para mostrar sus avances (Next.js + Strapi).",
-    // Portada temporal: mismo placeholder compartido, ahora servido desde Cloudinary.
-    imageKey: "projects/proyecto-01",
+    imageKey: "projects/blog-semillero/cover",
     link: "/proyectos/blog-semillero",
     date: "2022-11",
+  },
+  {
+    id: "montaneros",
+    title: "Montañeros",
+    description:
+      "Directorio turístico hecho como proyecto escolar, con backend en Payload CMS y frontend en Next.js.",
+    // Portada temporal: sin foto real todavía, mismo placeholder compartido que usaban los demás
+    // antes de subir sus capturas.
+    imageKey: "projects/proyecto-01",
+    link: "/proyectos/montaneros",
+    date: "2023-05",
   },
   {
     id: "city-builder",
     title: "City Builder",
     description:
       "Juego de construcción de ciudad hecho para la universidad, con patrones de diseño y renderización reactiva propia (sin frameworks).",
-    // Portada temporal: mismo placeholder compartido, ahora servido desde Cloudinary.
-    imageKey: "projects/proyecto-01",
+    imageKey: "projects/city-builder/cover",
     link: "/proyectos/city-builder",
     date: "2026-04",
   },
@@ -53,9 +62,18 @@ export const PROJECTS: ProjectItem[] = [
     title: "Class Manager",
     description:
       "Aplicación para gestionar clases, cursos y estudiantes — solo frontend, hecha con React.",
-    // Portada temporal: mismo placeholder compartido, ahora servido desde Cloudinary.
-    imageKey: "projects/proyecto-01",
+    imageKey: "projects/class-manager/cover",
     link: "/proyectos/class-manager",
     date: "2026-05",
+  },
+  {
+    id: "territorial",
+    title: "Territorial",
+    description:
+      "Proyecto frontend hecho para la universidad, con un mapa interactivo (Next.js + Tailwind CSS).",
+    // Portada temporal: sin foto real todavía, mismo placeholder compartido.
+    imageKey: "projects/proyecto-01",
+    link: "/proyectos/territorial",
+    date: "2026-06",
   },
 ];

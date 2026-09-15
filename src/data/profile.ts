@@ -51,7 +51,7 @@ export const profile: ProfileData = {
     secondaryCta: { label: "Blog", href: "/blog" },
   },
   about: {
-    bio: "Cuéntanos aquí quién eres, qué te apasiona de tu trabajo y qué te diferencia. Un par de párrafos cortos son suficientes.",
+    bio: "Me presento, soy Sebastián Garzón Arias, un estudiante de Ingeniería en Sistemas Computacionales de la Universidad de Caldas, con una formación previa a través de la curiosidad y mi pasión por la programación. Conocimiento que he adquirido de manera autodidacta; así descubrí que tengo habilidades para aprender y enseñar, y también me dio la habilidad de resolver de forma más eficiente y creativa los obstáculos que se presentan en este tipo de aprendizaje. Soy paciente en los procesos creativos, me gusta la innovación y el crecimiento constante, seguir de cerca la evolución de las tecnologías y crecer con ellas con seguridad. Lo que más me caracteriza es la constancia, la perseverancia y mi constante proceso de aprender nuevas habilidades.",
     study: {
       institution: "Universidad de Caldas",
       period: "2024-2 — Actualidad",
