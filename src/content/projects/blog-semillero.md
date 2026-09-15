@@ -19,16 +19,18 @@ links:
   demo: "https://blog-semillero.vercel.app/"
 steps:
   - text: "El backend está en un hosting gratuito y puede tardar unos segundos en despertar."
-    actionLabel: "Despertar backend"
-    actionHref: "https://blog-semillero-strapi.onrender.com/"
+    buttons:
+      - label: "Despertar backend"
+        href: "https://blog-semillero-strapi.onrender.com/"
   - text: "Entra al panel de administración de Strapi para ver la interfaz y cómo se administra el contenido."
     copyText:
       - value: "admin@example.com"
         label: "Correo"
       - value: "Admin123*"
         label: "Contraseña"
-    actionLabel: "Abrir panel de admin"
-    actionHref: "https://blog-semillero-strapi.onrender.com/admin"
+    buttons:
+      - label: "Abrir panel de admin"
+        href: "https://blog-semillero-strapi.onrender.com/admin"
 ---
 
 Este blog lo construí para un semillero de investigación universitario, como una forma de publicar y

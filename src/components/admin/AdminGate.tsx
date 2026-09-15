@@ -4,7 +4,7 @@ import LoginForm from "./LoginForm";
 import AdminLayout from "./AdminLayout";
 
 interface Props {
-  active: "dashboard" | "likes" | "contenido" | "imagenes";
+  active: "dashboard" | "likes" | "contenido" | "imagenes" | "servidores";
   children: ReactNode;
 }
 

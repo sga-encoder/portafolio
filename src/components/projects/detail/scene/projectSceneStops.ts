@@ -7,6 +7,25 @@
 // `[slug].astro` desde 014.
 import { resolveStarts, type ResolvedZoneStop, type SphereGeometry, type ZoneStop } from "../../../scene/engine/zoneStops";
 
+/** Override parcial de posición/tamaño para una esfera en una zona — ver `content.config.ts` (`sphereMovement`). */
+export interface SphereAxisOverride {
+  x?: number;
+  y?: number;
+  screenFraction?: number;
+}
+
+export type SphereMovementOverride = Partial<
+  Record<ProjectZoneKey, Partial<Record<ProjectSphereId, SphereAxisOverride>>>
+>;
+
+type ProjectZoneKey = "header" | "content" | "gallery";
+
+const ZONE_ID_BY_KEY: Record<ProjectZoneKey, ProjectZoneId> = {
+  header: "project-zone-header",
+  content: "project-zone-content",
+  gallery: "project-zone-gallery",
+};
+
 export type ProjectSphereId = "a" | "b";
 
 export const PROJECT_SPHERE_IDS: readonly ProjectSphereId[] = ["a", "b"];
@@ -46,6 +65,45 @@ export const projectZoneStops: readonly ZoneStop<ProjectSphereId, SphereGeometry
 /** `projectZoneStops` con todos los `start` resueltos, sin color todavía — ver `withProjectColors`. */
 export const resolvedProjectZoneStops: readonly ResolvedZoneStop<ProjectSphereId, SphereGeometry>[] =
   resolveStarts(PROJECT_SPHERE_IDS, projectZoneStops);
+
+/**
+ * Aplica el override por proyecto (`sphereMovement` del frontmatter, ver `content.config.ts`) sobre el
+ * `end` de la zona/esfera indicada, antes de resolver los `start` — así un proyecto puede mover/agrandar
+ * una esfera puntual sin perder la continuidad automática entre zonas que ya da `resolveStarts`.
+ */
+export function mergeSphereMovementOverride(
+  base: readonly ZoneStop<ProjectSphereId, SphereGeometry>[],
+  override?: SphereMovementOverride,
+): readonly ZoneStop<ProjectSphereId, SphereGeometry>[] {
+  if (!override) return base;
+
+  const overrideByZoneId = new Map<ProjectZoneId, Partial<Record<ProjectSphereId, SphereAxisOverride>>>();
+  for (const [key, zoneOverride] of Object.entries(override) as [ProjectZoneKey, SphereMovementOverride[ProjectZoneKey]][]) {
+    if (zoneOverride) overrideByZoneId.set(ZONE_ID_BY_KEY[key], zoneOverride);
+  }
+
+  return base.map((stop) => {
+    const zoneOverride = overrideByZoneId.get(stop.zoneId as ProjectZoneId);
+    if (!zoneOverride) return stop;
+
+    const spheres = { ...stop.spheres };
+    for (const sphereId of PROJECT_SPHERE_IDS) {
+      const axisOverride = zoneOverride[sphereId];
+      if (!axisOverride) continue;
+      const current = spheres[sphereId];
+      const [x, y, z] = current.end.position;
+      spheres[sphereId] = {
+        ...current,
+        end: {
+          position: [axisOverride.x ?? x, axisOverride.y ?? y, z],
+          screenFraction: axisOverride.screenFraction ?? current.end.screenFraction,
+        },
+      };
+    }
+
+    return { ...stop, spheres };
+  });
+}
 
 /**
  * Inyecta los 2 colores fijos de la página (dominantes de portada en detalle, acentos de marca en

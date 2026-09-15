@@ -12,7 +12,13 @@ import ProjectGallery from "../../components/projects/detail/ProjectGallery.tsx"
 import ProjectMainContent from "../../components/projects/detail/ProjectMainContent.astro";
 import { getCloudinaryUrl, getCloudinaryColors } from "../../utils/cloudinaryManifest";
 import { PROJECTS } from "../../data/projects";
-import { resolvedProjectZoneStops, withProjectColors } from "../../components/projects/detail/scene/projectSceneStops";
+import {
+  mergeSphereMovementOverride,
+  projectZoneStops,
+  PROJECT_SPHERE_IDS,
+  withProjectColors,
+} from "../../components/projects/detail/scene/projectSceneStops";
+import { resolveStarts } from "../../components/scene/engine/zoneStops";
 
 export async function getStaticPaths() {
   const projects = await getCollection("projects");
@@ -31,12 +37,14 @@ export async function getStaticPaths() {
 
 const { project, prevSlug, nextSlug } = Astro.props;
 const { Content } = await render(project);
-const { title, summary, coverImage, gallery, techStack, platforms, links, steps } = project.data;
+const { title, summary, coverImage, gallery, techStack, platforms, links, steps, sphereColors, sphereMovement } =
+  project.data;
 
 const cover = getCloudinaryUrl(coverImage, "w_900,q_auto,f_auto");
-const colors = getCloudinaryColors(coverImage);
+const colors = sphereColors ?? getCloudinaryColors(coverImage);
 const galleryImages = gallery.map((key) => ({ src: getCloudinaryUrl(key, "w_800,q_auto,f_auto"), alt: title }));
-const coloredZoneStops = withProjectColors(resolvedProjectZoneStops, colors[0], colors[1]);
+const resolvedZoneStops = resolveStarts(PROJECT_SPHERE_IDS, mergeSphereMovementOverride(projectZoneStops, sphereMovement));
+const coloredZoneStops = withProjectColors(resolvedZoneStops, colors[0], colors[1]);
 const currentProjectItem = PROJECTS.find((item) => item.id === project.id);
 
 const mainContentEntry = await getEntry("projectContent", project.id);

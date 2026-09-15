@@ -52,7 +52,9 @@ service cloud.firestore {
     }
 
     // 043 · Panel /admin — tokens de terceros (GitHub, Cloudinary Admin
-    // API). Nunca se escriben desde el cliente, ni siquiera autenticado: el
+    // API; desde 046 también Vercel/Render/Neon — token simple — y Firebase
+    // — cuenta de servicio de Google Cloud, ver src/lib/admin/servers/).
+    // Nunca se escriben desde el cliente, ni siquiera autenticado: el
     // autor los pega a mano desde la consola de Firebase.
     match /adminSecrets/{secretId} {
       allow read: if isAdmin();

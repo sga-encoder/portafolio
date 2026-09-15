@@ -1,123 +1,46 @@
-import { useEffect, useState } from "react";
-import { addImage, loadManifest, removeImage, type CloudinaryManifest } from "../../lib/admin/manifest";
+import { useState } from "react";
 import AdminGate from "./AdminGate";
+import PortfolioImagesTab from "./images/PortfolioImagesTab";
+import OtherProjectsTab from "./images/OtherProjectsTab";
+import StatsTab from "./images/StatsTab";
 
-type Status = "loading" | "idle" | "uploading" | "error";
+type Tab = "portafolio" | "otros" | "estadisticas";
 
-// Ver DashboardPanel.tsx: separado de ImagesPanel para que la carga del
-// manifest (vía GitHub) solo corra una vez que AdminGate confirmó sesión.
+const TABS: { key: Tab; label: string }[] = [
+  { key: "portafolio", label: "Portafolio" },
+  { key: "otros", label: "Otros proyectos" },
+  { key: "estadisticas", label: "Estadísticas" },
+];
+
+// Separado en 3 pestañas independientes (feature 045): cada una hace su
+// propio fetch en su propio efecto, así cambiar de pestaña no repite
+// llamadas innecesarias a GitHub/Cloudinary. Ver
+// .claude/spec/features/045-imagenes-multiproyecto-estadisticas/plan.md.
 function ImagesContent() {
-  const [manifest, setManifest] = useState<CloudinaryManifest | null>(null);
-  const [sha, setSha] = useState<string | null>(null);
-  const [status, setStatus] = useState<Status>("loading");
-  const [message, setMessage] = useState<string | null>(null);
-  const [newKey, setNewKey] = useState("");
-  const [newFile, setNewFile] = useState<File | null>(null);
-
-  useEffect(() => {
-    loadManifest()
-      .then((loaded) => {
-        setManifest(loaded.manifest);
-        setSha(loaded.sha);
-        setStatus("idle");
-      })
-      .catch(() => {
-        setStatus("error");
-        setMessage("No se pudo cargar el manifest.");
-      });
-  }, []);
-
-  async function handleUpload() {
-    if (!manifest || !newFile || !newKey.trim()) return;
-    setStatus("uploading");
-    setMessage(null);
-    try {
-      const next = await addImage(manifest, sha, newFile, newKey.trim());
-      setManifest(next);
-      setNewKey("");
-      setNewFile(null);
-      setStatus("idle");
-      setMessage("Imagen subida.");
-    } catch {
-      setStatus("error");
-      setMessage("No se pudo subir la imagen.");
-    }
-  }
-
-  async function handleDelete(key: string) {
-    if (!manifest) return;
-    if (!confirm(`¿Borrar "${key}"? Esta acción no se puede deshacer.`)) return;
-    setStatus("uploading");
-    setMessage(null);
-    try {
-      const next = await removeImage(manifest, sha, key);
-      setManifest(next);
-      setStatus("idle");
-      setMessage("Imagen borrada.");
-    } catch {
-      setStatus("error");
-      setMessage("No se pudo borrar la imagen.");
-    }
-  }
+  const [tab, setTab] = useState<Tab>("portafolio");
 
   return (
     <>
       <h1 className="mb-6 text-2xl font-display font-bold">Imágenes</h1>
 
-      <div className="mb-6 flex flex-wrap items-end gap-3 rounded-2xl bg-surface-muted p-4">
-        <label className="space-y-1 text-sm">
-          <span className="block">Clave (ej. proyectos/mi-imagen)</span>
-          <input
-            type="text"
-            value={newKey}
-            onChange={(event) => setNewKey(event.target.value)}
-            className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
-          />
-        </label>
-        <label className="space-y-1 text-sm">
-          <span className="block">Archivo</span>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(event) => setNewFile(event.target.files?.[0] ?? null)}
-          />
-        </label>
-        <button
-          type="button"
-          onClick={handleUpload}
-          disabled={status === "loading" || status === "uploading" || !newFile || !newKey.trim()}
-          className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-        >
-          {status === "uploading" ? "Subiendo…" : "Subir"}
-        </button>
-        {message && <span className="text-sm text-ink-muted">{message}</span>}
+      <div className="mb-6 flex flex-wrap gap-2">
+        {TABS.map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            onClick={() => setTab(item.key)}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+              tab === item.key ? "bg-brand text-white" : "bg-surface-muted text-ink-muted hover:text-ink"
+            }`}
+          >
+            {item.label}
+          </button>
+        ))}
       </div>
 
-      {status === "loading" && <p className="text-ink-muted">Cargando…</p>}
-
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-        {manifest &&
-          Object.entries(manifest.images).map(([key, entry]) => (
-            <div key={key} className="space-y-2 rounded-xl bg-surface-muted p-2">
-              <img
-                src={entry.url.replace("/image/upload/", "/image/upload/w_300,q_auto,f_auto/")}
-                alt={key}
-                className="aspect-square w-full rounded-lg object-cover"
-              />
-              <p className="truncate text-xs text-ink-muted" title={key}>
-                {key}
-              </p>
-              <button
-                type="button"
-                onClick={() => handleDelete(key)}
-                disabled={status === "uploading"}
-                className="w-full rounded-lg bg-red-500/20 px-2 py-1 text-xs text-red-400 disabled:opacity-50"
-              >
-                Borrar
-              </button>
-            </div>
-          ))}
-      </div>
+      {tab === "portafolio" && <PortfolioImagesTab />}
+      {tab === "otros" && <OtherProjectsTab />}
+      {tab === "estadisticas" && <StatsTab />}
     </>
   );
 }

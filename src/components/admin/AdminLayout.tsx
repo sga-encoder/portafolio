@@ -3,7 +3,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 
 interface Props {
-  active: "dashboard" | "likes" | "contenido" | "imagenes";
+  active: "dashboard" | "likes" | "contenido" | "imagenes" | "servidores";
   children: ReactNode;
 }
 
@@ -12,6 +12,7 @@ const NAV_ITEMS: { key: Props["active"]; label: string; href: string }[] = [
   { key: "likes", label: "Likes", href: "/admin/likes" },
   { key: "contenido", label: "Contenido", href: "/admin/contenido" },
   { key: "imagenes", label: "Imágenes", href: "/admin/imagenes" },
+  { key: "servidores", label: "Servidores", href: "/admin/servidores" },
 ];
 
 export default function AdminLayout({ active, children }: Props) {

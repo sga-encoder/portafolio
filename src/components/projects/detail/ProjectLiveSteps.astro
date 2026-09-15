@@ -6,11 +6,15 @@ interface CopyItem {
   label?: string;
 }
 
+interface ProjectButton {
+  label: string;
+  href: string;
+}
+
 interface Step {
   text: string;
   copyText?: CopyItem[];
-  actionLabel?: string;
-  actionHref?: string;
+  buttons?: ProjectButton[];
 }
 
 interface Props {
@@ -25,7 +29,7 @@ const leftColor = `var(--project-left-color, ${first})`;
 const rightColor = `var(--project-right-color, ${second})`;
 
 const allSteps: Step[] = demoHref
-  ? [...steps, { text: "Prueba el proyecto ya desplegado.", actionLabel: "Ver demo", actionHref: demoHref }]
+  ? [...steps, { text: "Prueba el proyecto ya desplegado.", buttons: [{ label: "Ver demo", href: demoHref }] }]
   : steps;
 ---
 
@@ -66,18 +70,18 @@ const allSteps: Step[] = demoHref
               </button>
             ))}
 
-            {step.actionHref && step.actionLabel && (
+            {step.buttons?.map((button) => (
               <ColorLinkButton
-                href={step.actionHref}
+                href={button.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 color={stepColor}
                 variant="solid"
                 class="w-fit"
               >
-                {step.actionLabel}
+                {button.label}
               </ColorLinkButton>
-            )}
+            ))}
           </li>
         );
       })
