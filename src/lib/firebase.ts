@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
@@ -37,11 +37,11 @@ const app = initializeApp({
 // build de producción sigue usando reCAPTCHA real, sin cambios.
 const DEV_APP_CHECK_DEBUG_TOKEN = "db1315f7-042d-41dc-a249-5f30ec17389b";
 
-// Enterprise, no el reCAPTCHA v3 clásico (045): Firebase dejó de ofrecer
-// registrar el proveedor clásico para apps nuevas en App Check, así que la
-// site key viene de Google Cloud Console → Security → reCAPTCHA Enterprise
-// (no de google.com/recaptcha/admin) y debe coincidir con la que está
-// registrada en Firebase Console → App Check → esta app web.
+// reCAPTCHA v3 clásico (045): en Firebase Console → App Check, esta app se
+// registra con este proveedor pegando la SECRET key del par v3 (la que
+// muestra google.com/recaptcha/admin como "clave secreta"), no la site key
+// — Firebase la usa server-side para verificar el token. La site key de acá
+// abajo es la mitad pública del mismo par, la que ve el navegador.
 const recaptchaSiteKey = import.meta.env.PUBLIC_FIREBASE_RECAPTCHA_SITE_KEY;
 if (recaptchaSiteKey && typeof document !== "undefined") {
   if (import.meta.env.DEV) {
@@ -49,7 +49,7 @@ if (recaptchaSiteKey && typeof document !== "undefined") {
       DEV_APP_CHECK_DEBUG_TOKEN;
   }
   initializeAppCheck(app, {
-    provider: new ReCaptchaEnterpriseProvider(recaptchaSiteKey),
+    provider: new ReCaptchaV3Provider(recaptchaSiteKey),
     isTokenAutoRefreshEnabled: true,
   });
 }
