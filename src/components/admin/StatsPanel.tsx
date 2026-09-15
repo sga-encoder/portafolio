@@ -142,20 +142,16 @@ function StatsContent({ projects }: Props) {
         <div className="flex flex-col gap-5">
           <StatsCard project={rows[0]} rank={0} dlColumns="three" />
 
-          {/* El resto se desplaza horizontalmente en vez de envolver en
-              filas: cada tarjeta mide ~40% del ancho del contenedor para
-              que se alcancen a ver 2 completas y media de la siguiente
-              (pedido explícito del usuario), como pista de que hay más
-              proyectos para el lado. */}
-          <div className="flex gap-5 overflow-x-auto pb-2 [scroll-snap-type:x_mandatory]">
+          {/* El resto envuelve en filas de 2, hacia abajo con el scroll
+              normal de la página (no horizontal) — pedido explícito del
+              usuario: al cargar se ve el proyecto 1, la fila siguiente con
+              el 2 y el 3, y luego lo que alcance a entrar del resto según
+              el alto de la ventana (naturalmente la mitad de la fila
+              siguiente si no entra completa), sin lógica especial: es el
+              comportamiento normal de una grilla que envuelve. */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             {rows.slice(1).map((project, i) => (
-              <div
-                key={project.slug}
-                className="shrink-0 [scroll-snap-align:start]"
-                style={{ width: "calc((100% - 2.5rem) / 2.5)" }}
-              >
-                <StatsCard project={project} rank={i + 1} dlColumns="two" />
-              </div>
+              <StatsCard key={project.slug} project={project} rank={i + 1} dlColumns="two" />
             ))}
           </div>
         </div>
