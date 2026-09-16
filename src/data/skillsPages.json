@@ -1,0 +1,110 @@
+[
+  {
+    "columns": [
+      {
+        "type": "skills",
+        "skills": [
+          {
+            "name": "JavaScript",
+            "percentage": 85,
+            "imageKey": "skills/javascript",
+            "category": "lenguajes"
+          },
+          {
+            "name": "Python",
+            "percentage": 60,
+            "imageKey": "skills/python",
+            "category": "lenguajes"
+          },
+          {
+            "name": "Java",
+            "percentage": 55,
+            "imageKey": "skills/java",
+            "category": "lenguajes"
+          },
+          {
+            "name": "TypeScript",
+            "percentage": 65,
+            "imageKey": "skills/typescript",
+            "category": "lenguajes"
+          },
+          {
+            "name": "Figma",
+            "percentage": 90,
+            "imageKey": "skills/figma",
+            "category": "herramientas"
+          }
+        ]
+      },
+      {
+        "type": "image",
+        "imageKey": "skills/persona02"
+      },
+      {
+        "type": "skills",
+        "skills": [
+          {
+            "name": "Tailwind",
+            "percentage": 70,
+            "imageKey": "skills/tailwind",
+            "category": "diseño"
+          },
+          {
+            "name": "CSS",
+            "percentage": 80,
+            "imageKey": "skills/css",
+            "category": "diseño"
+          },
+          {
+            "name": "Node.js",
+            "percentage": 75,
+            "imageKey": "skills/nodejs",
+            "category": "frameworks"
+          },
+          {
+            "name": "Next.js",
+            "percentage": 65,
+            "imageKey": "skills/nextjs",
+            "category": "frameworks"
+          },
+          {
+            "name": "React",
+            "percentage": 70,
+            "imageKey": "skills/react",
+            "category": "frameworks"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "columns": [
+      {
+        "type": "skills",
+        "skills": [
+          {
+            "name": "hola",
+            "percentage": 50,
+            "imageKey": "skills/css",
+            "category": "lenguajes"
+          }
+        ]
+      },
+      {
+        "type": "image",
+        "imageKey": "header/persona01"
+      },
+      {
+        "type": "skills",
+        "skills": [
+          {
+            "name": "meme",
+            "percentage": 50,
+            "imageKey": "skills/java",
+            "category": "lenguajes"
+          }
+        ]
+      }
+    ]
+  }
+]
