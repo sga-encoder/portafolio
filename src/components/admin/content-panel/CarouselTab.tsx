@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { loadJsonContent, publishJson, saveJsonDraft } from "../../../lib/admin/jsonContent";
 import { CAROUSEL_PROJECT_IDS } from "../../../data/carousel";
 import type { ProjectCardData } from "../../../lib/admin/projectCards";
+import AddProjectModal from "./AddProjectModal";
 import CarouselRow from "./CarouselRow";
 
 // Doc-id nuevo (no `home:carousel`, reusado por `066` con la forma vieja `ProjectItem[]`) — evita
@@ -55,11 +56,6 @@ export default function CarouselTab({ availableProjects }: Props) {
     };
   }, []);
 
-  function updateAt(index: number, id: string) {
-    if (!ids) return;
-    setIds(ids.map((current, i) => (i === index ? id : current)));
-  }
-
   function removeAt(index: number) {
     if (!ids) return;
     setIds(ids.filter((_, i) => i !== index));
@@ -74,9 +70,9 @@ export default function CarouselTab({ availableProjects }: Props) {
     setIds(next);
   }
 
-  function addRow() {
+  function handleAdd(slug: string) {
     if (!ids) return;
-    setIds([...ids, ""]);
+    setIds([...ids, slug]);
   }
 
   async function handleSaveDraft() {
@@ -128,19 +124,14 @@ export default function CarouselTab({ availableProjects }: Props) {
         acá solo se elige cuáles aparecen y en qué orden.
       </p>
 
-      <div className="flex flex-col gap-3 rounded-2xl bg-surface-muted p-4">
+      <div className="flex flex-wrap gap-3 rounded-2xl bg-surface-muted p-4">
         {ids.map((id, index) => {
-          const options = availableProjects.filter(
-            (project) => project.slug === id || !ids.includes(project.slug),
-          );
           const selected = availableProjects.find((project) => project.slug === id);
           return (
             <CarouselRow
               key={index}
               id={id}
               selected={selected}
-              options={options}
-              onChange={(next) => updateAt(index, next)}
               onRemove={() => removeAt(index)}
               onMoveUp={() => moveBy(index, -1)}
               onMoveDown={() => moveBy(index, 1)}
@@ -150,13 +141,10 @@ export default function CarouselTab({ availableProjects }: Props) {
           );
         })}
 
-        <button
-          type="button"
-          onClick={addRow}
-          className="rounded-lg border-2 border-dashed border-ink-muted/30 px-4 py-2 text-sm text-ink-muted hover:border-ink-muted hover:text-ink"
-        >
-          + Agregar proyecto
-        </button>
+        <AddProjectModal
+          options={availableProjects.filter((project) => !ids.includes(project.slug))}
+          onAdd={handleAdd}
+        />
       </div>
 
       <div className="flex items-center gap-3">

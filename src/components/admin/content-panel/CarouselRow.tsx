@@ -3,8 +3,6 @@ import type { ProjectCardData } from "../../../lib/admin/projectCards";
 interface Props {
   id: string;
   selected: ProjectCardData | undefined;
-  options: ProjectCardData[];
-  onChange: (id: string) => void;
   onRemove: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
@@ -13,16 +11,17 @@ interface Props {
 }
 
 /**
- * Fila del carrusel (071): miniatura de solo lectura (portada real del proyecto elegido) + un
- * único `<select>` para elegir qué proyecto ocupa este lugar — sin título/slug/fecha/descripción/
- * link, esos ya viven en el Markdown de cada proyecto. `options` ya llega sin los proyectos
- * elegidos en otras filas (no se puede duplicar).
+ * Tarjeta del carrusel (071, sin selector desde 072; tarjeta chica en horizontal desde este
+ * ajuste): miniatura de solo lectura (portada real del proyecto elegido) + título + año como
+ * texto — sin ningún control para cambiar qué proyecto ocupa este lugar, eso ahora solo se elige
+ * al agregar (`AddProjectModal`). La lista completa (`CarouselTab`) las acomoda en `flex-wrap` en
+ * vez de una pila vertical de filas de punta a punta, así que cada una es una tarjeta chica
+ * (imagen arriba, texto en medio, reordenar/quitar abajo) en vez de una fila horizontal ancha.
+ * Mover "anterior/siguiente" (antes ↑/↓) reordena dentro de ese flujo horizontal.
  */
 export default function CarouselRow({
   id,
   selected,
-  options,
-  onChange,
   onRemove,
   onMoveUp,
   onMoveDown,
@@ -30,59 +29,47 @@ export default function CarouselRow({
   canMoveDown,
 }: Props) {
   return (
-    <div className="flex items-center gap-4 rounded-xl bg-surface p-3">
+    <div className="flex w-28 shrink-0 flex-col items-center gap-1 rounded-xl bg-surface p-2 text-center">
       {selected?.imageSrc ? (
-        <img
-          src={selected.imageSrc}
-          alt={selected.title}
-          className="h-16 w-16 shrink-0 rounded-lg object-cover"
-        />
+        <img src={selected.imageSrc} alt={selected.title} className="aspect-square w-full rounded-lg object-cover" />
       ) : (
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-surface-muted text-xs text-ink-muted">
+        <div className="flex aspect-square w-full items-center justify-center rounded-lg bg-surface-muted text-xs text-ink-muted">
           Sin proyecto
         </div>
       )}
 
-      <select
-        value={id}
-        onChange={(event) => onChange(event.target.value)}
-        className="flex-1 rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2 text-sm"
-      >
-        <option value="">Selecciona un proyecto…</option>
-        {options.map((project) => (
-          <option key={project.slug} value={project.slug}>
-            {project.title}
-          </option>
-        ))}
-      </select>
+      <span className="line-clamp-2 font-display text-xs font-bold leading-tight text-ink">
+        {selected?.title ?? (id ? `Proyecto no encontrado (${id})` : "Sin proyecto")}
+      </span>
+      {selected && <span className="font-body text-[11px] text-ink-muted">{selected.date.slice(0, 4)}</span>}
 
-      <div className="flex shrink-0 flex-col gap-1">
+      <div className="flex shrink-0 gap-1">
         <button
           type="button"
           onClick={onMoveUp}
           disabled={!canMoveUp}
-          aria-label="Subir"
-          title="Subir"
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted text-sm disabled:opacity-30"
+          aria-label="Mover antes"
+          title="Mover antes"
+          className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-muted text-xs disabled:opacity-30"
         >
-          ↑
+          ←
         </button>
         <button
           type="button"
           onClick={onMoveDown}
           disabled={!canMoveDown}
-          aria-label="Bajar"
-          title="Bajar"
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted text-sm disabled:opacity-30"
+          aria-label="Mover después"
+          title="Mover después"
+          className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-muted text-xs disabled:opacity-30"
         >
-          ↓
+          →
         </button>
         <button
           type="button"
           onClick={onRemove}
           aria-label="Quitar proyecto"
           title="Quitar proyecto"
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted text-sm text-red-500"
+          className="flex h-6 w-6 items-center justify-center rounded-full bg-surface-muted text-xs text-red-500"
         >
           ✕
         </button>

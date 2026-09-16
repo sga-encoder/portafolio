@@ -493,6 +493,12 @@ body {
   animation: admin-confirm-dialog-out 220ms ease-in forwards;
 }
 
+/* Variante ancha (072, AddProjectModal.tsx): cuadrícula de hasta 2x3 tarjetas por página en vez
+   del ancho fijo de una tarjeta de confirmación de texto. */
+.admin-confirm-dialog--grid {
+  width: min(34rem, calc(100vw - 2rem));
+}
+
 .admin-confirm-dialog::backdrop {
   background-color: color-mix(in srgb, var(--color-surface) 65%, transparent);
   backdrop-filter: blur(6px);
