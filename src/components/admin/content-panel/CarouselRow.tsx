@@ -1,25 +1,10 @@
-import EditableImage from "../content-editor/EditableImage";
-import type { ProjectItem } from "../../../data/projects";
-
-// Mismo criterio que `slugifyLive`/`finalizeSlug` de `ContentEditor.tsx`: no recorta el guion
-// final en cada tecla (para no comerse el separador justo tras un espacio), sí al perder foco.
-function slugifyLive(raw: string): string {
-  return raw
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/-{2,}/g, "-")
-    .replace(/^-+/g, "");
-}
-
-function finalizeSlug(raw: string): string {
-  return slugifyLive(raw).replace(/-+$/g, "");
-}
+import type { ProjectCardData } from "../../../lib/admin/projectCards";
 
 interface Props {
-  project: ProjectItem;
-  onChange: (next: ProjectItem) => void;
+  id: string;
+  selected: ProjectCardData | undefined;
+  options: ProjectCardData[];
+  onChange: (id: string) => void;
   onRemove: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
@@ -27,94 +12,49 @@ interface Props {
   canMoveDown: boolean;
 }
 
-/** Fila editable de un proyecto (066): imagen a la izquierda, campos a la derecha, reordenar/quitar. */
-export default function CarouselRow({ project, onChange, onRemove, onMoveUp, onMoveDown, canMoveUp, canMoveDown }: Props) {
+/**
+ * Fila del carrusel (071): miniatura de solo lectura (portada real del proyecto elegido) + un
+ * único `<select>` para elegir qué proyecto ocupa este lugar — sin título/slug/fecha/descripción/
+ * link, esos ya viven en el Markdown de cada proyecto. `options` ya llega sin los proyectos
+ * elegidos en otras filas (no se puede duplicar).
+ */
+export default function CarouselRow({
+  id,
+  selected,
+  options,
+  onChange,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp,
+  canMoveDown,
+}: Props) {
   return (
-    <div className="flex items-start gap-4 rounded-xl bg-surface p-3">
-      <EditableImage
-        value={project.imageKey ?? ""}
-        onChange={(imageKey) => onChange({ ...project, imageKey })}
-        alt={project.title || "Portada del proyecto"}
-        className="h-16 w-16 shrink-0"
-      />
+    <div className="flex items-center gap-4 rounded-xl bg-surface p-3">
+      {selected?.imageSrc ? (
+        <img
+          src={selected.imageSrc}
+          alt={selected.title}
+          className="h-16 w-16 shrink-0 rounded-lg object-cover"
+        />
+      ) : (
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-surface-muted text-xs text-ink-muted">
+          Sin proyecto
+        </div>
+      )}
 
-      <div className="grid flex-1 gap-3 sm:grid-cols-2">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-ink-muted">Título</span>
-          <input
-            type="text"
-            value={project.title}
-            onChange={(event) => {
-              const title = event.target.value;
-              // Deriva ID/link del título mientras sigan "en sync" con el título anterior (proyecto
-              // recién agregado) — apenas el admin toca ID/link directamente, dejan de seguir al
-              // título letra a letra.
-              const idInSync = project.id === slugifyLive(project.title);
-              const id = idInSync ? slugifyLive(title) : project.id;
-              const linkInSync = project.link === (project.id ? `/proyectos/${project.id}` : "");
-              const link = linkInSync ? (id ? `/proyectos/${id}` : "") : project.link;
-              onChange({ ...project, title, id, link });
-            }}
-            className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-ink-muted">ID (slug)</span>
-          <input
-            type="text"
-            value={project.id}
-            onChange={(event) => {
-              const id = slugifyLive(event.target.value);
-              const linkInSync = project.link === (project.id ? `/proyectos/${project.id}` : "");
-              const link = linkInSync ? (id ? `/proyectos/${id}` : "") : project.link;
-              onChange({ ...project, id, link });
-            }}
-            onBlur={(event) => onChange({ ...project, id: finalizeSlug(event.target.value) })}
-            className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2 font-mono text-xs"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-ink-muted">Fecha (AAAA-MM)</span>
-          <input
-            type="text"
-            value={project.date}
-            onChange={(event) => onChange({ ...project, date: event.target.value })}
-            placeholder="2026-06"
-            className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-          <span className="text-ink-muted">Descripción</span>
-          <textarea
-            value={project.description}
-            onChange={(event) => onChange({ ...project, description: event.target.value })}
-            rows={2}
-            className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-          <span className="text-ink-muted">Link</span>
-          <input
-            type="text"
-            value={project.link}
-            onChange={(event) => onChange({ ...project, link: event.target.value })}
-            className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
-          />
-        </label>
-
-        <label className="flex items-center gap-2 text-sm sm:col-span-2">
-          <input
-            type="checkbox"
-            checked={project.featuredOnHome !== false}
-            onChange={(event) => onChange({ ...project, featuredOnHome: event.target.checked })}
-          />
-          <span className="text-ink-muted">Mostrar en el carrusel de Inicio</span>
-        </label>
-      </div>
+      <select
+        value={id}
+        onChange={(event) => onChange(event.target.value)}
+        className="flex-1 rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2 text-sm"
+      >
+        <option value="">Selecciona un proyecto…</option>
+        {options.map((project) => (
+          <option key={project.slug} value={project.slug}>
+            {project.title}
+          </option>
+        ))}
+      </select>
 
       <div className="flex shrink-0 flex-col gap-1">
         <button

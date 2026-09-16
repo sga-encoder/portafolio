@@ -16,11 +16,12 @@ const TABS: { key: Tab; label: string; enabled: boolean }[] = [
 ];
 
 // Pestañas de "Contenido" (064): cada una edita un archivo de datos de Inicio distinto
-// (profile.ts/skillsPages.ts/projects.ts/sceneStops.ts, todos migrados a JSON + wrapper
+// (profile.ts/skillsPages.ts/carousel.ts/sceneStops.ts, todos migrados a JSON + wrapper
 // TypeScript) vía el mismo par borrador(Firestore)/publicar(GitHub) de `jsonContent.ts`. Las 4
 // pestañas ya están activas ("Secciones"/"Habilidades"/"Carrusel"/"Animación 3D":
-// `064`/`069`/`066`/`067`; "Habilidades" pasó de `SkillsTab` (`065`) a `SkillsPagesTab` en `069`).
-function ContentPanelContent() {
+// `064`/`069`/`071`/`067`; "Habilidades" pasó de `SkillsTab` (`065`) a `SkillsPagesTab` en `069`;
+// "Carrusel" pasó del CRUD completo de `066` al selector simple de `071`).
+function ContentPanelContent({ switcherProjects }: { switcherProjects: ProjectCardData[] }) {
   const [tab, setTab] = useState<Tab>("secciones");
 
   return (
@@ -51,7 +52,7 @@ function ContentPanelContent() {
 
       {tab === "secciones" && <SectionsTab />}
       {tab === "habilidades" && <SkillsPagesTab />}
-      {tab === "carrusel" && <CarouselTab />}
+      {tab === "carrusel" && <CarouselTab availableProjects={switcherProjects} />}
       {tab === "animacion" && <AnimationTab />}
     </>
   );
@@ -64,7 +65,7 @@ interface Props {
 export default function ContentPanel({ switcherProjects }: Props) {
   return (
     <AdminGate active="contenido" switcherProjects={switcherProjects}>
-      <ContentPanelContent />
+      <ContentPanelContent switcherProjects={switcherProjects} />
     </AdminGate>
   );
 }
