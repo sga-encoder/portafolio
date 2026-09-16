@@ -36,6 +36,24 @@ sphereMovement:
   header:
     a:
       screenFraction: 1.3
+servers:
+  - id: web
+    name: Frontend
+    kind: web
+    company: vercel
+    projectId: "prj_NZjeFeVEh0WEeLBk9NwdRidXRdZa"
+    url: "https://blog-semillero.vercel.app/"
+  - id: backend
+    name: Backend (Strapi)
+    kind: other
+    company: render
+    serviceId: "srv-dac2rk942hec73egsib0"
+    url: "https://blog-semillero-strapi.onrender.com/"
+  - id: db
+    name: Base de datos (Neon)
+    kind: database
+    company: neon
+    projectId: "tiny-water-97564590"
 ---
 
 Este blog lo construí para un semillero de investigación universitario, como una forma de publicar y

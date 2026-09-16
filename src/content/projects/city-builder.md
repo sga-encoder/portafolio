@@ -18,6 +18,13 @@ links:
   demo: "https://city-builder-ruddy.vercel.app/"
 steps:
   - text: "Crea una partida para empezar a construir tu ciudad."
+servers:
+  - id: web
+    name: Frontend
+    kind: web
+    company: vercel
+    projectId: "prj_jHBUpMdaRcpDqckEKDAdpahRaocj"
+    url: "https://city-builder-ruddy.vercel.app/"
 ---
 
 Este es un juego de construcción de ciudad que hice para la universidad. El reto no era solo el juego en

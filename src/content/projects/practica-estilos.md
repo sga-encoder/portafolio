@@ -1,5 +1,5 @@
 ---
-title: "Práctica de estilos"
+title: "Galería de estilos"
 summary: "Segundo proyecto de aprendizaje: practiqué mucho CSS con React, siguiendo tutoriales de YouTube."
 coverImage: "projects/practica-estilos/cover"
 gallery:
@@ -14,9 +14,16 @@ platforms:
   - "desktop"
 links:
   repo: "https://github.com/sga-encoder/SGA-server"
-  demo: "https://hola-git-main-sga-programing-company.vercel.app/"
+  demo: "https://galeria-de-estilos-sga.vercel.app/"
 steps:
   - text: "Explora el menú y disfruta de los diseños."
+servers:
+  - id: web
+    name: Frontend
+    kind: web
+    company: vercel
+    projectId: "prj_KPbWTVgRbADGuqSWfNLkmt0lzfC2"
+    url: "https://galeria-de-estilos-sga.vercel.app/"
 ---
 
 Después de "Pelis", quise profundizar específicamente en CSS: este proyecto lo construí con React

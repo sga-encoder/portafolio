@@ -14,9 +14,16 @@ platforms:
   - "desktop"
 links:
   repo: "https://github.com/sga-encoder/Pelis"
-  demo: "https://leccion-0006.vercel.app/index.html"
+  demo: "https://pelis-sga.vercel.app/"
 steps:
   - text: "Ten un poco de paciencia la primera vez que cargue — es una de mis primeras webs, sin optimizar."
+servers:
+  - id: web
+    name: Frontend
+    kind: web
+    company: vercel
+    projectId: "QmUueugy1q6FJDkb8fbaYsLqvvqGVZBNJHGy5RAVdSEJ9W"
+    url: "https://pelis-sga.vercel.app/"
 ---
 
 Esta fue literalmente mi primera web. La hice siguiendo un curso de YouTube, aprendiendo HTML, CSS y
