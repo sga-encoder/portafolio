@@ -361,17 +361,19 @@ html {
   margin-left: 0.75rem;
 }
 
-/* El label ("Cambiar de proyecto") comparte la regla global `.group:hover
-   .scroll-dot-label, .group:focus-within .scroll-dot-label { opacity: 1;
-   ... }` con el resto de labels del sitio — el `:focus-within` está ahí
-   para que un usuario de teclado (tab) también lo vea. Pero en `<details>`
-   el `<summary>` queda enfocado en cuanto se abre (clic o tap) y no se
-   desenfoca solo por eso, así que en mobile (sin hover real) el label se
-   quedaba visible todo el tiempo que el panel estuviera abierto en vez de
-   solo al pasar el mouse. Se anula acá específicamente el `:focus-within`
-   (con más especificidad que la regla global, sumando `.project-switcher`)
-   para que este label dependa solo de `:hover`. */
-.project-switcher.group:focus-within .project-switcher-label {
+/* (085) El label ("Cambiar de proyecto"/"Proyectos") comparte la regla global
+   `.group:hover .scroll-dot-label, .group:focus-within .scroll-dot-label,
+   .is-pressed .scroll-dot-label { opacity: 1; ... }` con el resto de labels
+   del sitio. Pedido explícito del usuario: el label debe desaparecer apenas
+   el panel se abre, sin importar si el trigger sigue en `:hover` (escritorio,
+   abrir con click y dejar el mouse encima) o `:focus-within` (mobile, el
+   `<summary>` queda enfocado al abrir con tap y no se desenfoca solo por
+   eso). En vez de cubrir cada estado por separado, la condición correcta es
+   el propio atributo nativo `[open]` del `<details>` — cubre ambos casos con
+   una sola regla. Especificidad igual a la que reemplaza (`.project-switcher`
+   + `[open]` + `.group` + descendiente = 4 partes de nivel clase), por
+   encima de las 3 partes de la regla base. */
+.project-switcher[open].group .project-switcher-label {
   opacity: 0;
   transform: translateX(-8px) scale(0.5);
 }
@@ -486,10 +488,29 @@ html {
     gap: 2vw;
   }
 
+  /* (083) En mobile el botón "Ver todos" pasa de arriba a debajo del panel de
+     tarjetas: `order: 1` sobreescribe, solo en este breakpoint, el
+     `order: -1` de la regla base (compartida con escritorio desde 076, donde
+     sigue valiendo "a la izquierda"). El panel (`.project-switcher-panel`)
+     no tiene `order` explícito (default 0), así que con el botón en
+     `order: 1` queda después de él en el eje de columna. */
   .project-switcher-all {
+    order: 1;
     width: 100%;
     flex-direction: row;
     padding-block: 1rem;
+  }
+
+  /* (085) `AdminDotNav.tsx`, mobile, con el toggle admin⇄inicio activo
+     (`082`): el trigger de "Proyectos" pasa a vivir en la barra secundaria
+     (`NAV_BAR_MOBILE_SECONDARY`), y con la barra principal (`ScrollDotNav`)
+     ahora también visible el usuario pidió más separación del borde
+     inferior. `12rem` = el doble del offset base (`6rem`), el mismo
+     incremento que ya usa `NAV_BAR_MOBILE_SECONDARY` (`bottom-24` = 6rem)
+     para separar una barra de otra — "un nivel" extra, consistente con el
+     resto de offsets del sistema de rieles. */
+  .project-switcher-shell--lifted {
+    bottom: calc(12rem + env(safe-area-inset-bottom));
   }
 }
 

@@ -47,3 +47,11 @@ export const NAV_RAIL_DESKTOP_SECONDARY =
   "fixed left-20 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-4 md:left-28 md:flex";
 
 export const NAV_BAR_MOBILE_SECONDARY = "fixed inset-x-0 bottom-24 z-30 flex justify-center px-4 md:hidden";
+
+/**
+ * Tercer riel en mobile (081, caso `showHomeNav` + sub-página): cuando conviven `ScrollDotNav`
+ * (principal), `AdminDotNav` (secundario) y `SubPageDotNav` (terciario) a la vez, este último no
+ * puede compartir el offset de `NAV_BAR_MOBILE_SECONDARY` con `AdminDotNav` — se apilaría encima.
+ * Mismo mecanismo que el offset desktop equivalente (`left-40`/`left-48` en `SubPageDotNav`).
+ */
+export const NAV_BAR_MOBILE_TERTIARY = "fixed inset-x-0 bottom-48 z-20 flex justify-center px-4 md:hidden";

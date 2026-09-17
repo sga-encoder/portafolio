@@ -9,6 +9,7 @@ import { formatProjectDate } from "../../utils/projectDateLabel";
 import {
   NAV_BAR_MOBILE,
   NAV_BAR_MOBILE_LIST,
+  NAV_BAR_MOBILE_SECONDARY,
   NAV_ITEM_HIT_AREA,
   NAV_RAIL_FRAME,
   NAV_RAIL_LIST,
@@ -179,6 +180,14 @@ export default function AdminDotNav({ active, switcherProjects, currentSlug, sid
     side === "secondary"
       ? "fixed left-20 top-1/2 z-50 hidden -translate-y-1/2 flex-col gap-4 md:left-28 md:flex"
       : "fixed left-4 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-4 md:left-6 md:flex";
+  const mobileClassName = side === "secondary" ? NAV_BAR_MOBILE_SECONDARY : NAV_BAR_MOBILE;
+  // (085) Las 3 secciones con submenú propio (`SubPageDotNav`: años en "proyectos", pestañas en
+  // "contenido"/"imagenes") renderizan ese submenú como una barra hermana en la posición "secundaria"
+  // — la misma franja donde, si no hay submenú, el toggle admin⇄inicio movería este propio nav. El
+  // panel del selector "Proyectos" (dentro de este mismo componente) necesita el mismo extra de altura
+  // (`liftPanel`) en cualquiera de los dos casos, para no solaparse con esa barra vecina.
+  const hasSubPageNav = active === "proyectos" || active === "contenido" || active === "imagenes";
+  const liftSwitcherPanel = Boolean(toggle?.enabled) || hasSubPageNav;
   const isProyectosActive = active === "proyectos";
   // (076) El ítem "Proyectos" se mantiene activo también mientras su propio panel
   // esté abierto, sin importar la ruta actual — riel desktop y barra mobile son
@@ -223,6 +232,7 @@ export default function AdminDotNav({ active, switcherProjects, currentSlug, sid
                 triggerIcon="folder"
                 triggerLabel="Proyectos"
                 onOpenChange={setProyectosOpenDesktop}
+                liftPanel={liftSwitcherPanel}
               />
             </li>
             {AFTER_PROYECTOS.map((item) => (
@@ -233,7 +243,7 @@ export default function AdminDotNav({ active, switcherProjects, currentSlug, sid
         </div>
       </nav>
 
-      <nav aria-label="Navegación del panel de administración" className={NAV_BAR_MOBILE}>
+      <nav aria-label="Navegación del panel de administración" className={mobileClassName}>
         <ul ref={mobileListRef} className={NAV_BAR_MOBILE_LIST}>
           {toggle && <NavModeToggle page={toggle.page} enabled={toggle.enabled} onToggle={toggle.onToggle} variant="mobile" placement="start" />}
           {BEFORE_PROYECTOS.map((item) => (
@@ -247,6 +257,7 @@ export default function AdminDotNav({ active, switcherProjects, currentSlug, sid
               triggerIcon="folder"
               triggerLabel="Proyectos"
               onOpenChange={setProyectosOpenMobile}
+              liftPanel={liftSwitcherPanel}
             />
           </li>
           {AFTER_PROYECTOS.map((item) => (

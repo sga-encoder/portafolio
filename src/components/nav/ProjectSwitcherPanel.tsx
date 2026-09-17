@@ -21,6 +21,11 @@ interface Props {
    *  contiene se mantenga "activo" mientras esté abierto, ver `AdminDotNav.tsx`). Opcional: el consumidor
    *  del sitio público (`ProjectDetailNav.astro`) no lo usa. */
   onOpenChange?: (open: boolean) => void;
+  /** (085) En mobile, sube el panel + botón "Ver todos" un nivel extra de separación del borde inferior —
+   *  usado por `AdminDotNav.tsx` cuando hay una barra de navegación hermana cerca de esta (toggle
+   *  admin⇄inicio activo, o la propia sección tiene un `SubPageDotNav` de submenú). Sin efecto en
+   *  escritorio. */
+  liftPanel?: boolean;
 }
 
 /**
@@ -50,6 +55,7 @@ export default function ProjectSwitcherPanel({
   allLabel = "Ver todos los proyectos",
   allIcon = "grid",
   onOpenChange,
+  liftPanel = false,
 }: Props) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
@@ -112,7 +118,9 @@ export default function ProjectSwitcherPanel({
         {triggerLabel}
       </span>
 
-      <div className="project-switcher-shell z-40 flex items-stretch">
+      <div
+        className={`project-switcher-shell z-40 flex items-stretch${liftPanel ? " project-switcher-shell--lifted" : ""}`}
+      >
         <div
           className="project-switcher-panel flex items-stretch rounded-2xl border p-3 backdrop-blur"
           style={{ ...cardStyle, ["--switcher-scroll-color" as string]: color } as React.CSSProperties}

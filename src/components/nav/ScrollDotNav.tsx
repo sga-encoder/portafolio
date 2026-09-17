@@ -7,6 +7,7 @@ import { attachHoldToNavigate } from "./holdToNavigate";
 import {
   NAV_BAR_MOBILE,
   NAV_BAR_MOBILE_LIST,
+  NAV_BAR_MOBILE_SECONDARY,
   NAV_ITEM_HIT_AREA,
   NAV_RAIL_FRAME,
   NAV_RAIL_LIST,
@@ -53,9 +54,10 @@ export default function ScrollDotNav({ side = "left", toggle }: Props) {
     side === "secondary"
       ? "fixed left-20 top-1/2 z-50 hidden -translate-y-1/2 flex-col gap-4 md:left-28 md:flex"
       : "fixed left-4 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-4 md:left-6 md:flex";
+  const mobileClassName = side === "secondary" ? NAV_BAR_MOBILE_SECONDARY : NAV_BAR_MOBILE;
 
   const handleSectionClick = (id: string) => {
-    if (side === "secondary" && window.location.pathname !== "/") {
+    if (window.location.pathname !== "/") {
       window.location.href = `/#${id}`;
       return;
     }
@@ -67,13 +69,13 @@ export default function ScrollDotNav({ side = "left", toggle }: Props) {
     const list = mobileListRef.current;
     if (!list) return;
     return attachHoldToNavigate(list, (id) => {
-      if (side === "secondary" && window.location.pathname !== "/") {
+      if (window.location.pathname !== "/") {
         window.location.href = `/#${id}`;
         return;
       }
       scrollToSection(id);
     });
-  }, [side]);
+  }, []);
 
   return (
     <>
@@ -115,7 +117,7 @@ export default function ScrollDotNav({ side = "left", toggle }: Props) {
         </div>
       </nav>
 
-      <nav aria-label="Navegación de secciones" className={NAV_BAR_MOBILE}>
+      <nav aria-label="Navegación de secciones" className={mobileClassName}>
         <ul ref={mobileListRef} className={NAV_BAR_MOBILE_LIST}>
           {SCROLL_NAV_ITEMS.map((item, index) => {
             const isActive = index === activeIndex;

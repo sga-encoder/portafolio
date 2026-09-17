@@ -1,6 +1,7 @@
 import {
   NAV_BAR_MOBILE_LIST,
   NAV_BAR_MOBILE_SECONDARY,
+  NAV_BAR_MOBILE_TERTIARY,
   NAV_ITEM_HIT_AREA,
   NAV_RAIL_DESKTOP_SECONDARY,
   NAV_RAIL_FRAME,
@@ -49,6 +50,7 @@ export default function SubPageDotNav({ ariaLabel, items, activeKey, onSelect }:
   const desktopClassName = showHomeNav
     ? "fixed left-40 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-4 md:left-48 md:flex"
     : NAV_RAIL_DESKTOP_SECONDARY;
+  const mobileClassName = showHomeNav ? NAV_BAR_MOBILE_TERTIARY : NAV_BAR_MOBILE_SECONDARY;
 
   return (
     <>
@@ -83,7 +85,7 @@ export default function SubPageDotNav({ ariaLabel, items, activeKey, onSelect }:
         </div>
       </nav>
 
-      <nav aria-label={ariaLabel} className={NAV_BAR_MOBILE_SECONDARY}>
+      <nav aria-label={ariaLabel} className={mobileClassName}>
         <ul className={NAV_BAR_MOBILE_LIST}>
           {items.map((item) => {
             const isActive = item.key === activeKey;
