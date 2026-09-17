@@ -30,16 +30,14 @@ function sideFor(index: number, total: number): "left" | "right" {
     }
   </div>
 
-  {/* Mobile (<768px): columnas apiladas verticalmente, sin chevron. */}
+  {/* Mobile (<768px): columnas apiladas verticalmente, sin chevron. Sin imagen central (082). */}
   <div class="flex flex-1 flex-col items-center justify-center gap-8 py-6 md:hidden">
     {
-      columns.map((column, index) =>
-        column.type === "image" ? (
-          <SkillsImageColumn imageKey={column.imageKey ?? ""} />
-        ) : (
-          <SkillColumn skills={column.skills ?? []} side={sideFor(index, columns.length)} variant="mobile" />
-        ),
-      )
+      columns
+        .filter((column) => column.type !== "image")
+        .map((column, index, filtered) => (
+          <SkillColumn skills={column.skills ?? []} side={sideFor(index, filtered.length)} variant="mobile" />
+        ))
     }
   </div>
 </div>

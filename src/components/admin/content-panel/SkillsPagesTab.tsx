@@ -266,7 +266,7 @@ export default function SkillsPagesTab() {
               <ChevronIcon direction="left" />
             </button>
           )}
-          <div className="w-full px-9">
+          <div className="w-full px-[2.5%] md:px-9">
             <SkillsPageCard page={currentPage} categories={categories} onChange={updateCurrent} />
           </div>
           {pageCount > 1 && (

@@ -47,7 +47,7 @@ export default function SkillsPageCard({ page, categories, onChange }: Props) {
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className="flex flex-nowrap items-stretch justify-center gap-[2vw]">
+      <div className="flex flex-col items-stretch gap-3 md:flex-row md:justify-center md:gap-[2vw]">
         {page.columns.map((column, colIndex) => (
           <SkillsColumnCard
             key={colIndex}
