@@ -53,4 +53,7 @@ export interface ServerStatusResult {
   details: ServerStatusDetail[];
   checkedAt: string;
   error?: string;
+  /** Link directo al dashboard del proveedor (Vercel/Render/Neon) para este recurso puntual — si
+   * el autor ya tiene sesión abierta en ese proveedor en el navegador, abre autenticado. */
+  dashboardUrl?: string;
 }

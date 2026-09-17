@@ -2,11 +2,11 @@
 // Reemplaza a ProjectPager (3 botones de texto en fila) por un menú de
 // navegación tipo dot-nav (mismo mecanismo visual que ScrollDotNav/YearDotNav:
 // fijo al lateral, label en hover, oculto en mobile). A diferencia de esos
-// dos -que son scroll-spy entre secciones equivalentes-, aquí las 4 acciones
-// son distintas (retroceder/avanzar/inicio/cambiar de proyecto), así que
-// cada ítem se distingue por forma/ícono además de color, y el "activo" no
-// existe: en su lugar hay un estado deshabilitado para anterior/siguiente en
-// los extremos.
+// dos -que son scroll-spy entre secciones equivalentes-, aquí las acciones
+// son distintas (retroceder/avanzar/cambiar de proyecto), así que cada ítem
+// se distingue por forma/ícono además de color, y el "activo" no existe: en
+// su lugar hay un estado deshabilitado para anterior/siguiente en los
+// extremos.
 // (037) El riel/barra ganan un borde animado (`NAV_RAIL_FRAME`/`.nav-rail-glow`)
 // y, en mobile, mantener presionado un botón muestra su label sin navegar
 // hasta soltar (mismo mecanismo que ScrollDotNav/YearDotNav, pero aquí los
@@ -15,19 +15,22 @@
 // (041) "Ver todos los proyectos" ya NO es un ítem de este menú — pasó a ser
 // un botón companion *dentro* del panel del selector rápido
 // (`ProjectSwitcherPanel`), visible solo mientras ese panel está abierto (ver
-// ese componente). El menú principal queda simétrico en desktop y mobile: 4
-// ítems — anterior, inicio, selector rápido (ícono capas), siguiente —, sin
-// pestañas ni botones flotantes aparte.
+// ese componente).
 // (054) `ProjectSwitcherPanel` vive en `src/components/nav/` como componente
 // React compartido con `/admin` (`AdminDotNav.tsx`), en vez del `.astro`
 // propio de este directorio que tenía antes — montado acá como `client:load`.
+// (081) El ítem "inicio" se quitó: `SiteMainNav` (nav principal del sitio,
+// montado aparte en `[slug].astro`) ya cubre esa función, y este menú pasó a
+// ser su submenú de sub-página (`NAV_RAIL_DESKTOP_SECONDARY`/
+// `NAV_BAR_MOBILE_SECONDARY`) — quedan 3 ítems: anterior, selector rápido
+// (ícono capas), siguiente.
 import NavIcon from "./NavIcon.astro";
 import ProjectSwitcherPanel from "../../nav/ProjectSwitcherPanel";
 import {
-  NAV_BAR_MOBILE,
   NAV_BAR_MOBILE_LIST,
+  NAV_BAR_MOBILE_SECONDARY,
   NAV_ITEM_HIT_AREA,
-  NAV_RAIL_DESKTOP,
+  NAV_RAIL_DESKTOP_SECONDARY,
   NAV_RAIL_FRAME,
   NAV_RAIL_LIST,
 } from "../../nav/navRailClasses";
@@ -58,7 +61,7 @@ interface NavItem {
   href?: string;
   color: string;
   disabled: boolean;
-  icon: "chevron-left" | "home" | "chevron-right";
+  icon: "chevron-left" | "chevron-right";
 }
 
 const prevItem: NavItem = {
@@ -68,14 +71,6 @@ const prevItem: NavItem = {
   color: leftColor,
   disabled: !prevHref,
   icon: "chevron-left",
-};
-const homeItem: NavItem = {
-  key: "home",
-  label: "Volver al inicio",
-  href: "/",
-  color: leftColor,
-  disabled: false,
-  icon: "home",
 };
 const nextItem: NavItem = {
   key: "next",
@@ -91,7 +86,6 @@ type RailEntry = { kind: "item"; item: NavItem } | { kind: "switcher" };
 // Mismo orden en desktop y mobile: ya no hay asimetría entre riel y barra.
 const entries: RailEntry[] = [
   { kind: "item", item: prevItem },
-  { kind: "item", item: homeItem },
   ...(hasSwitcher ? [{ kind: "switcher" } as const] : []),
   { kind: "item", item: nextItem },
 ];
@@ -103,7 +97,7 @@ const circleStyle = (color: string) =>
 {
   /* Desktop: nav lateral fijo, mismo criterio hidden/md:flex que ScrollDotNav/YearDotNav. */
 }
-<nav aria-label="Navegación entre proyectos" class={NAV_RAIL_DESKTOP}>
+<nav aria-label="Navegación entre proyectos" class={NAV_RAIL_DESKTOP_SECONDARY}>
   <div class={NAV_RAIL_FRAME}>
     <ul class={NAV_RAIL_LIST}>
       {
@@ -156,7 +150,7 @@ const circleStyle = (color: string) =>
      posiciona `fixed`/centrado vía CSS global (`.project-switcher-shell`,
      `global.css`), no un `<style>` scoped (054, ver `ProjectSwitcherPanel.tsx`). */
 }
-<nav aria-label="Navegación entre proyectos" class={NAV_BAR_MOBILE}>
+<nav aria-label="Navegación entre proyectos" class={NAV_BAR_MOBILE_SECONDARY}>
   <ul class={`${NAV_BAR_MOBILE_LIST} hold-to-navigate-list`}>
     {
       entries.map((entry) =>

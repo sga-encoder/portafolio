@@ -46,27 +46,37 @@ const {
       // patrón que `ProjectLikeButton.astro`. El guard por `dataset` evita
       // doble-bind si el nodo persiste entre dos disparos del evento.
       function initNavRailIdlePause() {
-        document.querySelectorAll(".nav-rail-glow").forEach((el) => {
+        const rails = Array.from(document.querySelectorAll(".nav-rail-glow"));
+        if (!rails.length) return;
+
+        const phase = `${-((performance.now() / 1000) % 6).toFixed(2)}s`;
+        document.documentElement.style.setProperty("--nav-rail-phase", phase);
+
+        let globalActiveInteractions = 0;
+
+        const pauseAll = () => {
+          globalActiveInteractions++;
+          rails.forEach((rail) => rail.classList.add("is-paused"));
+        };
+
+        const resumeAll = () => {
+          globalActiveInteractions = Math.max(0, globalActiveInteractions - 1);
+          if (globalActiveInteractions === 0) {
+            rails.forEach((rail) => rail.classList.remove("is-paused"));
+          }
+        };
+
+        rails.forEach((el) => {
           if (el.dataset.idleBound === "true") return;
           el.dataset.idleBound = "true";
 
-          let activeInteractions = 0;
-          const pause = () => {
-            activeInteractions++;
-            el.classList.add("is-paused");
-          };
-          const resume = () => {
-            activeInteractions = Math.max(0, activeInteractions - 1);
-            if (activeInteractions === 0) el.classList.remove("is-paused");
-          };
-
-          el.addEventListener("pointerenter", pause);
-          el.addEventListener("pointerleave", resume);
-          el.addEventListener("focusin", pause);
-          el.addEventListener("focusout", resume);
-          el.addEventListener("touchstart", pause, { passive: true });
-          el.addEventListener("touchend", resume);
-          el.addEventListener("touchcancel", resume);
+          el.addEventListener("pointerenter", pauseAll);
+          el.addEventListener("pointerleave", resumeAll);
+          el.addEventListener("focusin", pauseAll);
+          el.addEventListener("focusout", resumeAll);
+          el.addEventListener("touchstart", pauseAll, { passive: true });
+          el.addEventListener("touchend", resumeAll);
+          el.addEventListener("touchcancel", resumeAll);
         });
       }
       document.addEventListener("astro:page-load", initNavRailIdlePause);

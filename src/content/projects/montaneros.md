@@ -14,11 +14,6 @@ links:
   repo: https://github.com/sga-encoder/montaneros-blog
   demo: https://montaneros.vercel.app/
 steps:
-  - text: El backend está en un hosting gratuito y puede tardar unos segundos en despertar.
-    copyText: []
-    buttons:
-      - label: Despertar backend
-        href: https://montaneros-cms-cpmn.onrender.com/
   - text: Entra al panel de administración de Payload CMS para ver la interfaz y cómo se administra el contenido.
     copyText:
       - value: admin@example.com
@@ -28,6 +23,7 @@ steps:
     buttons:
       - label: Abrir panel de admin
         href: https://montaneros-cms-cpmn.onrender.com/admin
+        locked: true
 servers:
   - id: web
     name: Frontend

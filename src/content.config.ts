@@ -10,6 +10,11 @@ const copyItem = z.object({
 const projectButton = z.object({
   label: z.string(),
   href: z.string().url(),
+  // Botón que depende del mismo backend Render que "Ver demo" (ej. panel de admin de Strapi/Payload)
+  // — si el proyecto tiene servers[] con company: "render", este botón queda bloqueado con el
+  // mismo candado/cuenta regresiva hasta que el autor haga click en "Despertar backend" (080).
+  // Sin servidores Render, se ignora y el botón se muestra normal.
+  locked: z.boolean().default(false).optional(),
 });
 
 const step = z.object({

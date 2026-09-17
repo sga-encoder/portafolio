@@ -91,8 +91,12 @@ service cloud.firestore {
     }
 
     // 043 · Panel /admin — tokens de terceros (GitHub, Cloudinary Admin
-    // API; desde 046 también Vercel/Render/Neon — token simple — y Firebase
-    // — cuenta de servicio de Google Cloud, ver src/lib/admin/servers/).
+    // API; desde 046 también Vercel — token simple, reusado en 074 para
+    // variables de entorno — y Firebase — cuenta de servicio de Google
+    // Cloud, ver src/lib/admin/servers/). Render/Neon NO viven acá desde
+    // 075: sus APIs no aceptan llamadas directas del navegador (sin CORS),
+    // así que su token vive como variable de entorno server-only
+    // (RENDER_API_TOKEN/NEON_API_TOKEN) leída por /api/infra-status.
     // Nunca se escriben desde el cliente, ni siquiera autenticado: el
     // autor los pega a mano desde la consola de Firebase.
     match /adminSecrets/{secretId} {

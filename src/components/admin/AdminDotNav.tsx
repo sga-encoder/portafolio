@@ -10,10 +10,10 @@ import {
   NAV_BAR_MOBILE,
   NAV_BAR_MOBILE_LIST,
   NAV_ITEM_HIT_AREA,
-  NAV_RAIL_DESKTOP,
   NAV_RAIL_FRAME,
   NAV_RAIL_LIST,
 } from "../nav/navRailClasses";
+import { NavModeToggle, type NavMode } from "../nav/NavModeToggle";
 
 export type AdminSection = "dashboard" | "estadisticas" | "proyectos" | "contenido" | "imagenes" | "servidores";
 
@@ -52,6 +52,12 @@ interface Props {
   switcherProjects: ProjectCardData[];
   /** Proyecto actualmente abierto en `/admin/proyectos/[slug]` — se excluye del selector rápido. */
   currentSlug?: string;
+  side?: "left" | "secondary";
+  toggle?: {
+    page: NavMode;
+    enabled: boolean;
+    onToggle: () => void;
+  };
 }
 
 function NavLink({
@@ -167,8 +173,12 @@ function LogoutItem({ variant }: { variant: "desktop" | "mobile" }) {
  * directo; "Cerrar sesión" vive acá también como último ítem (acción, no
  * ruta — nunca se pinta "activo").
  */
-export default function AdminDotNav({ active, switcherProjects, currentSlug }: Props) {
+export default function AdminDotNav({ active, switcherProjects, currentSlug, side = "left", toggle }: Props) {
   const mobileListRef = useRef<HTMLUListElement>(null);
+  const desktopClassName =
+    side === "secondary"
+      ? "fixed left-20 top-1/2 z-50 hidden -translate-y-1/2 flex-col gap-4 md:left-28 md:flex"
+      : "fixed left-4 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-4 md:left-6 md:flex";
   const isProyectosActive = active === "proyectos";
   // (076) El ítem "Proyectos" se mantiene activo también mientras su propio panel
   // esté abierto, sin importar la ruta actual — riel desktop y barra mobile son
@@ -198,9 +208,10 @@ export default function AdminDotNav({ active, switcherProjects, currentSlug }: P
 
   return (
     <>
-      <nav aria-label="Navegación del panel de administración" className={NAV_RAIL_DESKTOP}>
+      <nav aria-label="Navegación del panel de administración" className={desktopClassName}>
         <div className={NAV_RAIL_FRAME}>
           <ul className={NAV_RAIL_LIST}>
+            {toggle && <NavModeToggle page={toggle.page} enabled={toggle.enabled} onToggle={toggle.onToggle} variant="desktop" placement="start" />}
             {BEFORE_PROYECTOS.map((item) => (
               <NavLink key={item.key} item={item} isActive={item.key === active} variant="desktop" />
             ))}
@@ -224,6 +235,7 @@ export default function AdminDotNav({ active, switcherProjects, currentSlug }: P
 
       <nav aria-label="Navegación del panel de administración" className={NAV_BAR_MOBILE}>
         <ul ref={mobileListRef} className={NAV_BAR_MOBILE_LIST}>
+          {toggle && <NavModeToggle page={toggle.page} enabled={toggle.enabled} onToggle={toggle.onToggle} variant="mobile" placement="start" />}
           {BEFORE_PROYECTOS.map((item) => (
             <NavLink key={item.key} item={item} isActive={item.key === active} variant="mobile" />
           ))}

@@ -8,10 +8,10 @@ import {
   NAV_BAR_MOBILE,
   NAV_BAR_MOBILE_LIST,
   NAV_ITEM_HIT_AREA,
-  NAV_RAIL_DESKTOP,
   NAV_RAIL_FRAME,
   NAV_RAIL_LIST,
 } from "./navRailClasses";
+import { NavModeToggle, type NavMode } from "./NavModeToggle";
 
 function scrollToSection(id: string) {
   const el = document.getElementById(id);
@@ -35,19 +35,49 @@ const circleStyle = (color: string) =>
  * mobile, mantener presionado hace lo mismo (clase `is-pressed` vía
  * `holdToNavigate.ts`) y la navegación solo ocurre al soltar encima (037).
  */
-export default function ScrollDotNav() {
+type NavSide = "left" | "secondary";
+
+interface Props {
+  side?: NavSide;
+  toggle?: {
+    page: NavMode;
+    enabled: boolean;
+    onToggle: () => void;
+  };
+}
+
+export default function ScrollDotNav({ side = "left", toggle }: Props) {
   const { activeIndex } = useSectionScroll(SECTION_IDS);
   const mobileListRef = useRef<HTMLUListElement>(null);
+  const desktopClassName =
+    side === "secondary"
+      ? "fixed left-20 top-1/2 z-50 hidden -translate-y-1/2 flex-col gap-4 md:left-28 md:flex"
+      : "fixed left-4 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-4 md:left-6 md:flex";
+
+  const handleSectionClick = (id: string) => {
+    if (side === "secondary" && window.location.pathname !== "/") {
+      window.location.href = `/#${id}`;
+      return;
+    }
+
+    scrollToSection(id);
+  };
 
   useEffect(() => {
     const list = mobileListRef.current;
     if (!list) return;
-    return attachHoldToNavigate(list, scrollToSection);
-  }, []);
+    return attachHoldToNavigate(list, (id) => {
+      if (side === "secondary" && window.location.pathname !== "/") {
+        window.location.href = `/#${id}`;
+        return;
+      }
+      scrollToSection(id);
+    });
+  }, [side]);
 
   return (
     <>
-      <nav aria-label="Navegación de secciones" className={NAV_RAIL_DESKTOP}>
+      <nav aria-label="Navegación de secciones" className={desktopClassName}>
         <div className={NAV_RAIL_FRAME}>
           <ul className={NAV_RAIL_LIST}>
             {SCROLL_NAV_ITEMS.map((item, index) => {
@@ -61,7 +91,7 @@ export default function ScrollDotNav() {
                     type="button"
                     aria-label={item.label}
                     aria-current={isActive ? "true" : undefined}
-                    onClick={() => scrollToSection(item.id)}
+                    onClick={() => handleSectionClick(item.id)}
                     className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-brand)"
                     style={circleStyle(color)}
                   >
@@ -80,6 +110,7 @@ export default function ScrollDotNav() {
                 </li>
               );
             })}
+            {toggle && <NavModeToggle page={toggle.page} enabled={toggle.enabled} onToggle={toggle.onToggle} variant="desktop" placement="start" />}
           </ul>
         </div>
       </nav>
@@ -98,7 +129,7 @@ export default function ScrollDotNav() {
                   aria-label={item.label}
                   aria-current={isActive ? "true" : undefined}
                   data-hold-nav={item.id}
-                  onClick={() => scrollToSection(item.id)}
+                  onClick={() => handleSectionClick(item.id)}
                   className={NAV_ITEM_HIT_AREA}
                 >
                   <span
@@ -121,6 +152,7 @@ export default function ScrollDotNav() {
               </li>
             );
           })}
+          {toggle && <NavModeToggle page={toggle.page} enabled={toggle.enabled} onToggle={toggle.onToggle} variant="mobile" placement="start" />}
         </ul>
       </nav>
     </>

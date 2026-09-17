@@ -9,6 +9,10 @@ interface CopyItem {
 interface ProjectButton {
   label: string;
   href: string;
+  /** Depende del mismo backend Render que "Ver demo" (080) — bloqueado con candado + cuenta
+   * regresiva hasta que se despierta, compartiendo el mismo "Despertar backend" de la página. Se
+   * ignora si el proyecto no tiene servers[] con company: "render". */
+  locked?: boolean;
 }
 
 interface Step {
@@ -17,20 +21,50 @@ interface Step {
   buttons?: ProjectButton[];
 }
 
+interface ServerRef {
+  company: string;
+  url?: string;
+}
+
 interface Props {
   steps: Step[];
   colors: [string, string];
   demoHref?: string;
+  servers?: ServerRef[];
 }
 
-const { steps, colors, demoHref } = Astro.props;
+const { steps, colors, demoHref, servers } = Astro.props;
 const [first, second] = colors;
 const leftColor = `var(--project-left-color, ${first})`;
 const rightColor = `var(--project-right-color, ${second})`;
 
-const allSteps: Step[] = demoHref
-  ? [...steps, { text: "Prueba el proyecto ya desplegado.", buttons: [{ label: "Ver demo", href: demoHref }] }]
-  : steps;
+// Render (plan free) apaga la instancia tras ~15 min sin tráfico — el visitante puede despertarla
+// antes de abrir el demo (u otro link que dependa del mismo backend, ej. panel de admin) en vez de
+// encontrarse con la primera carga lenta/rota. Ver
+// .claude/spec/features/080-despertar-backend-render/plan.md.
+const renderUrls = (servers ?? [])
+  .filter((server): server is ServerRef & { url: string } => server.company === "render" && Boolean(server.url))
+  .map((server) => server.url);
+const gated = renderUrls.length > 0;
+
+// "Ver demo" es un caso especial derivado de `links.demo` (no vive en `steps[]`), pero usa el
+// mismo mecanismo genérico de `locked` que cualquier botón de un paso del autor (ej. "Abrir panel
+// de admin") — pedido explícito del usuario para poder marcar cualquier link que dependa del mismo
+// backend, no solo el demo.
+const demoSteps: Step[] = demoHref
+  ? [
+      ...(gated
+        ? [
+            {
+              text: "El backend de este proyecto puede estar dormido por inactividad (plan gratuito) — despertalo antes de entrar al demo.",
+            },
+          ]
+        : []),
+      { text: "Prueba el proyecto ya desplegado.", buttons: [{ label: "Ver demo", href: demoHref, locked: gated }] },
+    ]
+  : [];
+const allSteps: Step[] = [...steps, ...demoSteps];
+const wakeStepIndex = gated && demoHref ? allSteps.length - 2 : -1;
 ---
 
 <div class="flex h-full flex-col gap-4">
@@ -40,8 +74,13 @@ const allSteps: Step[] = demoHref
     {
       allSteps.map((step, index) => {
         const stepColor = index % 2 === 0 ? leftColor : rightColor;
+        const lockedButtons = gated ? (step.buttons ?? []).filter((button) => button.locked) : [];
+        const openButtons = (step.buttons ?? []).filter((button) => !gated || !button.locked);
+        const stepIsGated = lockedButtons.length > 0;
+        const lockedLabels = lockedButtons.map((button) => button.label).join(" / ");
+
         return (
-          <li class="flex flex-col gap-3 rounded-2xl bg-surface-muted p-4">
+          <li class:list={["relative flex flex-col gap-3 rounded-2xl bg-surface-muted p-4", stepIsGated && "overflow-hidden"]}>
             <div class="flex items-start gap-3">
               <span
                 class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold text-(--color-brand-contrast)"
@@ -70,7 +109,7 @@ const allSteps: Step[] = demoHref
               </button>
             ))}
 
-            {step.buttons?.map((button) => (
+            {openButtons.map((button) => (
               <ColorLinkButton
                 href={button.href}
                 target="_blank"
@@ -82,6 +121,55 @@ const allSteps: Step[] = demoHref
                 {button.label}
               </ColorLinkButton>
             ))}
+
+            {lockedButtons.map((button) => (
+              <a
+                href="#"
+                data-wake-link
+                data-wake-href={button.href}
+                aria-disabled="true"
+                tabindex={-1}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="wake-gated-link is-locked w-fit"
+                style={`--btn-color: ${stepColor};`}
+              >
+                {button.label}
+              </a>
+            ))}
+
+            {index === wakeStepIndex && (
+              <button
+                type="button"
+                class="wake-backend-button"
+                data-wake-trigger
+                data-wake-urls={JSON.stringify(renderUrls)}
+                style={`--btn-color: ${stepColor};`}
+              >
+                Despertar backend
+              </button>
+            )}
+
+            {stepIsGated && (
+              <div class="wake-lock-overlay" data-wake-overlay>
+                <div class="wake-lock-row">
+                  <svg class="wake-lock-symbol" viewBox="0 0 24 24" width="36" height="36" fill="none" aria-hidden="true">
+                    <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                    <path
+                      d="M8 11V7a4 4 0 0 1 8 0v4"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <span class="wake-lock-countdown" data-wake-countdown hidden />
+                </div>
+                <p class="wake-lock-hint" data-wake-hint>
+                  Bloqueado — despertá el backend en el paso anterior para usar "{lockedLabels}".
+                </p>
+              </div>
+            )}
           </li>
         );
       })
@@ -138,6 +226,115 @@ const allSteps: Step[] = demoHref
     text-transform: uppercase;
     color: var(--chip-color);
   }
+
+  .wake-backend-button {
+    width: fit-content;
+    border-radius: 9999px;
+    border: 1px solid var(--btn-color);
+    background-color: transparent;
+    padding: 0.4rem 1rem;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--btn-color);
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      opacity 0.2s;
+  }
+
+  .wake-backend-button:hover:not(:disabled) {
+    background-color: var(--btn-color);
+    color: var(--color-brand-contrast);
+  }
+
+  .wake-backend-button:disabled {
+    opacity: 0.6;
+  }
+
+  .wake-gated-link {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background-color: var(--btn-color);
+    padding: 0.5rem 1.25rem;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-brand-contrast);
+    transition: opacity 0.2s;
+  }
+
+  .wake-gated-link:hover {
+    opacity: 0.9;
+  }
+
+  .wake-gated-link.is-locked {
+    opacity: 0.45;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  /* Overlay de un paso bloqueado por el backend Render dormido (080) — cubre toda la tarjeta del
+     paso con blur, con un candado y (al hacer click en "Despertar backend") una cuenta regresiva
+     al lado, ambos visibles a la vez. `mix-blend-mode` hace que tomen el color de lo que tienen
+     detrás (el degradado de fondo de la página) en vez de un blanco plano. */
+  .wake-lock-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 1rem;
+    text-align: center;
+    background-color: color-mix(in srgb, var(--color-surface-muted) 55%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition:
+      opacity 0.35s ease,
+      visibility 0.35s ease;
+  }
+
+  .wake-lock-overlay.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .wake-lock-row {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .wake-lock-symbol {
+    color: white;
+    mix-blend-mode: overlay;
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-brand) 70%, transparent));
+  }
+
+  .wake-lock-countdown {
+    font-family: var(--font-display);
+    font-size: 2.75rem;
+    font-weight: 700;
+    line-height: 1;
+    color: white;
+    mix-blend-mode: overlay;
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--color-brand) 70%, transparent));
+  }
+
+  .wake-lock-hint {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--color-ink-muted);
+    max-width: 16rem;
+  }
 </style>
 
 <script is:inline data-astro-rerun>
@@ -162,6 +359,89 @@ const allSteps: Step[] = demoHref
         } catch (error) {
           console.error("No se pudo copiar el texto", error);
         }
+      });
+    });
+
+    // Despertar el backend de Render (080) — solo por click, nunca automático (un ping en cada
+    // carga de página gastaría cómputo del plan free sin que nadie lo pidiera). `no-cors` evita el
+    // bloqueo de CORS: no necesitamos leer el body/status, solo si la conexión se completó y
+    // cuánto tardó. Un solo click desbloquea TODOS los pasos marcados `locked` a la vez (puede
+    // haber más de uno: "Ver demo", "Abrir panel de admin", etc.), no solo el paso del demo.
+    const ESTIMATED_WAKE_SECONDS = 50;
+    const MIN_VISIBLE_MS = 2000;
+
+    document.querySelectorAll("[data-wake-trigger]").forEach((button) => {
+      if (button.dataset.wakeBound === "true") return;
+      button.dataset.wakeBound = "true";
+
+      button.addEventListener("click", async () => {
+        const urls = JSON.parse(button.getAttribute("data-wake-urls") || "[]");
+        const overlays = document.querySelectorAll("[data-wake-overlay]");
+        const countdownEls = document.querySelectorAll("[data-wake-countdown]");
+        const hints = document.querySelectorAll("[data-wake-hint]");
+        const links = document.querySelectorAll("[data-wake-link]");
+        button.disabled = true;
+
+        // El candado se queda visible y la cuenta regresiva aparece junto a él, ambos centrados
+        // sobre el fondo difuminado de cada paso bloqueado.
+        countdownEls.forEach((el) => (el.hidden = false));
+        hints.forEach((el) => (el.textContent = "Despertando el backend…"));
+
+        let remaining = ESTIMATED_WAKE_SECONDS;
+        countdownEls.forEach((el) => (el.textContent = String(remaining)));
+        const countdown = setInterval(() => {
+          remaining = Math.max(0, remaining - 1);
+          countdownEls.forEach((el) => (el.textContent = String(remaining)));
+          if (remaining === 0) {
+            hints.forEach((el) => (el.textContent = "Esto está tardando más de lo esperado…"));
+          }
+        }, 1000);
+
+        const start = performance.now();
+        const results = await Promise.allSettled(
+          urls.map((url) => {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 60000);
+            return fetch(url, { mode: "no-cors", cache: "no-store", signal: controller.signal }).finally(() =>
+              clearTimeout(timeout),
+            );
+          }),
+        );
+        const elapsedMs = performance.now() - start;
+        if (elapsedMs < MIN_VISIBLE_MS) {
+          await new Promise((resolve) => setTimeout(resolve, MIN_VISIBLE_MS - elapsedMs));
+        }
+        clearInterval(countdown);
+
+        const allOk = results.every((result) => result.status === "fulfilled");
+        const finalText = allOk
+          ? `✓ Backend listo (respondió en ${(elapsedMs / 1000).toFixed(1)}s)`
+          : "No respondió a tiempo — igual podés intentar abrir el link";
+        hints.forEach((el) => (el.textContent = finalText));
+
+        // Pausa breve para que el mensaje final se alcance a leer antes de que el overlay se
+        // desvanezca.
+        await new Promise((resolve) => setTimeout(resolve, 900));
+
+        // Desbloquear todos los links pase lo que pase — un ping fallido no debe dejar al
+        // visitante varado sin forma de llegar al demo/panel de admin.
+        links.forEach((link) => {
+          link.removeAttribute("aria-disabled");
+          link.removeAttribute("tabindex");
+          link.href = link.dataset.wakeHref;
+          link.classList.remove("is-locked");
+        });
+        overlays.forEach((overlay) => overlay.classList.add("is-hidden"));
+        button.disabled = false;
+      });
+    });
+
+    document.querySelectorAll("[data-wake-link]").forEach((link) => {
+      if (link.dataset.wakeLinkBound === "true") return;
+      link.dataset.wakeLinkBound = "true";
+
+      link.addEventListener("click", (event) => {
+        if (link.hasAttribute("aria-disabled")) event.preventDefault();
       });
     });
   })();

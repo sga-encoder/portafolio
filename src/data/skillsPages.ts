@@ -1,6 +1,8 @@
 import skillsPagesJson from "./skillsPages.json";
 
-export type SkillCategory = "lenguajes" | "herramientas" | "diseño" | "frameworks";
+/** Antes un union type fijo a 4 valores; desde `073` (paso 2) es una lista editable — ver
+ * `skillCategories.ts`. Queda como alias de `string` para no romper los imports existentes. */
+export type SkillCategory = string;
 
 export interface Skill {
   name: string;

@@ -18,11 +18,6 @@ links:
   repo: https://github.com/sga-encoder/blog-semillero
   demo: https://blog-semillero.vercel.app/
 steps:
-  - text: El backend está en un hosting gratuito y puede tardar unos segundos en despertar.
-    copyText: []
-    buttons:
-      - label: Despertar backend
-        href: https://blog-semillero-strapi.onrender.com/
   - text: Entra al panel de administración de Strapi para ver la interfaz y cómo se administra el contenido.
     copyText:
       - value: admin@example.com
@@ -32,6 +27,7 @@ steps:
     buttons:
       - label: Abrir panel de admin
         href: https://blog-semillero-strapi.onrender.com/admin
+        locked: true
 sphereMovement:
   header:
     a:

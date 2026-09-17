@@ -38,15 +38,31 @@ export async function getVercelStatus(server: VercelServer): Promise<ServerStatu
   const state = deployment.state as string | undefined;
   const url = deployment.url as string | undefined;
   const created = (deployment.createdAt ?? deployment.created) as number | undefined;
+  const meta = (deployment.meta ?? {}) as Record<string, string | undefined>;
+  const commitSha = meta.githubCommitSha;
+  const commitMessage = meta.githubCommitMessage;
+  const commitBranch = meta.githubCommitRef;
+  const commitAuthor = meta.githubCommitAuthorName;
+
+  const details = [
+    { label: "URL", value: url ? `https://${url}` : "—" },
+    { label: "Entorno", value: (deployment.target as string) ?? "preview" },
+    { label: "Creado", value: created ? new Date(created).toLocaleString() : "—" },
+  ];
+  if (commitBranch) details.push({ label: "Branch", value: commitBranch });
+  if (commitSha) {
+    details.push({
+      label: "Commit",
+      value: commitMessage ? `${commitSha.slice(0, 7)} — ${commitMessage}` : commitSha.slice(0, 7),
+    });
+  }
+  if (commitAuthor) details.push({ label: "Autor", value: commitAuthor });
 
   return {
     state: mapState(state),
     summary: state ?? "Desconocido",
-    details: [
-      { label: "URL", value: url ? `https://${url}` : "—" },
-      { label: "Entorno", value: (deployment.target as string) ?? "preview" },
-      { label: "Creado", value: created ? new Date(created).toLocaleString() : "—" },
-    ],
+    details,
     checkedAt,
+    dashboardUrl: deployment.inspectorUrl as string | undefined,
   };
 }

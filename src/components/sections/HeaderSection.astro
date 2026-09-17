@@ -8,7 +8,7 @@ import HeaderTextBlock from "./header/HeaderTextBlock.astro";
 
 // secondaryCta ("Blog") no se pasa a propósito: sigue en backlog sin contenido
 // (ver roadmap.md), oculto de forma reversible (026) sin borrar el dato en profile.ts.
-const { nameLines, initials, tagline, primaryCta } = profile.header;
+const { nameLines, portraitFrames, portraitIntervalSeconds, tagline, primaryCta } = profile.header;
 const portraitAlt = `Retrato de ${nameLines.join(" ")}`;
 ---
 
@@ -21,14 +21,26 @@ const portraitAlt = `Retrato de ${nameLines.join(" ")}`;
           <HeaderDivider class="w-full" slot="divider" />
         </HeaderTextBlock>
       </div>
-      <HeaderPortrait initials={initials} alt={portraitAlt} class="hidden w-[26vw] max-w-[420px] shrink-0 sm:block" />
+      <HeaderPortrait
+        frames={portraitFrames}
+        intervalSeconds={portraitIntervalSeconds}
+        alt={portraitAlt}
+        class="hidden w-[26vw] max-w-[420px] shrink-0 sm:block"
+      />
     </div>
 
     <!-- Celular en portrait: retrato de fondo + tarjeta inferior con título/subtítulo/botones.
          La tarjeta se solapa sobre la parte baja de la persona (piernas), dejando asomar solo
          la punta del pie por debajo, y sobresale lateralmente del ancho del marco. -->
     <div class="relative h-full w-full landscape:hidden md:hidden">
-      <HeaderPortrait initials={initials} alt={portraitAlt} hideInitials variant="background" class="absolute inset-0" />
+      <HeaderPortrait
+        frames={portraitFrames}
+        intervalSeconds={portraitIntervalSeconds}
+        alt={portraitAlt}
+        hideWord
+        variant="background"
+        class="absolute inset-0"
+      />
       <HeaderContentCard class="absolute inset-x-[-4vw] bottom-[9vh]">
         <HeaderTextBlock nameLines={nameLines} tagline={tagline} primaryCta={primaryCta} />
       </HeaderContentCard>

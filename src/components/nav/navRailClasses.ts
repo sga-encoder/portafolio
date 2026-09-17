@@ -6,7 +6,7 @@
  */
 
 export const NAV_RAIL_DESKTOP =
-  "fixed left-4 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-4 md:left-6 md:flex";
+  "fixed left-4 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-4 md:left-6 md:flex";
 
 export const NAV_RAIL_LIST = "flex flex-col gap-4";
 
@@ -35,3 +35,15 @@ export const NAV_BAR_MOBILE_LIST =
 
 /** Envoltorio de área táctil ≥44px sin agrandar el punto/ícono visible. */
 export const NAV_ITEM_HIT_AREA = "flex h-11 w-11 items-center justify-center";
+
+/**
+ * Riel/barra "secundario" (081): mismo mecanismo que `NAV_RAIL_DESKTOP`/`NAV_BAR_MOBILE`, pero
+ * desplazado para convivir al lado del dot-nav principal de `/admin/*` (`AdminDotNav`) en vez de
+ * superponerse — usado por `SubPageDotNav` en las páginas con sub-páginas (Proyectos/Contenido/
+ * Imágenes). El offset es aproximado (ancho del riel principal + separación), no depende de leer
+ * su tamaño real en runtime.
+ */
+export const NAV_RAIL_DESKTOP_SECONDARY =
+  "fixed left-20 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-4 md:left-28 md:flex";
+
+export const NAV_BAR_MOBILE_SECONDARY = "fixed inset-x-0 bottom-24 z-30 flex justify-center px-4 md:hidden";

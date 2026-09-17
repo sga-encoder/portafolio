@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { getServerStatus, type ProjectServer, type ServerStatusResult } from "../../../lib/admin/servers";
+import { pingUrl } from "../../../lib/admin/servers/ping";
+import VercelEnvPanel from "./VercelEnvPanel";
 
 interface Props {
   server: ProjectServer;
@@ -32,12 +34,31 @@ const KIND_LABELS: Record<ProjectServer["kind"], string> = {
 export default function ServerStatusCard({ server }: Props) {
   const [status, setStatus] = useState<ServerStatusResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pinging, setPinging] = useState(false);
+  const [pingText, setPingText] = useState<string | null>(null);
 
   async function refresh() {
     setLoading(true);
     const result = await getServerStatus(server);
     setStatus(result);
     setLoading(false);
+  }
+
+  // Chequeo real de "¿está despierto?" — solo Render, solo por click (nunca automático: hacerlo al
+  // cargar la página gastaría el tiempo de cómputo gratis del plan free sin que nadie lo pidiera).
+  // Ver .claude/spec/features/080-despertar-backend-render/plan.md.
+  async function checkAwake(url: string) {
+    setPinging(true);
+    setPingText("Despertando… puede tardar hasta 50s la primera vez");
+    const result = await pingUrl(url);
+    if (!result.ok) {
+      setPingText("No respondió — ¿caído o URL incorrecta?");
+    } else if (result.elapsedMs > 3000) {
+      setPingText(`Despertó en ${(result.elapsedMs / 1000).toFixed(1)}s (estaba dormido)`);
+    } else {
+      setPingText(`Ya estaba despierto (${Math.round(result.elapsedMs)}ms)`);
+    }
+    setPinging(false);
   }
 
   useEffect(() => {
@@ -90,13 +111,41 @@ export default function ServerStatusCard({ server }: Props) {
               ))}
             </dl>
           )}
-          {server.url && (
-            <a href={server.url} target="_blank" rel="noreferrer" className="text-xs text-brand underline">
-              Abrir enlace ↗
-            </a>
+          <div className="flex flex-wrap gap-3">
+            {server.url && (
+              <a href={server.url} target="_blank" rel="noreferrer" className="text-xs text-brand underline">
+                Abrir enlace ↗
+              </a>
+            )}
+            {status.dashboardUrl && (
+              <a
+                href={status.dashboardUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-brand underline"
+              >
+                Ver en {COMPANY_LABELS[server.company]} ↗
+              </a>
+            )}
+          </div>
+
+          {server.company === "render" && server.url && (
+            <div className="flex flex-col gap-1">
+              <button
+                type="button"
+                onClick={() => checkAwake(server.url!)}
+                disabled={pinging}
+                className="w-fit rounded-full bg-surface px-3 py-1 text-xs font-medium text-ink-muted hover:text-ink disabled:opacity-50"
+              >
+                {pinging ? "Despertando…" : "Verificar si está despierto"}
+              </button>
+              {pingText && <p className="text-xs text-ink-muted">{pingText}</p>}
+            </div>
           )}
         </>
       )}
+
+      {server.company === "vercel" && <VercelEnvPanel server={server} />}
     </div>
   );
 }

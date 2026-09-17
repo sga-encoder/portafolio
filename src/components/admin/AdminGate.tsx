@@ -7,7 +7,7 @@ import type { ProjectCardData } from "../../lib/admin/projectCards";
 
 interface Props {
   active: AdminSection;
-  /** Ancho `75vw` (md+) en vez de `max-w-4xl` — solo lo usa el editor de detalle de `/admin/proyectos/[slug]` (053). */
+  /** Ancho `75vw` (md+) en vez de `max-w-4xl` — editor de detalle de `/admin/proyectos/[slug]` (053) y `/admin/contenido` (073). */
   wide?: boolean;
   /** Proyectos del selector rápido del ítem "Proyectos" del dot-nav (054). */
   switcherProjects: ProjectCardData[];

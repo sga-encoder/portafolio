@@ -3,6 +3,7 @@ import { getCollection, getEntry, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProjectHeader from "../../components/projects/detail/ProjectHeader.astro";
 import ProjectDetailNav from "../../components/projects/detail/ProjectDetailNav.astro";
+import SiteMainNav from "../../components/nav/SiteMainNav";
 import ProjectPageBackground from "../../components/projects/detail/ProjectPageBackground.astro";
 import ProjectViewTracker from "../../components/projects/detail/ProjectViewTracker.astro";
 import ProjectScene3D from "../../components/projects/detail/scene/ProjectScene3D";
@@ -39,7 +40,7 @@ export async function getStaticPaths() {
 
 const { project, prevSlug, nextSlug } = Astro.props;
 const { Content } = await render(project);
-const { title, summary, coverImage, gallery, techStack, platforms, links, steps, sphereColors, sphereMovement } =
+const { title, summary, coverImage, gallery, techStack, platforms, links, steps, servers, sphereColors, sphereMovement } =
   project.data;
 
 const cover = getCloudinaryUrl(coverImage, "w_900,q_auto,f_auto");
@@ -80,6 +81,8 @@ const otherProjects = PROJECTS.filter((item) => item.id !== project.id).map((ite
   <ProjectViewTracker slug={project.id} />
   <ProjectScene3D client:load zoneStops={coloredZoneStops} />
 
+  <SiteMainNav client:load />
+
   <div id="project-zone-header" class="mx-auto w-full px-4 pt-12 md:w-[70%]">
     <ProjectDetailNav
       prevHref={prevSlug ? `/proyectos/${prevSlug}` : undefined}
@@ -110,7 +113,7 @@ const otherProjects = PROJECTS.filter((item) => item.id !== project.id).map((ite
 
       <ProjectDivider colors={colors} />
 
-      <ProjectLiveSteps steps={steps} colors={colors} demoHref={links.demo} />
+      <ProjectLiveSteps steps={steps} colors={colors} demoHref={links.demo} servers={servers} />
     </div>
 
     {

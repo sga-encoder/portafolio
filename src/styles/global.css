@@ -201,6 +201,7 @@ html {
   );
   background-size: 100% 260%;
   animation: nav-rail-glow-sweep-y 6s infinite;
+  animation-delay: var(--nav-rail-phase, 0s);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -239,60 +240,53 @@ html {
    `nav-rail-glow-sweep`. */
 @keyframes nav-rail-idle-x {
   0%,
-  20% {
-    transform: translateX(0%);
+  18% {
+    transform: translateX(0px);
     animation-timing-function: ease-in-out;
   }
-  70% {
-    transform: translateX(50%);
-    animation-timing-function: cubic-bezier(0.6, 0, 1, 1);
+  42% {
+    transform: translateX(10px);
+    animation-timing-function: ease-in-out;
   }
-  83% {
-    transform: translateX(-9%);
+  58% {
+    transform: translateX(-6px);
+    animation-timing-function: ease-in-out;
+  }
+  75% {
+    transform: translateX(3px);
     animation-timing-function: ease-out;
   }
-  90% {
-    transform: translateX(4%);
-    animation-timing-function: ease-in-out;
-  }
-  96% {
-    transform: translateX(-1.5%);
-    animation-timing-function: ease-in-out;
-  }
   100% {
-    transform: translateX(0%);
+    transform: translateX(0px);
   }
 }
 
 @keyframes nav-rail-idle-y {
   0%,
-  20% {
-    transform: translateY(0%);
+  18% {
+    transform: translateY(0px);
     animation-timing-function: ease-in-out;
   }
-  70% {
-    transform: translateY(-50%);
-    animation-timing-function: cubic-bezier(0.6, 0, 1, 1);
+  42% {
+    transform: translateY(-8px);
+    animation-timing-function: ease-in-out;
   }
-  83% {
-    transform: translateY(9%);
+  58% {
+    transform: translateY(4px);
+    animation-timing-function: ease-in-out;
+  }
+  75% {
+    transform: translateY(-2px);
     animation-timing-function: ease-out;
   }
-  90% {
-    transform: translateY(-4%);
-    animation-timing-function: ease-in-out;
-  }
-  96% {
-    transform: translateY(1.5%);
-    animation-timing-function: ease-in-out;
-  }
   100% {
-    transform: translateY(0%);
+    transform: translateY(0px);
   }
 }
 
 .nav-rail-glow {
   animation: nav-rail-idle-y 6s infinite;
+  animation-delay: var(--nav-rail-phase, 0s);
   will-change: transform;
 }
 

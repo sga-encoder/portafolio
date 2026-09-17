@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { doc, getDoc, type Timestamp } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import AdminGate from "./AdminGate";
 import PublishDraftButton from "./PublishDraftButton";
+import SubPageDotNav from "../nav/SubPageDotNav";
 import { isDraftPending, type DraftDoc } from "../../lib/admin/drafts";
 import type { ProjectCardData, ProjectYearGroup } from "../../lib/admin/projectCards";
 
@@ -78,11 +79,18 @@ function saveCollapsedYears(years: Set<string>) {
   }
 }
 
+function yearSectionId(year: string): string {
+  return `admin-proyectos-year-${year}`;
+}
+
 // Ver DashboardPanel.tsx/StatsPanel.tsx: separado de ContentList para que el
 // fetch de estadísticas solo corra una vez que AdminGate confirmó sesión.
 function ContentListContent({ groups }: Props) {
   const [stats, setStats] = useState<Record<string, ProjectStats>>({});
   const [collapsedYears, setCollapsedYears] = useState<Set<string>>(() => loadCollapsedYears());
+  const [activeYear, setActiveYear] = useState<string | null>(groups[0]?.year ?? null);
+  const collapsedYearsRef = useRef(collapsedYears);
+  collapsedYearsRef.current = collapsedYears;
 
   function toggleYear(year: string) {
     setCollapsedYears((prev) => {
@@ -91,6 +99,39 @@ function ContentListContent({ groups }: Props) {
       else next.add(year);
       saveCollapsedYears(next);
       return next;
+    });
+  }
+
+  // Scroll-spy del submenú de años (081): resalta el año más cerca del top del viewport mientras
+  // el usuario hace scroll manual, sin esperar a que haga clic en el submenú.
+  useEffect(() => {
+    const elements = groups
+      .map((group) => document.getElementById(yearSectionId(group.year)))
+      .filter((el): el is HTMLElement => el !== null);
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((entry) => entry.isIntersecting);
+        if (visible.length === 0) return;
+        const topMost = visible.reduce((a, b) => (a.boundingClientRect.top <= b.boundingClientRect.top ? a : b));
+        setActiveYear(topMost.target.id.replace("admin-proyectos-year-", ""));
+      },
+      { rootMargin: "-10% 0px -80% 0px" },
+    );
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [groups]);
+
+  function navigateToYear(year: string) {
+    if (collapsedYearsRef.current.has(year)) toggleYear(year);
+    setActiveYear(year);
+    // Doble rAF: espera a que React aplique la expansión (si la hubo) y el navegador la pinte,
+    // así el scroll apunta a la posición final del encabezado y no a la que tenía colapsado.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.getElementById(yearSectionId(year))?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     });
   }
 
@@ -129,11 +170,17 @@ function ContentListContent({ groups }: Props) {
           Ver todos los proyectos
         </a>
       </div>
+      <SubPageDotNav
+        ariaLabel="Navegación entre años"
+        items={groups.map((group) => ({ key: group.year, dotLabel: group.year.slice(-2), label: group.year }))}
+        activeKey={activeYear}
+        onSelect={navigateToYear}
+      />
       <div className="flex flex-col gap-10">
         {groups.map((group) => {
           const isCollapsed = collapsedYears.has(group.year);
           return (
-          <div key={group.year}>
+          <div key={group.year} id={yearSectionId(group.year)} className="scroll-mt-6">
             <button
               type="button"
               onClick={() => toggleYear(group.year)}

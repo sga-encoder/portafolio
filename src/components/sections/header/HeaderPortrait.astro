@@ -1,24 +1,72 @@
 ---
 import { getCloudinaryUrl } from "../../../utils/cloudinaryManifest";
+import type { HeaderPortraitFrame } from "../../../data/profile";
 
 interface Props {
-  initials: string;
+  frames: HeaderPortraitFrame[];
+  intervalSeconds: number;
   alt: string;
-  hideInitials?: boolean;
+  hideWord?: boolean;
   variant?: "side" | "background";
   class?: string;
 }
 
-const { initials, alt, hideInitials = false, variant = "side", class: className } = Astro.props;
-const personaUrl = getCloudinaryUrl("header/persona01", "q_auto,f_auto");
+const {
+  frames,
+  intervalSeconds,
+  alt,
+  hideWord = false,
+  variant = "side",
+  class: className,
+} = Astro.props;
 ---
 
-<div class:list={["header-portrait", className]} data-variant={variant}>
-  {!hideInitials && (
-    <span class="header-portrait__initials" aria-hidden="true">{initials}</span>
-  )}
-  <img src={personaUrl} alt={alt} class="header-portrait__image" loading="eager" decoding="async" />
+<div
+  class:list={["header-portrait", className]}
+  data-variant={variant}
+  data-interval={intervalSeconds}
+>
+  {frames.map((frame, index) => (
+    <div class="header-portrait__frame" data-active={index === 0 ? "true" : "false"}>
+      {!hideWord && (
+        <span class="header-portrait__word" aria-hidden="true">{frame.word}</span>
+      )}
+      <img
+        src={getCloudinaryUrl(frame.imageKey, "q_auto,f_auto")}
+        alt={index === 0 ? alt : ""}
+        class="header-portrait__image"
+        loading="eager"
+        decoding="async"
+      />
+    </div>
+  ))}
 </div>
+
+{frames.length > 1 && (
+  <script>
+    function initHeaderPortraitRotation() {
+      document.querySelectorAll<HTMLElement>(".header-portrait[data-interval]").forEach((root) => {
+        if (root.dataset.rotationInit === "true") return;
+        root.dataset.rotationInit = "true";
+        const frames = Array.from(root.querySelectorAll<HTMLElement>(".header-portrait__frame"));
+        if (frames.length <= 1) return;
+        let active = frames.findIndex((f) => f.dataset.active === "true");
+        if (active < 0) active = 0;
+        const intervalMs = Number(root.dataset.interval) * 1000 || 6000;
+        const timer = setInterval(() => {
+          frames[active].dataset.active = "false";
+          active = (active + 1) % frames.length;
+          frames[active].dataset.active = "true";
+        }, intervalMs);
+        // Limpieza al salir de la página vía View Transitions, mismo criterio que otros
+        // listeners globales del sitio (evita timers huérfanos tras astro:page-load repetidos).
+        document.addEventListener("astro:before-swap", () => clearInterval(timer), { once: true });
+      });
+    }
+    initHeaderPortraitRotation();
+    document.addEventListener("astro:page-load", initHeaderPortraitRotation);
+  </script>
+)}
 
 <style>
   .header-portrait {
@@ -27,7 +75,18 @@ const personaUrl = getCloudinaryUrl("header/persona01", "q_auto,f_auto");
     width: 100%;
   }
 
-  .header-portrait__image {
+  .header-portrait__frame {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+
+  .header-portrait__frame[data-active="true"] {
+    opacity: 1;
+  }
+
+  .header-portrait__frame .header-portrait__image {
     position: absolute;
     inset: calc(var(--frame-border, 20px) * -1) calc(var(--frame-border, 20px) * -1)
       calc(var(--frame-border, 20px) * -1) auto;
@@ -44,7 +103,7 @@ const personaUrl = getCloudinaryUrl("header/persona01", "q_auto,f_auto");
   /* Variante "background": el retrato deja de ser una columna lateral y pasa
      a cubrir todo el marco por detrás del contenido (usada en el layout
      mobile portrait de HeaderSection). */
-  .header-portrait[data-variant="background"] .header-portrait__image {
+  .header-portrait[data-variant="background"] .header-portrait__frame .header-portrait__image {
     inset: 0;
     right: auto;
     height: 100%;
@@ -54,19 +113,25 @@ const personaUrl = getCloudinaryUrl("header/persona01", "q_auto,f_auto");
     transform: none;
   }
 
-  .header-portrait__initials {
+  .header-portrait__word {
     position: absolute;
     z-index: 1;
-    left: 18%;
-    bottom: 22%;
+    left: 22%;
+    bottom: 55%;
     transform-origin: left bottom;
     transform: rotate(-90deg) translateX(-100%);
     display: inline-block;
     white-space: nowrap;
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(1.575rem, 3.15vw, 3.15rem);
+    font-size: clamp(2.5rem, 5.5vw, 5.5rem);
     letter-spacing: 0.05em;
-    color: var(--color-ink);
+    color: color-mix(in srgb, var(--color-ink) 100%, transparent 65%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .header-portrait__frame {
+      transition: none;
+    }
   }
 </style>

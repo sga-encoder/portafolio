@@ -5,31 +5,25 @@ function newColumn(type: SkillsColumnType): SkillsColumn {
   return type === "skills" ? { type: "skills", skills: [] } : { type: "image", imageKey: "" };
 }
 
+/** Mismo criterio que `SkillsPage.astro` del sitio público: mitad izquierda del array de
+ * columnas queda "left", la mitad derecha "right" — define el color del anillo de cada skill. */
+function sideFor(index: number, total: number): "left" | "right" {
+  return index < total / 2 ? "left" : "right";
+}
+
 interface Props {
   page: SkillsPage;
-  index: number;
+  categories: string[];
   onChange: (next: SkillsPage) => void;
-  onRemove: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  canMoveUp: boolean;
-  canMoveDown: boolean;
 }
 
 /**
- * Tarjeta de una página del carrusel de Habilidades (069): header con reordenar/quitar página,
- * y debajo la lista de sus columnas (1 a 3, orden = orden visual izquierda→derecha en desktop).
+ * Editor de columnas de una página de Habilidades (073): columnas lado a lado igual que
+ * `SkillsPage.astro` del sitio público. Sin chrome de página propio — la navegación entre páginas
+ * y su reordenamiento viven en `SkillsPagesTab.tsx` (carrusel, mismo patrón que
+ * `SkillsCarousel.tsx`), acá solo se edita el contenido de la página actual.
  */
-export default function SkillsPageCard({
-  page,
-  index,
-  onChange,
-  onRemove,
-  onMoveUp,
-  onMoveDown,
-  canMoveUp,
-  canMoveDown,
-}: Props) {
+export default function SkillsPageCard({ page, categories, onChange }: Props) {
   function updateColumnAt(colIndex: number, next: SkillsColumn) {
     onChange({ ...page, columns: page.columns.map((column, i) => (i === colIndex ? next : column)) });
   }
@@ -52,47 +46,14 @@ export default function SkillsPageCard({
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl bg-surface-muted p-4">
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-medium text-ink-muted">Página {index + 1}</span>
-        <div className="flex shrink-0 gap-1">
-          <button
-            type="button"
-            onClick={onMoveUp}
-            disabled={!canMoveUp}
-            aria-label="Subir página"
-            title="Subir página"
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-surface text-sm disabled:opacity-30"
-          >
-            ↑
-          </button>
-          <button
-            type="button"
-            onClick={onMoveDown}
-            disabled={!canMoveDown}
-            aria-label="Bajar página"
-            title="Bajar página"
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-surface text-sm disabled:opacity-30"
-          >
-            ↓
-          </button>
-          <button
-            type="button"
-            onClick={onRemove}
-            aria-label="Quitar página"
-            title="Quitar página"
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-surface text-sm text-red-500"
-          >
-            ✕
-          </button>
-        </div>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-nowrap items-stretch justify-center gap-[2vw]">
         {page.columns.map((column, colIndex) => (
           <SkillsColumnCard
             key={colIndex}
             column={column}
+            color={sideFor(colIndex, page.columns.length) === "left" ? "var(--color-brand)" : "var(--color-accent-2)"}
+            categories={categories}
             onChange={(next) => updateColumnAt(colIndex, next)}
             onRemove={() => removeColumnAt(colIndex)}
             onMoveLeft={() => moveColumnBy(colIndex, -1)}
@@ -104,18 +65,18 @@ export default function SkillsPageCard({
       </div>
 
       {page.columns.length < 3 && (
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
           <button
             type="button"
             onClick={() => addColumn("skills")}
-            className="rounded-lg border-2 border-dashed border-ink-muted/30 px-4 py-2 text-sm text-ink-muted hover:border-ink-muted hover:text-ink"
+            className="rounded-lg border-2 border-dashed border-ink-muted/30 px-3 py-1 text-xs text-ink-muted hover:border-ink-muted hover:text-ink"
           >
             + Columna de habilidades
           </button>
           <button
             type="button"
             onClick={() => addColumn("image")}
-            className="rounded-lg border-2 border-dashed border-ink-muted/30 px-4 py-2 text-sm text-ink-muted hover:border-ink-muted hover:text-ink"
+            className="rounded-lg border-2 border-dashed border-ink-muted/30 px-3 py-1 text-xs text-ink-muted hover:border-ink-muted hover:text-ink"
           >
             + Columna de imagen
           </button>

@@ -5,11 +5,23 @@ export interface Cta {
   href: string;
 }
 
+export interface HeaderPortraitFrame {
+  /** Clave del manifest de Cloudinary (src/data/cloudinaryManifest.json), mismo criterio que el
+   *  resto de `imageKey` del sitio (065/068). */
+  imageKey: string;
+  /** Palabra mostrada rotada -90° detrás del retrato (ver HeaderPortrait.astro). Puede repetirse
+   *  o quedar vacía; sin validación de longitud (mismo criterio permisivo que el resto del panel). */
+  word: string;
+}
+
 export interface HeaderData {
   /** Nombre completo; cada línea se muestra en su propio renglón del título. */
   nameLines: string[];
-  /** Iniciales mostradas en vertical junto al retrato (ver `HeaderPortrait.astro`). */
-  initials: string;
+  /** 1 a N frames que rotan en bucle (ver `HeaderPortrait.astro`). Con 1 solo frame no hay
+   *  rotación visible. */
+  portraitFrames: HeaderPortraitFrame[];
+  /** Segundos entre cambio de frame. Ignorado (sin temporizador) si `portraitFrames.length <= 1`. */
+  portraitIntervalSeconds: number;
   tagline: string;
   primaryCta: Cta;
   /** Oculto a propósito (026): el blog sigue sin contenido (backlog en roadmap.md).

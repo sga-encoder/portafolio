@@ -2,8 +2,8 @@ import EditableImage from "../content-editor/EditableImage";
 import type { Skill, SkillsColumn, SkillsColumnType } from "../../../data/skillsPages";
 import SkillRow from "./SkillRow";
 
-function newSkill(): Skill {
-  return { name: "", percentage: 50, imageKey: "", category: "lenguajes" };
+function newSkill(defaultCategory: string): Skill {
+  return { name: "", percentage: 50, imageKey: "", category: defaultCategory };
 }
 
 function emptyColumnOf(type: SkillsColumnType): SkillsColumn {
@@ -16,6 +16,8 @@ function hasData(column: SkillsColumn): boolean {
 
 interface Props {
   column: SkillsColumn;
+  color: string;
+  categories: string[];
   onChange: (next: SkillsColumn) => void;
   onRemove: () => void;
   onMoveLeft: () => void;
@@ -25,12 +27,15 @@ interface Props {
 }
 
 /**
- * Tarjeta de una columna dentro de una página de Habilidades (069): tipo ("skills"/"image"),
- * reordenar izquierda/derecha dentro de la página, quitar, y contenido según tipo. Cambiar el
- * tipo con datos cargados pide confirmación antes de descartarlos.
+ * Columna dentro de una página de Habilidades (073): tipo ("skills"/"image"), reordenar
+ * izquierda/derecha, quitar, y contenido según tipo — mismo tamaño `clamp()`/`vh` que el resto del
+ * editor para que la página completa quepa en el viewport sin scroll. Cambiar el tipo con datos
+ * cargados pide confirmación antes de descartarlos.
  */
 export default function SkillsColumnCard({
   column,
+  color,
+  categories,
   onChange,
   onRemove,
   onMoveLeft,
@@ -66,65 +71,61 @@ export default function SkillsColumnCard({
   }
 
   function addSkill() {
-    onChange({ ...column, skills: [...(column.skills ?? []), newSkill()] });
+    onChange({ ...column, skills: [...(column.skills ?? []), newSkill(categories[0] ?? "")] });
   }
 
   const skills = column.skills ?? [];
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl bg-surface p-3">
-      <div className="flex items-center justify-between gap-3">
-        <label className="flex items-center gap-2 text-sm">
-          <span className="text-ink-muted">Tipo</span>
-          <select
-            value={column.type}
-            onChange={(event) => handleTypeChange(event.target.value as SkillsColumnType)}
-            className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
-          >
-            <option value="skills">Habilidades</option>
-            <option value="image">Imagen</option>
-          </select>
-        </label>
-
-        <div className="flex shrink-0 gap-1">
-          <button
-            type="button"
-            onClick={onMoveLeft}
-            disabled={!canMoveLeft}
-            aria-label="Mover columna a la izquierda"
-            title="Mover columna a la izquierda"
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted text-sm disabled:opacity-30"
-          >
-            ←
-          </button>
-          <button
-            type="button"
-            onClick={onMoveRight}
-            disabled={!canMoveRight}
-            aria-label="Mover columna a la derecha"
-            title="Mover columna a la derecha"
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted text-sm disabled:opacity-30"
-          >
-            →
-          </button>
-          <button
-            type="button"
-            onClick={onRemove}
-            aria-label="Quitar columna"
-            title="Quitar columna"
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted text-sm text-red-500"
-          >
-            ✕
-          </button>
-        </div>
+    <div className="flex h-full flex-col items-center gap-1.5">
+      <div className="flex shrink-0 items-center gap-1">
+        <select
+          value={column.type}
+          onChange={(event) => handleTypeChange(event.target.value as SkillsColumnType)}
+          className="rounded-lg border border-ink-muted/30 bg-transparent px-2 py-0.5 text-xs"
+        >
+          <option value="skills">Habilidades</option>
+          <option value="image">Imagen</option>
+        </select>
+        <button
+          type="button"
+          onClick={onMoveLeft}
+          disabled={!canMoveLeft}
+          aria-label="Mover columna a la izquierda"
+          title="Mover columna a la izquierda"
+          className="flex h-5 w-5 items-center justify-center rounded-full bg-surface-muted text-[0.65rem] disabled:opacity-30"
+        >
+          ←
+        </button>
+        <button
+          type="button"
+          onClick={onMoveRight}
+          disabled={!canMoveRight}
+          aria-label="Mover columna a la derecha"
+          title="Mover columna a la derecha"
+          className="flex h-5 w-5 items-center justify-center rounded-full bg-surface-muted text-[0.65rem] disabled:opacity-30"
+        >
+          →
+        </button>
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label="Quitar columna"
+          title="Quitar columna"
+          className="flex h-5 w-5 items-center justify-center rounded-full bg-surface-muted text-[0.65rem] text-red-500"
+        >
+          ✕
+        </button>
       </div>
 
       {column.type === "skills" ? (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-1 flex-col items-center justify-center gap-[1vh]">
           {skills.map((skill, index) => (
             <SkillRow
               key={index}
               skill={skill}
+              color={color}
+              categories={categories}
               onChange={(next) => updateSkillAt(index, next)}
               onRemove={() => removeSkillAt(index)}
               onMoveUp={() => moveSkillBy(index, -1)}
@@ -136,18 +137,20 @@ export default function SkillsColumnCard({
           <button
             type="button"
             onClick={addSkill}
-            className="rounded-lg border-2 border-dashed border-ink-muted/30 px-4 py-2 text-sm text-ink-muted hover:border-ink-muted hover:text-ink"
+            className="rounded-lg border-2 border-dashed border-ink-muted/30 px-2 py-1 text-[0.7rem] text-ink-muted hover:border-ink-muted hover:text-ink"
           >
             + Agregar habilidad
           </button>
         </div>
       ) : (
-        <EditableImage
-          value={column.imageKey ?? ""}
-          onChange={(imageKey) => onChange({ ...column, imageKey })}
-          alt="Imagen de la columna"
-          className="h-40 w-40"
-        />
+        <div className="flex flex-1 items-center justify-center">
+          <EditableImage
+            value={column.imageKey ?? ""}
+            onChange={(imageKey) => onChange({ ...column, imageKey })}
+            alt="Imagen de la columna"
+            className="aspect-square w-[clamp(6rem,22vh,12rem)]"
+          />
+        </div>
       )}
     </div>
   );

@@ -5,6 +5,7 @@ import ProjectScene3D from "../../components/projects/detail/scene/ProjectScene3
 import ProjectsListBackground from "../../components/projects/list/ProjectsListBackground.astro";
 import TimelineProjectCard from "../../components/projects/list/TimelineProjectCard.astro";
 import YearDotNav from "../../components/projects/list/YearDotNav";
+import SiteMainNav from "../../components/nav/SiteMainNav";
 import { TIMELINE_COLORS } from "../../components/projects/list/timelineColors";
 import { buildTimelineZoneStops } from "../../components/projects/list/scene/listZoneStops";
 import { PROJECTS } from "../../data/projects";
@@ -62,6 +63,7 @@ const zoneStops = buildTimelineZoneStops(
 <BaseLayout title="Proyectos - Sebastián Garzón Arias" description="Todos los proyectos, organizados por año y mes.">
   <ProjectsListBackground />
   <ProjectScene3D client:load zoneStops={zoneStops} />
+  <SiteMainNav client:load />
   <YearDotNav client:load years={yearGroups.map((group) => group.year)} />
 
   <div class="mx-auto w-full px-4 pb-28 pt-12 md:w-[70%] md:pb-16">
