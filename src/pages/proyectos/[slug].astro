@@ -6,6 +6,7 @@ import ProjectDetailNav from "../../components/projects/detail/ProjectDetailNav.
 import SiteMainNav from "../../components/nav/SiteMainNav";
 import ProjectPageBackground from "../../components/projects/detail/ProjectPageBackground.astro";
 import ProjectViewTracker from "../../components/projects/detail/ProjectViewTracker.astro";
+import ProjectSwipeNav from "../../components/projects/detail/ProjectSwipeNav.astro";
 import ProjectScene3D from "../../components/projects/detail/scene/ProjectScene3D";
 import ProjectDescriptionContext from "../../components/projects/detail/ProjectDescriptionContext.astro";
 import ProjectDivider from "../../components/projects/detail/ProjectDivider.astro";
@@ -53,6 +54,8 @@ const galleryImages = gallery.map((item) => ({
 const resolvedZoneStops = resolveStarts(PROJECT_SPHERE_IDS, mergeSphereMovementOverride(projectZoneStops, sphereMovement));
 const coloredZoneStops = withProjectColors(resolvedZoneStops, colors[0], colors[1]);
 const currentProjectItem = PROJECTS.find((item) => item.id === project.id);
+const prevHref = prevSlug ? `/proyectos/${prevSlug}` : undefined;
+const nextHref = nextSlug ? `/proyectos/${nextSlug}` : undefined;
 
 const mainContentEntry = await getEntry("projectContent", project.id);
 const MainContent = mainContentEntry ? (await render(mainContentEntry)).Content : null;
@@ -84,12 +87,8 @@ const otherProjects = PROJECTS.filter((item) => item.id !== project.id).map((ite
   <SiteMainNav client:load />
 
   <div id="project-zone-header" class="mx-auto w-full px-4 pt-12 md:w-[70%]">
-    <ProjectDetailNav
-      prevHref={prevSlug ? `/proyectos/${prevSlug}` : undefined}
-      nextHref={nextSlug ? `/proyectos/${nextSlug}` : undefined}
-      colors={colors}
-      otherProjects={otherProjects}
-    />
+    <ProjectDetailNav prevHref={prevHref} nextHref={nextHref} colors={colors} otherProjects={otherProjects} />
+    <ProjectSwipeNav prevHref={prevHref} nextHref={nextHref} />
 
     <div class="mt-6">
       <ProjectHeader

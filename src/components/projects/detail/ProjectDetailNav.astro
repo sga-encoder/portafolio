@@ -64,30 +64,34 @@ interface NavItem {
   icon: "chevron-left" | "chevron-right";
 }
 
+// (084) Sentido invertido a pedido del usuario: el botón que se renderiza
+// primero (izquierda en la barra mobile, arriba en el riel desktop) lleva al
+// próximo proyecto (más nuevo); el que se renderiza último ("anterior", más
+// viejo) queda a la derecha/abajo. Antes era al revés.
 const prevItem: NavItem = {
   key: "prev",
   label: "Proyecto anterior",
   href: prevHref,
-  color: leftColor,
+  color: rightColor,
   disabled: !prevHref,
-  icon: "chevron-left",
+  icon: "chevron-right",
 };
 const nextItem: NavItem = {
   key: "next",
   label: "Próximo proyecto",
   href: nextHref,
-  color: rightColor,
+  color: leftColor,
   disabled: !nextHref,
-  icon: "chevron-right",
+  icon: "chevron-left",
 };
 
 type RailEntry = { kind: "item"; item: NavItem } | { kind: "switcher" };
 
 // Mismo orden en desktop y mobile: ya no hay asimetría entre riel y barra.
 const entries: RailEntry[] = [
-  { kind: "item", item: prevItem },
-  ...(hasSwitcher ? [{ kind: "switcher" } as const] : []),
   { kind: "item", item: nextItem },
+  ...(hasSwitcher ? [{ kind: "switcher" } as const] : []),
+  { kind: "item", item: prevItem },
 ];
 
 const circleStyle = (color: string) =>

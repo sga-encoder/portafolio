@@ -1,0 +1,73 @@
+---
+// (084) Swipe horizontal en mobile para navegar entre proyectos, sin tener
+// que tocar la barra de navegación inferior. Sin UI visible — mismo patrón
+// que ProjectViewTracker.astro (un elemento hidden con data-* + script).
+// Misma convención de dirección que ProjectCarousel.tsx (swipe derecha =
+// proyecto anterior/más viejo, swipe izquierda = próximo/más nuevo), no la
+// posición visual de los botones de ProjectDetailNav (aunque tras invertir
+// esas flechas coinciden).
+interface Props {
+  prevHref?: string;
+  nextHref?: string;
+}
+
+const { prevHref, nextHref } = Astro.props;
+---
+
+{(prevHref || nextHref) && (
+  <div data-swipe-nav-root data-prev-href={prevHref} data-next-href={nextHref} hidden></div>
+)}
+
+<script is:inline data-astro-rerun>
+  (function () {
+    var root = document.querySelector("[data-swipe-nav-root]");
+    if (!root || root.dataset.swipeBound === "true") return;
+    root.dataset.swipeBound = "true";
+
+    var prevHref = root.dataset.prevHref || null;
+    var nextHref = root.dataset.nextHref || null;
+    if (!prevHref && !nextHref) return;
+
+    var isMobile = window.matchMedia("(max-width: 767px)");
+    var THRESHOLD = 60;
+    var startX = 0;
+    var startY = 0;
+    var tracking = false;
+
+    function isExcludedTarget(target) {
+      return !!(
+        target.closest &&
+        target.closest("#project-zone-gallery, [data-hold-nav], .project-switcher-shell")
+      );
+    }
+
+    document.addEventListener(
+      "touchstart",
+      function (event) {
+        tracking =
+          isMobile.matches && event.touches.length === 1 && !isExcludedTarget(event.target);
+        if (!tracking) return;
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+      },
+      { passive: true },
+    );
+
+    document.addEventListener(
+      "touchend",
+      function (event) {
+        if (!tracking) return;
+        tracking = false;
+
+        var touch = event.changedTouches[0];
+        var deltaX = touch.clientX - startX;
+        var deltaY = touch.clientY - startY;
+        if (Math.abs(deltaX) < THRESHOLD || Math.abs(deltaX) < Math.abs(deltaY) * 1.5) return;
+
+        var href = deltaX > 0 ? prevHref : nextHref;
+        if (href) window.location.href = href;
+      },
+      { passive: true },
+    );
+  })();
+</script>
