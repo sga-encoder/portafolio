@@ -336,7 +336,16 @@ html {
    tarjetas visualmente separadas en vez de una compartida.
    `overflow-x: visible` + `overflow-y: auto` es una combinación que CSS no
    permite (el navegador fuerza el eje "visible" a "auto"), así que con
-   `md:w-full` en las tarjetas el eje X pasa a `md:overflow-x-hidden`. */
+   `md:w-full` en las tarjetas el eje X pasa a `md:overflow-x-hidden`.
+   (076) "Ver todos" pasa a la izquierda del grid (antes a la derecha) vía
+   `order: -1` sin tocar el orden real del DOM (sigue siendo panel-primero en
+   el markup, por lectura de pantalla/tab). Antes ese `order: -1` solo
+   aplicaba en mobile (era casualmente el mismo valor que ya lograba "arriba
+   del grid" en la columna de esa media query); ahora es la regla base,
+   válida en ambos breakpoints. Su texto gana `writing-mode: vertical-rl`
+   solo en escritorio (`.project-switcher-all-label`, min-width 768px) — en
+   mobile el botón es una fila horizontal angosta, texto vertical ahí no
+   tiene sentido. */
 .project-switcher > summary {
   list-style: none;
 }
@@ -347,6 +356,10 @@ html {
 
 .project-switcher:not([open]) .project-switcher-shell {
   display: none;
+}
+
+.project-switcher-all {
+  order: -1;
 }
 
 .project-switcher-label {
@@ -381,20 +394,33 @@ html {
 
 /* Desktop: el riel siempre está a la izquierda con espacio de sobra a la
    derecha, así que un ancho fijo + shell abriéndose hacia la derecha del
-   botón nunca se sale de pantalla. */
+   botón nunca se sale de pantalla.
+   (076) `position: fixed` en vez de `absolute`: el contenedor de bloque de
+   un elemento `fixed` no es su ancestro `position: relative` más cercano
+   (`.project-switcher`, el `<details>` — ese sigue siendo el ancestro de
+   `.project-switcher-label`, el tooltip, que si debe quedar pegado al
+   ícono) sino el ancestro más cercano con `transform`/`will-change:
+   transform` — acá es `.nav-rail-glow` (`NAV_RAIL_FRAME`/
+   `NAV_BAR_MOBILE_LIST`, ya lo tiene por la animación idle de `049`), que es
+   exactamente la caja visual del riel/menú completo. Por eso `top: 50%` +
+   `translateY(-50%)` centran el panel respecto a todo el menú (alto real,
+   con la cantidad de ítems que tenga) en vez de respecto al botón trigger
+   de 36px — pedido explícito del usuario tras ver que quedaba descentrado.
+   `left: 100%` pasa a ser relativo al ancho de esa misma caja (el riel
+   completo, no solo el ícono), por lo que el panel abre justo al lado del
+   menú entero. */
 .project-switcher-shell {
+  position: fixed;
   left: 100%;
   top: 50%;
   margin-left: calc(0.75rem + 1vw);
   transform: translateY(-50%);
   gap: 1vw;
-  /* Ancho: el contenedor de posicionamiento (`<details>`) mide solo 36px
-     (el botón), así que el "shrink-to-fit" por defecto de un absolute con
-     `left` fijo pero sin `width` calcula el espacio disponible sobre esos
-     36px y colapsa el shell al mínimo — hay que fijar el ancho a mano.
-     27.5rem = grid (2 tarjetas de 10rem + gap-3) + botón companion (w-20) +
-     padding; se suma el `1vw` del gap aparte para que no se lo coma el
-     ancho fijo en viewports grandes. */
+  /* Ancho: sin este valor, el "shrink-to-fit" por defecto de un fixed con
+     `left` fijo pero sin `width` colapsa el shell al mínimo — hay que
+     fijarlo a mano. 27.5rem = grid (2 tarjetas de 10rem + gap-3) + botón
+     companion (w-20) + padding; se suma el `1vw` del gap aparte para que no
+     se lo coma el ancho fijo en viewports grandes. */
   width: calc(27.5rem + 1vw);
   max-height: 20rem;
 }
@@ -428,6 +454,11 @@ html {
   .project-switcher-grid::-webkit-scrollbar-thumb:hover {
     background-color: color-mix(in srgb, var(--switcher-scroll-color, var(--color-brand)) 80%, white);
   }
+
+  .project-switcher-all-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
 }
 
 @media (max-width: 767px) {
@@ -452,9 +483,9 @@ html {
     bottom: calc(6rem + env(safe-area-inset-bottom));
     margin: 0;
     transform: translateX(-50%);
-    /* Columna en vez de fila: "Ver todos" (reordenado arriba con
-       `order: -1` en `.project-switcher-all`) queda arriba del panel en vez
-       de al lado. */
+    /* Columna en vez de fila: "Ver todos" (mismo `order: -1` de
+       `.project-switcher-all`, ahora regla base compartida con desktop, 076)
+       queda arriba del panel en vez de al lado. */
     flex-direction: column;
     width: min(20rem, calc(100vw - 2rem));
     max-height: 60vh;
@@ -462,7 +493,6 @@ html {
   }
 
   .project-switcher-all {
-    order: -1;
     width: 100%;
     flex-direction: row;
     padding-block: 1rem;

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 import NavIcon from "../nav/NavIcon";
@@ -170,7 +170,15 @@ function LogoutItem({ variant }: { variant: "desktop" | "mobile" }) {
 export default function AdminDotNav({ active, switcherProjects, currentSlug }: Props) {
   const mobileListRef = useRef<HTMLUListElement>(null);
   const isProyectosActive = active === "proyectos";
-  const proyectosColor = isProyectosActive ? "var(--color-brand)" : MUTED;
+  // (076) El ítem "Proyectos" se mantiene activo también mientras su propio panel
+  // esté abierto, sin importar la ruta actual — riel desktop y barra mobile son
+  // `<details>` independientes, así que cada uno lleva su propio estado de apertura.
+  const [proyectosOpenDesktop, setProyectosOpenDesktop] = useState(false);
+  const [proyectosOpenMobile, setProyectosOpenMobile] = useState(false);
+  const proyectosColorDesktop =
+    isProyectosActive || proyectosOpenDesktop ? "var(--color-brand)" : MUTED;
+  const proyectosColorMobile =
+    isProyectosActive || proyectosOpenMobile ? "var(--color-brand)" : MUTED;
   const projectSwitcherItems = switcherProjects
     .filter((project) => project.slug !== currentSlug)
     .map((project) => ({
@@ -199,10 +207,11 @@ export default function AdminDotNav({ active, switcherProjects, currentSlug }: P
             <li className="relative flex items-center">
               <ProjectSwitcherPanel
                 items={projectSwitcherItems}
-                color={proyectosColor}
+                color={proyectosColorDesktop}
                 allHref="/admin/proyectos"
                 triggerIcon="folder"
                 triggerLabel="Proyectos"
+                onOpenChange={setProyectosOpenDesktop}
               />
             </li>
             {AFTER_PROYECTOS.map((item) => (
@@ -221,10 +230,11 @@ export default function AdminDotNav({ active, switcherProjects, currentSlug }: P
           <li className="relative flex items-center">
             <ProjectSwitcherPanel
               items={projectSwitcherItems}
-              color={proyectosColor}
+              color={proyectosColorMobile}
               allHref="/admin/proyectos"
               triggerIcon="folder"
               triggerLabel="Proyectos"
+              onOpenChange={setProyectosOpenMobile}
             />
           </li>
           {AFTER_PROYECTOS.map((item) => (

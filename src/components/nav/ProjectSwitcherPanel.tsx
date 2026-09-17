@@ -17,6 +17,10 @@ interface Props {
   triggerLabel?: string;
   allLabel?: string;
   allIcon?: NavIconName;
+  /** Notifica al padre cuando el panel se abre/cierra (p. ej. para que el ítem del menú principal que lo
+   *  contiene se mantenga "activo" mientras esté abierto, ver `AdminDotNav.tsx`). Opcional: el consumidor
+   *  del sitio público (`ProjectDetailNav.astro`) no lo usa. */
+  onOpenChange?: (open: boolean) => void;
 }
 
 /**
@@ -45,6 +49,7 @@ export default function ProjectSwitcherPanel({
   triggerLabel = "Cambiar de proyecto",
   allLabel = "Ver todos los proyectos",
   allIcon = "grid",
+  onOpenChange,
 }: Props) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
@@ -53,6 +58,7 @@ export default function ProjectSwitcherPanel({
     if (!details) return;
 
     const onToggle = () => {
+      onOpenChange?.(details.open);
       if (details.open) return;
       const summary = details.querySelector("summary");
       if (summary instanceof HTMLElement && document.activeElement === summary) summary.blur();
@@ -75,7 +81,7 @@ export default function ProjectSwitcherPanel({
       document.removeEventListener("click", onDocClick);
       document.removeEventListener("keydown", onKeydown);
     };
-  }, []);
+  }, [onOpenChange]);
 
   const circleStyle = {
     border: `2px solid ${color}`,
@@ -106,7 +112,7 @@ export default function ProjectSwitcherPanel({
         {triggerLabel}
       </span>
 
-      <div className="project-switcher-shell absolute z-40 flex items-stretch">
+      <div className="project-switcher-shell z-40 flex items-stretch">
         <div
           className="project-switcher-panel flex items-stretch rounded-2xl border p-3 backdrop-blur"
           style={{ ...cardStyle, ["--switcher-scroll-color" as string]: color } as React.CSSProperties}
@@ -143,7 +149,9 @@ export default function ProjectSwitcherPanel({
           style={cardStyle}
         >
           <NavIcon icon={allIcon} />
-          <span className="font-body text-xs font-semibold leading-tight">{allLabel}</span>
+          <span className="project-switcher-all-label font-body text-xs font-semibold leading-tight">
+            {allLabel}
+          </span>
         </a>
       </div>
     </details>
