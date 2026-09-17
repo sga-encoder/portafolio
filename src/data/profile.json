@@ -17,6 +17,10 @@
       {
         "imageKey": "header/persona01",
         "word": "SGA"
+      },
+      {
+        "imageKey": "about/persona03",
+        "word": "AMABLE"
       }
     ],
     "portraitIntervalSeconds": 6
