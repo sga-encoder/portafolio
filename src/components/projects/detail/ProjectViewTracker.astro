@@ -1,9 +1,14 @@
 ---
 // Contador de visitas por proyecto (feature 055), Firestore. Sin UI visible
 // — solo registra la visita, `/admin/proyectos` es quien muestra el dato.
-// Mismo mecanismo de import/`runTransaction` que ProjectLikeButton.astro
-// (módulo normal, no `is:inline`, reinicializado por página vía
-// `astro:page-load` en vez de re-ejecución del módulo en soft-nav).
+// Mismo criterio de import (módulo normal, no `is:inline`, reinicializado
+// por página vía `astro:page-load`) que ProjectLikeButton.astro, pero SIN
+// transacción (086): `projectViews/{slug}/days/{date}` es de lectura
+// admin-only (057) y un `runTransaction` exige que todas sus lecturas
+// tengan éxito antes de escribir nada — esa lectura siempre daba
+// permission-denied para un visitante normal y abortaba el contador
+// entero. `writeBatch` + `increment()` logra el mismo "todo o nada" sin
+// necesitar leer ningún documento primero.
 interface Props {
   slug: string;
 }
@@ -15,7 +20,7 @@ const { slug } = Astro.props;
 
 <script>
   import { db } from "../../../lib/firebase";
-  import { doc, runTransaction, serverTimestamp } from "firebase/firestore";
+  import { doc, increment, serverTimestamp, writeBatch } from "firebase/firestore";
 
   function todayKey(): string {
     return new Date().toISOString().slice(0, 10);
@@ -37,15 +42,11 @@ const { slug } = Astro.props;
 
     const viewRef = doc(db, "projectViews", slug);
     const dayRef = doc(db, "projectViews", slug, "days", todayKey());
-    runTransaction(db, async (tx) => {
-      // Firestore exige todas las lecturas de una transacción antes de
-      // cualquier escritura, por eso los 2 `get` van juntos arriba.
-      const [snap, daySnap] = await Promise.all([tx.get(viewRef), tx.get(dayRef)]);
-      const nextCount = snap.exists() ? (snap.data().count ?? 0) + 1 : 1;
-      const nextDayCount = daySnap.exists() ? (daySnap.data().count ?? 0) + 1 : 1;
-      tx.set(viewRef, { count: nextCount, lastVisit: serverTimestamp() });
-      tx.set(dayRef, { count: nextDayCount });
-    })
+    const batch = writeBatch(db);
+    batch.set(viewRef, { count: increment(1), lastVisit: serverTimestamp() }, { merge: true });
+    batch.set(dayRef, { count: increment(1) }, { merge: true });
+    batch
+      .commit()
       .then(() => {
         localStorage.setItem(key, "true");
       })
