@@ -574,6 +574,20 @@
       ],
       "sourcePath": "admin:upload",
       "uploadedAt": "2026-09-29T15:28:41.026Z"
+    },
+    "proyectos/persona-pose-04": {
+      "publicId": "portafolio/proyectos/persona-pose-04",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1790696804/portafolio/proyectos/persona-pose-04.png",
+      "hash": "",
+      "width": 600,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#C0009D",
+        "#0033FF"
+      ],
+      "sourcePath": "admin:upload",
+      "uploadedAt": "2026-09-29T15:46:45.155Z"
     }
   }
 }
