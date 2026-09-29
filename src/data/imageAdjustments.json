@@ -1,0 +1,13 @@
+{
+  "$schemaVersion": 1,
+  "images": {
+    "proyectos/persona-pose-01": {
+      "brightness": -24,
+      "contrast": 7,
+      "gamma": -10,
+      "saturation": 17,
+      "vibrance": -23,
+      "sharpen": 50
+    }
+  }
+}
