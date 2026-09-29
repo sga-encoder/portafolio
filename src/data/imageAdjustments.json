@@ -15,6 +15,12 @@
       "gamma": -1,
       "saturation": 27,
       "vibrance": -17
+    },
+    "proyectos/persona-pose-03": {
+      "brightness": -34,
+      "contrast": 17,
+      "saturation": 31,
+      "vibrance": -15
     }
   }
 }
