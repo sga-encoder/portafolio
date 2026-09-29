@@ -549,17 +549,17 @@
     },
     "proyectos/persona-pose-05": {
       "publicId": "portafolio/proyectos/persona-pose-05",
-      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1790689642/portafolio/proyectos/persona-pose-05.png",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1790695494/portafolio/proyectos/persona-pose-05.png",
       "hash": "",
-      "width": 423,
-      "height": 1132,
+      "width": 600,
+      "height": 1200,
       "format": "png",
       "colors": [
         "#C0009D",
         "#0033FF"
       ],
       "sourcePath": "admin:upload",
-      "uploadedAt": "2026-09-29T13:47:23.326Z"
+      "uploadedAt": "2026-09-29T15:24:55.004Z"
     },
     "proyectos/persona-pose-06": {
       "publicId": "portafolio/proyectos/persona-pose-06",
