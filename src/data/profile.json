@@ -15,11 +15,11 @@
     },
     "portraitFrames": [
       {
-        "imageKey": "header/persona01",
+        "imageKey": "proyectos/persona-pose-01",
         "word": "SGA"
       },
       {
-        "imageKey": "about/persona03",
+        "imageKey": "proyectos/persona-pose-02",
         "word": "AMABLE"
       }
     ],
