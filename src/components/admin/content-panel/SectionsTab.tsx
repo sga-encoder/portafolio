@@ -1,45 +1,14 @@
 import { useEffect, useState } from "react";
 import { loadJsonContent, publishJson, saveJsonDraft } from "../../../lib/admin/jsonContent";
-import { getCloudinaryUrl } from "../../../utils/cloudinaryManifest";
 import { profile as fallbackProfile, type ProfileData } from "../../../data/profile";
 import SocialLinksEditor from "./SocialLinksEditor";
 import HeaderPortraitFrameRow from "./HeaderPortraitFrameRow";
+import EditableImage from "../content-editor/EditableImage";
 
 const DRAFT_ID = "home:profile";
 const FILE_PATH = "src/data/profile.json";
 
 type Status = "loading" | "idle" | "saving" | "publishing" | "error";
-
-const PORTRAITS: { key: string; label: string }[] = [
-  { key: "skills/persona02", label: "Retrato de Habilidades" },
-  { key: "about/persona03", label: "Retrato de Sobre mí" },
-];
-
-function PortraitPreview({ imageKey, label }: { imageKey: string; label: string }) {
-  let url: string | null = null;
-  try {
-    url = getCloudinaryUrl(imageKey, "w_160,q_auto,f_auto");
-  } catch {
-    url = null;
-  }
-  return (
-    <div className="flex items-center gap-3 rounded-lg bg-surface-muted p-2">
-      {url ? (
-        <img src={url} alt={label} className="h-14 w-14 rounded-lg object-cover" />
-      ) : (
-        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-surface text-xs text-ink-muted">
-          Sin imagen
-        </div>
-      )}
-      <div className="text-sm">
-        <p>{label}</p>
-        <a href="/admin/imagenes" className="text-brand hover:underline">
-          Cambiar en Imágenes →
-        </a>
-      </div>
-    </div>
-  );
-}
 
 /**
  * Migra en memoria un borrador de Firestore guardado antes de `078` (forma vieja
@@ -63,9 +32,8 @@ function normalizeHeader(input: ProfileData): ProfileData {
 }
 
 /**
- * Pestaña "Secciones" del panel de Contenido (064): edita los textos de Header y Sobre mí que
- * viven en `src/data/profile.json`. Las imágenes/retratos ya se editan en `/admin/imagenes`
- * (`060`) — acá solo se muestra una miniatura + enlace directo, ver spec.md.
+ * Pestaña "Secciones" del panel de Contenido (064): edita Header y Sobre mí, que viven en
+ * `src/data/profile.json` — incluidos sus retratos (079 y 091), elegidos con `EditableImage`.
  */
 export default function SectionsTab() {
   const [data, setData] = useState<ProfileData | null>(null);
@@ -146,7 +114,7 @@ export default function SectionsTab() {
     setStatus("publishing");
     setMessage(null);
     try {
-      await publishJson(DRAFT_ID, FILE_PATH, cleanProfile(data), sha);
+      setSha(await publishJson(DRAFT_ID, FILE_PATH, cleanProfile(data), sha));
       setIsDraft(false);
       setStatus("idle");
       setMessage("Publicado.");
@@ -326,6 +294,16 @@ export default function SectionsTab() {
       <section className="flex flex-col gap-4 rounded-2xl bg-surface-muted p-4">
         <h2 className="font-display text-sm font-bold uppercase tracking-wide text-ink-muted">Sobre mí</h2>
 
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-ink-muted">Retrato</span>
+          <EditableImage
+            value={data.about.portraitKey || "about/persona03"}
+            onChange={(portraitKey) => update({ about: { ...data.about, portraitKey } })}
+            alt="Retrato de Sobre mí"
+            className="h-32 w-32"
+          />
+        </div>
+
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-ink-muted">Biografía</span>
           <textarea
@@ -368,13 +346,6 @@ export default function SectionsTab() {
             onChange={(social) => update({ about: { ...data.about, social } })}
           />
         </div>
-      </section>
-
-      <section className="flex flex-col gap-3 rounded-2xl bg-surface-muted p-4">
-        <h2 className="font-display text-sm font-bold uppercase tracking-wide text-ink-muted">Retratos</h2>
-        {PORTRAITS.map((portrait) => (
-          <PortraitPreview key={portrait.key} imageKey={portrait.key} label={portrait.label} />
-        ))}
       </section>
 
       <div className="flex items-center gap-3">

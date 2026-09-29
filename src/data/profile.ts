@@ -44,6 +44,8 @@ export interface SocialLink {
 }
 
 export interface AboutData {
+  /** Clave del manifest de Cloudinary del retrato de Sobre mí (091); sin valor → `about/persona03`. */
+  portraitKey?: string;
   bio: string;
   study: StudyItem;
   social: SocialLink[];
