@@ -76,35 +76,5 @@
         ]
       }
     ]
-  },
-  {
-    "columns": [
-      {
-        "type": "skills",
-        "skills": [
-          {
-            "name": "hola",
-            "percentage": 50,
-            "imageKey": "skills/css",
-            "category": "lenguajes"
-          }
-        ]
-      },
-      {
-        "type": "image",
-        "imageKey": "header/persona01"
-      },
-      {
-        "type": "skills",
-        "skills": [
-          {
-            "name": "meme",
-            "percentage": 50,
-            "imageKey": "skills/java",
-            "category": "lenguajes"
-          }
-        ]
-      }
-    ]
   }
 ]
