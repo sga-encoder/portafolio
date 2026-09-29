@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { addImage, loadManifest, type CloudinaryManifest } from "../../../lib/admin/manifest";
+import ImageDropzone from "../ImageDropzone";
 
 interface Props {
   /** `url` es la del manifest recién cargado (siempre al día) — evita depender del manifest
@@ -45,12 +46,14 @@ export default function CloudinaryPicker({ onSelect, onClose }: Props) {
     setMessage(null);
     try {
       const key = newKey.trim();
-      const next = await addImage(manifest, sha, newFile, key);
-      setManifest(next);
-      onSelect(key, next.images[key].url);
-    } catch {
+      const saved = await addImage(manifest, sha, newFile, key);
+      setManifest(saved.manifest);
+      setSha(saved.sha);
+      onSelect(key, saved.manifest.images[key].url);
+    } catch (err) {
+      console.error(err);
       setStatus("error");
-      setMessage("No se pudo subir la imagen.");
+      setMessage(`No se pudo subir la imagen: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -118,10 +121,10 @@ export default function CloudinaryPicker({ onSelect, onClose }: Props) {
                 className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
               />
             </label>
-            <label className="space-y-1 text-sm">
+            <div className="min-w-64 flex-1 space-y-1 text-sm">
               <span className="block">Archivo</span>
-              <input type="file" accept="image/*" onChange={(event) => setNewFile(event.target.files?.[0] ?? null)} />
-            </label>
+              <ImageDropzone file={newFile} onChange={setNewFile} disabled={status === "uploading"} />
+            </div>
             <button
               type="button"
               onClick={handleUpload}

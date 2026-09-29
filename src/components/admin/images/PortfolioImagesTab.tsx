@@ -8,6 +8,19 @@ import {
 } from "../../../lib/admin/manifest";
 import { listResourcesByPrefix, type CloudinaryResource } from "../../../lib/admin/cloudinaryAccount";
 import { groupEntriesBySection } from "./groupBySection";
+import ImageDropzone from "../ImageDropzone";
+import ImageAdjustEditor from "./ImageAdjustEditor";
+import {
+  EMPTY_ADJUSTMENTS_FILE,
+  loadAdjustments,
+  publishAdjustments,
+  removeAdjustments,
+  saveAdjustmentsDraft,
+  withAdjustments,
+} from "../../../lib/admin/imageAdjustments";
+import type { LoadedJsonContent } from "../../../lib/admin/jsonContent";
+import type { ImageAdjustments, ImageAdjustmentsFile } from "../../../data/imageAdjustments";
+import { applyCloudinaryTransformations, hasAdjustments } from "../../../utils/imageAdjustments";
 
 type Status = "loading" | "idle" | "uploading" | "error";
 type UnusedStatus = "idle" | "loading" | "error";
@@ -51,6 +64,18 @@ export default function PortfolioImagesTab() {
   const [unusedStatus, setUnusedStatus] = useState<UnusedStatus>("idle");
   const [selectedResourceId, setSelectedResourceId] = useState("");
 
+  // Ajustes no destructivos por imagen (092), con su propio borrador/publicación.
+  const [adjustments, setAdjustments] = useState<LoadedJsonContent<ImageAdjustmentsFile>>({
+    data: EMPTY_ADJUSTMENTS_FILE,
+    sha: null,
+    isDraft: false,
+  });
+  const [adjustingKey, setAdjustingKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadAdjustments().then(setAdjustments);
+  }, []);
+
   useEffect(() => {
     loadManifest()
       .then((loaded) => {
@@ -75,19 +100,25 @@ export default function PortfolioImagesTab() {
   }
 
   async function handleUpload() {
-    if (!manifest || !newFile || !newKey.trim()) return;
+    if (!newFile || !newKey.trim()) return;
+    if (!manifest) {
+      setMessage("El manifest no cargó: recarga la página antes de subir.");
+      return;
+    }
     setStatus("uploading");
     setMessage(null);
     try {
-      const next = await addImage(manifest, sha, newFile, newKey.trim());
-      setManifest(next);
+      const saved = await addImage(manifest, sha, newFile, newKey.trim());
+      setManifest(saved.manifest);
+      setSha(saved.sha);
       setNewKey("");
       setNewFile(null);
       setStatus("idle");
       setMessage("Imagen subida.");
-    } catch {
+    } catch (err) {
+      console.error(err);
       setStatus("error");
-      setMessage("No se pudo subir la imagen.");
+      setMessage(`No se pudo subir la imagen: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -97,13 +128,16 @@ export default function PortfolioImagesTab() {
     setStatus("uploading");
     setMessage(null);
     try {
-      const next = await removeImage(manifest, sha, key);
-      setManifest(next);
+      const saved = await removeImage(manifest, sha, key);
+      setManifest(saved.manifest);
+      setSha(saved.sha);
+      if (key in adjustments.data.images) setAdjustments(await removeAdjustments(key, adjustments));
       setStatus("idle");
       setMessage("Imagen borrada.");
-    } catch {
+    } catch (err) {
+      console.error(err);
       setStatus("error");
-      setMessage("No se pudo borrar la imagen.");
+      setMessage(`No se pudo borrar la imagen: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -133,15 +167,17 @@ export default function PortfolioImagesTab() {
     setStatus("uploading");
     setMessage(null);
     try {
-      const next = await addImage(manifest, sha, replaceFile, key);
-      setManifest(next);
+      const saved = await addImage(manifest, sha, replaceFile, key);
+      setManifest(saved.manifest);
+      setSha(saved.sha);
       setReplacingKey(null);
       setReplaceFile(null);
       setStatus("idle");
       setMessage("Imagen reemplazada.");
-    } catch {
+    } catch (err) {
+      console.error(err);
       setStatus("error");
-      setMessage("No se pudo reemplazar la imagen.");
+      setMessage(`No se pudo reemplazar la imagen: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -152,19 +188,34 @@ export default function PortfolioImagesTab() {
     setStatus("uploading");
     setMessage(null);
     try {
-      const next = await replaceImageWithExisting(manifest, sha, key, resource);
-      setManifest(next);
+      const saved = await replaceImageWithExisting(manifest, sha, key, resource);
+      setManifest(saved.manifest);
+      setSha(saved.sha);
       setReplacingKey(null);
       setSelectedResourceId("");
       setStatus("idle");
       setMessage("Imagen reemplazada.");
-    } catch {
+    } catch (err) {
+      console.error(err);
       setStatus("error");
-      setMessage("No se pudo reemplazar la imagen.");
+      setMessage(`No se pudo reemplazar la imagen: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
+  async function saveKeyAdjustmentsDraft(key: string, next: ImageAdjustments) {
+    const data = withAdjustments(adjustments.data, key, next);
+    await saveAdjustmentsDraft(data);
+    setAdjustments((prev) => ({ ...prev, data, isDraft: true }));
+  }
+
+  async function publishKeyAdjustments(key: string, next: ImageAdjustments) {
+    const data = withAdjustments(adjustments.data, key, next);
+    const newSha = await publishAdjustments(data, adjustments.sha);
+    setAdjustments({ data, sha: newSha, isDraft: false });
+  }
+
   const groups = manifest ? groupEntriesBySection(Object.entries(manifest.images)) : null;
+  const adjustingEntry = adjustingKey && manifest ? manifest.images[adjustingKey] : undefined;
 
   return (
     <>
@@ -178,14 +229,10 @@ export default function PortfolioImagesTab() {
             className="rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
           />
         </label>
-        <label className="space-y-1 text-sm">
+        <div className="min-w-64 flex-1 space-y-1 text-sm">
           <span className="block">Archivo</span>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(event) => setNewFile(event.target.files?.[0] ?? null)}
-          />
-        </label>
+          <ImageDropzone file={newFile} onChange={setNewFile} disabled={status === "uploading"} />
+        </div>
         <button
           type="button"
           onClick={handleUpload}
@@ -194,8 +241,17 @@ export default function PortfolioImagesTab() {
         >
           {status === "uploading" ? "Subiendo…" : "Subir"}
         </button>
+        {newFile && !newKey.trim() && (
+          <span className="text-sm text-ink-muted">Escribe la clave para poder subir.</span>
+        )}
         {message && <span className="text-sm text-ink-muted">{message}</span>}
       </div>
+
+      {adjustments.isDraft && (
+        <p className="mb-4 w-fit rounded-full bg-brand/20 px-3 py-1 text-xs text-brand">
+          Ajustes de imagen en borrador sin publicar
+        </p>
+      )}
 
       {status === "loading" && <p className="text-ink-muted">Cargando…</p>}
 
@@ -232,15 +288,30 @@ export default function PortfolioImagesTab() {
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                   {entries.map(([key, entry]) => (
                     <div key={key} className="space-y-2 rounded-xl bg-surface-muted p-2">
-                      <img
-                        src={entry.url.replace("/image/upload/", "/image/upload/w_300,q_auto,f_auto/")}
-                        alt={key}
-                        className="aspect-square w-full rounded-lg object-cover"
-                      />
+                      <div className="relative">
+                        <img
+                          src={applyCloudinaryTransformations(entry.url, adjustments.data.images[key], "w_300,q_auto,f_auto")}
+                          alt={key}
+                          className="aspect-square w-full rounded-lg object-cover"
+                        />
+                        {hasAdjustments(adjustments.data.images[key]) && (
+                          <span className="absolute left-1 top-1 rounded-full bg-brand px-2 py-0.5 text-[10px] text-white">
+                            Ajustada
+                          </span>
+                        )}
+                      </div>
                       <p className="truncate text-xs text-ink-muted" title={key}>
                         {key}
                       </p>
                       <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setAdjustingKey(key)}
+                          disabled={status === "uploading"}
+                          className="flex-1 rounded-lg bg-brand/20 px-2 py-1 text-xs text-brand disabled:opacity-50"
+                        >
+                          Ajustar
+                        </button>
                         <button
                           type="button"
                           onClick={() => toggleReplace(key)}
@@ -263,11 +334,11 @@ export default function PortfolioImagesTab() {
                         <div className="space-y-3 rounded-lg bg-surface p-2 text-xs">
                           <div className="space-y-1">
                             <p className="font-medium">Subir nueva</p>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(event) => setReplaceFile(event.target.files?.[0] ?? null)}
-                              className="w-full text-xs"
+                            <ImageDropzone
+                              file={replaceFile}
+                              onChange={setReplaceFile}
+                              disabled={status === "uploading"}
+                              compact
                             />
                             <button
                               type="button"
@@ -322,6 +393,18 @@ export default function PortfolioImagesTab() {
             </section>
           );
         })}
+
+      {adjustingKey && adjustingEntry && (
+        <ImageAdjustEditor
+          key={adjustingKey}
+          imageKey={adjustingKey}
+          imageUrl={adjustingEntry.url}
+          initial={adjustments.data.images[adjustingKey] ?? {}}
+          onSaveDraft={(next) => saveKeyAdjustmentsDraft(adjustingKey, next)}
+          onPublish={(next) => publishKeyAdjustments(adjustingKey, next)}
+          onClose={() => setAdjustingKey(null)}
+        />
+      )}
     </>
   );
 }
