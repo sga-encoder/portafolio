@@ -65,6 +65,8 @@ interface SphereRuntime {
   previous: Vector3;
   displayColor: Color;
   radius: number;
+  /** Radio visible en pantalla, como fracción del alto del viewport (para consumidores 2D, ej. el relight de retratos). */
+  screenRadius: number;
   /** Si `screenFraction` en este frame es > 0 — esferas "dormidas" (aún no nacidas) no cuentan como on-screen. */
   active: boolean;
   motionFactor: number;
@@ -79,6 +81,8 @@ export interface SphereFrameState {
   x: number;
   y: number;
   color: string;
+  /** Radio visible como fracción del alto del viewport. */
+  radius: number;
   active: boolean;
 }
 
@@ -118,6 +122,7 @@ export default function SceneContent({ sphereIds, zoneStops, sizeScale = IDENTIT
         previous: initialPosition.clone(),
         displayColor: getColor(initialPose.color).clone(),
         radius: 0,
+        screenRadius: 0,
         active: initialPose.screenFraction > 0,
         motionFactor: 0,
         trail: Array.from({ length: TRAIL_LENGTH }, () => new Vector3()),
@@ -132,7 +137,7 @@ export default function SceneContent({ sphereIds, zoneStops, sizeScale = IDENTIT
   const { activeIndexRef, progressRef } = useZoneScrollRefs(zoneStops.map((stop) => stop.zoneId));
 
   const frameStates = useStableRef<SphereFrameState[]>(() =>
-    sphereIds.map((id) => ({ id, x: 0, y: 0, color: "#000000", active: true })),
+    sphereIds.map((id) => ({ id, x: 0, y: 0, color: "#000000", radius: 0, active: true })),
   );
 
   useFrame((state, delta) => {
@@ -167,6 +172,8 @@ export default function SceneContent({ sphereIds, zoneStops, sizeScale = IDENTIT
       const rawScreenFraction = lerp(start.screenFraction, end.screenFraction, zoneProgress);
       sphere.active = rawScreenFraction > 0;
       const screenFraction = rawScreenFraction * scale;
+      // `screenFraction` es el diámetro visible sobre el alto del viewport (ver `radiusForScreenFraction`).
+      sphere.screenRadius = Math.max(screenFraction, 0) / 2;
       sphere.radius = radiusForScreenFraction(camera, sphere.current.z, screenFraction) + 0.001;
     }
 
@@ -224,6 +231,7 @@ export default function SceneContent({ sphereIds, zoneStops, sizeScale = IDENTIT
         frameState.x = screen.x;
         frameState.y = screen.y;
         frameState.color = `#${sphere.displayColor.getHexString()}`;
+        frameState.radius = sphere.screenRadius;
         frameState.active = sphere.active;
       }
     });

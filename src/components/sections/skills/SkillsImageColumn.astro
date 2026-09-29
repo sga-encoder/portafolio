@@ -14,6 +14,7 @@ const imageUrl = getCloudinaryUrl(imageKey, "q_auto,f_auto");
     src={imageUrl}
     alt="Retrato ilustrado del autor"
     class="skills-image-column__img"
+    data-portrait-relight
     loading="lazy"
     decoding="async"
   />
@@ -21,6 +22,8 @@ const imageUrl = getCloudinaryUrl(imageKey, "q_auto,f_auto");
 
 <style>
   .skills-image-column {
+    /* Contenedor del canvas del relight de retratos (093), posicionado sobre el <img>. */
+    position: relative;
     display: flex;
     height: 100%;
     max-width: 30vw;
