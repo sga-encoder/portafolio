@@ -8,6 +8,13 @@
       "saturation": 17,
       "vibrance": -23,
       "sharpen": 50
+    },
+    "proyectos/persona-pose-02": {
+      "brightness": -20,
+      "contrast": 8,
+      "gamma": -1,
+      "saturation": 27,
+      "vibrance": -17
     }
   }
 }
