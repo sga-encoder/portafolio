@@ -43,8 +43,11 @@ const {
       // navs usa `transition:persist` (se remontan en cada navegación), así
       // que se engancha a `astro:page-load` (dispara en la carga inicial y en
       // cada transición) en vez de correr una sola vez al parsear — mismo
-      // patrón que `ProjectLikeButton.astro`. El guard por `dataset` evita
-      // doble-bind si el nodo persiste entre dos disparos del evento.
+      // patrón que `ProjectLikeButton.astro`. El guard (un WeakSet en memoria)
+      // evita doble-bind si el nodo persiste entre dos disparos del evento; no
+      // se marca el nodo con un atributo porque estos navs son islas React y
+      // un atributo agregado antes de hidratar da "hydration mismatch".
+      const navRailBound = new WeakSet();
       function initNavRailIdlePause() {
         const rails = Array.from(document.querySelectorAll(".nav-rail-glow"));
         if (!rails.length) return;
@@ -67,8 +70,8 @@ const {
         };
 
         rails.forEach((el) => {
-          if (el.dataset.idleBound === "true") return;
-          el.dataset.idleBound = "true";
+          if (navRailBound.has(el)) return;
+          navRailBound.add(el);
 
           el.addEventListener("pointerenter", pauseAll);
           el.addEventListener("pointerleave", resumeAll);
