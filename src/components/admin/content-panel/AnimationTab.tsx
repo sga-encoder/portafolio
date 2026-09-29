@@ -100,7 +100,7 @@ export default function AnimationTab() {
     setStatus("publishing");
     setMessage(null);
     try {
-      await publishJson(DRAFT_ID, FILE_PATH, data, sha);
+      setSha(await publishJson(DRAFT_ID, FILE_PATH, data, sha));
       setIsDraft(false);
       setStatus("idle");
       setMessage("Publicado.");

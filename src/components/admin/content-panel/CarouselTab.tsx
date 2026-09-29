@@ -96,7 +96,7 @@ export default function CarouselTab({ availableProjects }: Props) {
     setStatus("publishing");
     setMessage(null);
     try {
-      await publishJson(DRAFT_ID, FILE_PATH, cleanIds(ids), sha);
+      setSha(await publishJson(DRAFT_ID, FILE_PATH, cleanIds(ids), sha));
       setIsDraft(false);
       setStatus("idle");
       setMessage("Publicado.");

@@ -115,7 +115,7 @@ export default function SkillsPagesTab() {
     setCategoriesStatus("publishing");
     setCategoriesMessage(null);
     try {
-      await publishJson(CATEGORIES_DRAFT_ID, CATEGORIES_FILE_PATH, categories, categoriesSha);
+      setCategoriesSha(await publishJson(CATEGORIES_DRAFT_ID, CATEGORIES_FILE_PATH, categories, categoriesSha));
       setCategoriesIsDraft(false);
       setCategoriesStatus("idle");
       setCategoriesMessage("Publicado.");
@@ -183,7 +183,7 @@ export default function SkillsPagesTab() {
     setStatus("publishing");
     setMessage(null);
     try {
-      await publishJson(DRAFT_ID, FILE_PATH, cleanSkillsPages(data), sha);
+      setSha(await publishJson(DRAFT_ID, FILE_PATH, cleanSkillsPages(data), sha));
       setIsDraft(false);
       setStatus("idle");
       setMessage("Publicado.");

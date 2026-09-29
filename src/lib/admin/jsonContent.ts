@@ -61,9 +61,16 @@ export async function saveJsonDraft(draftId: string, data: unknown): Promise<voi
   );
 }
 
-export async function publishJson(draftId: string, filePath: string, data: unknown, sha: string | null): Promise<void> {
+/** Devuelve el sha nuevo del archivo: quien llama debe guardarlo, o un segundo "Publicar" en la
+ * misma sesión manda el sha viejo y GitHub responde 409. */
+export async function publishJson(
+  draftId: string,
+  filePath: string,
+  data: unknown,
+  sha: string | null,
+): Promise<string | null> {
   const content = serialize(data);
-  await putFile(filePath, content, `admin: actualizar ${filePath}`, sha ?? undefined);
+  const newSha = await putFile(filePath, content, `admin: actualizar ${filePath}`, sha ?? undefined);
 
   const draftSnap = await getDoc(doc(db, "adminDrafts", draftId));
   const hasCreatedAt = draftSnap.exists() && (draftSnap.data() as JsonDraftDoc).createdAt != null;
@@ -77,4 +84,5 @@ export async function publishJson(draftId: string, filePath: string, data: unkno
     },
     { merge: true },
   );
+  return newSha;
 }
