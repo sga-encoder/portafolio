@@ -1,0 +1,16 @@
+[
+  {
+    "id": "source-maker",
+    "title": "Source Maker",
+    "repo": "sga-encoder/source-maker",
+    "etapasPath": ".claude/spec/etapas.md",
+    "startedAt": "2026-09"
+  },
+  {
+    "id": "pias-plataforma",
+    "title": "PIAS Plataforma",
+    "repo": "pia-rag-universidad-de-caldas/pias-plataforma",
+    "etapasPath": "specs/etapas.md",
+    "startedAt": "2026-09"
+  }
+]

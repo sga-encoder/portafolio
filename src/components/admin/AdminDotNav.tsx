@@ -16,13 +16,13 @@ import {
 } from "../nav/navRailClasses";
 import { NavModeToggle, type NavMode } from "../nav/NavModeToggle";
 
-export type AdminSection = "dashboard" | "estadisticas" | "proyectos" | "contenido" | "imagenes" | "servidores";
+export type AdminSection = "dashboard" | "estadisticas" | "proyectos" | "gestor" | "contenido" | "imagenes" | "servidores";
 
 interface AdminNavItem {
   key: AdminSection;
   href: string;
   label: string;
-  icon: "home" | "heart" | "folder" | "image" | "server" | "grid";
+  icon: "home" | "heart" | "folder" | "image" | "server" | "grid" | "layers";
 }
 
 // "proyectos" no vive acá: en vez de un link directo, ese ítem despliega
@@ -34,6 +34,9 @@ const BEFORE_PROYECTOS: readonly AdminNavItem[] = [
   { key: "estadisticas", href: "/admin/estadisticas", label: "Estadísticas", icon: "heart" },
 ];
 const AFTER_PROYECTOS: readonly AdminNavItem[] = [
+  // (087) "Gestor" va pegado a "Proyectos" porque es su contracara: aquel edita la página pública
+  // de un proyecto terminado, este sigue el avance de los que todavía se están construyendo.
+  { key: "gestor", href: "/admin/gestor", label: "Gestor", icon: "layers" },
   { key: "contenido", href: "/admin/contenido", label: "Contenido", icon: "grid" },
   { key: "imagenes", href: "/admin/imagenes", label: "Imágenes", icon: "image" },
   { key: "servidores", href: "/admin/servidores", label: "Servidores", icon: "server" },

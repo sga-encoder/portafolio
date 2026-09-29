@@ -1,0 +1,16 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import GestorPanel from "../../components/admin/GestorPanel";
+import { buildProjectCards } from "../../lib/admin/projectCards";
+
+// `publishedSlugs` distingue un proyecto del gestor que ya tiene página pública (`/proyectos/[slug]`,
+// enlaza a su editor) de uno que todavía no existe fuera del panel — ver 087/spec.md.
+const entries = await getCollection("projects");
+const publishedSlugs = entries.map((entry) => entry.id);
+const switcherProjects = await buildProjectCards();
+---
+
+<BaseLayout title="Admin · Gestor de proyectos" noindex>
+  <GestorPanel client:load switcherProjects={switcherProjects} publishedSlugs={publishedSlugs} />
+</BaseLayout>
