@@ -16,15 +16,18 @@
     "portraitFrames": [
       {
         "imageKey": "proyectos/persona-pose-01",
-        "word": "INTELIGENTE"
+        "word": "INTELIGENTE",
+        "wordSideDesktop": "left"
       },
       {
         "imageKey": "proyectos/persona-pose-02",
-        "word": "CREATIVO"
+        "word": "CREATIVO",
+        "wordSideDesktop": "left"
       },
       {
         "imageKey": "proyectos/persona-pose-03",
-        "word": "AMABLE"
+        "word": "AMABLE",
+        "wordSideMobile": "right"
       }
     ],
     "portraitIntervalSeconds": 4
