@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import { getCloudinaryUrl } from "../../utils/cloudinaryManifest";
-import { CAROUSEL_PROJECT_IDS } from "../../data/carousel";
+import { CAROUSEL_CONFIG, CAROUSEL_PROJECT_IDS } from "../../data/carousel";
 import ProjectCarousel from "../projects/ProjectCarousel";
 
 // Título/descripción/imagen salen del content collection (071) — misma fuente que
@@ -25,7 +25,7 @@ const projects = CAROUSEL_PROJECT_IDS.map((id) => {
   id="proyectos"
   class="flex min-h-screen w-full flex-col justify-center gap-10 px-4 py-16 md:h-screen short:gap-8 short:py-4"
 >
-  <ProjectCarousel client:load projects={projects} />
+  <ProjectCarousel client:load projects={projects} autoplaySeconds={CAROUSEL_CONFIG.autoplaySeconds} />
   <h2
     class="text-center font-display text-[clamp(1.75rem,9vw,3rem)] font-bold text-ink md:text-8xl short:text-[clamp(1.25rem,6vh,3rem)]"
   >

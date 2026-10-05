@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { loadJsonContent, publishJson, saveJsonDraft } from "../../../lib/admin/jsonContent";
-import { CAROUSEL_PROJECT_IDS } from "../../../data/carousel";
+import { CAROUSEL_CONFIG, MAX_AUTOPLAY_SECONDS, normalizeCarouselConfig } from "../../../data/carousel";
 import type { ProjectCardData } from "../../../lib/admin/projectCards";
 import AddProjectModal from "./AddProjectModal";
 import CarouselRow from "./CarouselRow";
@@ -22,13 +22,15 @@ interface Props {
 }
 
 /**
- * Pestaña "Carrusel" del panel de Contenido (071): gestiona únicamente membresía + orden del
- * carrusel de Proyectos de Inicio sobre `src/data/carousel.json` (`string[]` de ids). Título,
+ * Pestaña "Carrusel" del panel de Contenido (071): gestiona membresía + orden del carrusel de
+ * Proyectos de Inicio y, desde `098`, los segundos de avance automático, sobre
+ * `src/data/carousel.json` (`{ projectIds, autoplaySeconds }`). Título,
  * descripción y portada de cada proyecto se resuelven en `ProjectsSection.astro` directamente
  * desde su Markdown — acá no se editan, solo se elige cuál aparece y en qué orden.
  */
 export default function CarouselTab({ availableProjects }: Props) {
   const [ids, setIds] = useState<string[] | null>(null);
+  const [autoplaySeconds, setAutoplaySeconds] = useState(CAROUSEL_CONFIG.autoplaySeconds);
   const [sha, setSha] = useState<string | null>(null);
   const [isDraft, setIsDraft] = useState(false);
   const [status, setStatus] = useState<Status>("loading");
@@ -36,10 +38,12 @@ export default function CarouselTab({ availableProjects }: Props) {
 
   useEffect(() => {
     let cancelled = false;
-    loadJsonContent<string[]>(DRAFT_ID, FILE_PATH)
+    loadJsonContent<unknown>(DRAFT_ID, FILE_PATH)
       .then((loaded) => {
         if (cancelled) return;
-        setIds(loaded.data);
+        const config = normalizeCarouselConfig(loaded.data);
+        setIds(config.projectIds);
+        setAutoplaySeconds(config.autoplaySeconds);
         setSha(loaded.sha);
         setIsDraft(loaded.isDraft);
         setStatus("idle");
@@ -47,7 +51,8 @@ export default function CarouselTab({ availableProjects }: Props) {
       .catch((err) => {
         console.error(err);
         if (cancelled) return;
-        setIds(CAROUSEL_PROJECT_IDS);
+        setIds(CAROUSEL_CONFIG.projectIds);
+        setAutoplaySeconds(CAROUSEL_CONFIG.autoplaySeconds);
         setSha(null);
         setStatus("idle");
       });
@@ -55,6 +60,10 @@ export default function CarouselTab({ availableProjects }: Props) {
       cancelled = true;
     };
   }, []);
+
+  function buildConfig(currentIds: string[]) {
+    return normalizeCarouselConfig({ projectIds: cleanIds(currentIds), autoplaySeconds });
+  }
 
   function removeAt(index: number) {
     if (!ids) return;
@@ -80,7 +89,7 @@ export default function CarouselTab({ availableProjects }: Props) {
     setStatus("saving");
     setMessage(null);
     try {
-      await saveJsonDraft(DRAFT_ID, cleanIds(ids));
+      await saveJsonDraft(DRAFT_ID, buildConfig(ids));
       setIsDraft(true);
       setStatus("idle");
       setMessage("Borrador guardado.");
@@ -96,7 +105,7 @@ export default function CarouselTab({ availableProjects }: Props) {
     setStatus("publishing");
     setMessage(null);
     try {
-      setSha(await publishJson(DRAFT_ID, FILE_PATH, cleanIds(ids), sha));
+      setSha(await publishJson(DRAFT_ID, FILE_PATH, buildConfig(ids), sha));
       setIsDraft(false);
       setStatus("idle");
       setMessage("Publicado.");
@@ -146,6 +155,22 @@ export default function CarouselTab({ availableProjects }: Props) {
           onAdd={handleAdd}
         />
       </div>
+
+      <label className="flex w-fit flex-col gap-2 text-sm">
+        <span className="font-medium text-ink">Avance automático (segundos)</span>
+        <input
+          type="number"
+          min={0}
+          max={MAX_AUTOPLAY_SECONDS}
+          step={1}
+          value={autoplaySeconds}
+          onChange={(event) => setAutoplaySeconds(Number(event.target.value) || 0)}
+          className="w-32 rounded-lg bg-surface-muted px-3 py-2 text-ink"
+        />
+        <span className="text-xs text-ink-muted">
+          Cada cuántos segundos pasa solo al siguiente proyecto (máximo {MAX_AUTOPLAY_SECONDS}). 0 lo desactiva.
+        </span>
+      </label>
 
       <div className="flex items-center gap-3">
         <button

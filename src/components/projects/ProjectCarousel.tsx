@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface CarouselProject {
   id: string;
@@ -10,6 +10,8 @@ export interface CarouselProject {
 
 interface Props {
   projects: CarouselProject[];
+  /** Segundos entre avances automáticos (098); `0` lo desactiva. */
+  autoplaySeconds?: number;
 }
 
 function ChevronIcon({ direction }: { direction: "left" | "right" }) {
@@ -23,9 +25,30 @@ function ChevronIcon({ direction }: { direction: "left" | "right" }) {
 
 const SWIPE_THRESHOLD_PX = 45;
 
-export default function ProjectCarousel({ projects }: Props) {
+export default function ProjectCarousel({ projects, autoplaySeconds = 0 }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
   const touchStartX = useRef<number | null>(null);
+
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(query.matches);
+    const onChange = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
+
+  // Depende de `currentIndex`: cualquier cambio (automático, flechas o swipe) reinicia la cuenta.
+  const paused = hovered || focused || reducedMotion;
+  useEffect(() => {
+    if (paused || autoplaySeconds <= 0 || projects.length < 2) return;
+    const timer = window.setTimeout(() => {
+      setCurrentIndex((index) => (index + 1) % projects.length);
+    }, autoplaySeconds * 1000);
+    return () => window.clearTimeout(timer);
+  }, [currentIndex, paused, autoplaySeconds, projects.length]);
 
   if (projects.length === 0) return null;
 
@@ -58,7 +81,15 @@ export default function ProjectCarousel({ projects }: Props) {
   );
 
   return (
-    <div className="relative mx-auto w-full max-w-7xl">
+    <div
+      className="relative mx-auto w-full max-w-7xl"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
+      }}
+    >
       {/* Layout de escritorio: visible en landscape o md:+ (016 fija este criterio para el esfuerzo de responsive). */}
       <div className="relative hidden px-12 short:px-6 landscape:block sm:px-16 md:block">
         <button
