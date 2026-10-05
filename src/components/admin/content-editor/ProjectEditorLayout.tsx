@@ -38,6 +38,7 @@ export interface ProjectFrontmatter {
   platforms: ("mobile" | "desktop")[];
   links?: { repo?: string; demo?: string };
   steps: Step[];
+  demoFirst?: boolean;
   sphereColors?: [string, string];
   sphereMovement?: Record<string, { a?: Record<string, number>; b?: Record<string, number> }>;
   servers?: ProjectServer[];

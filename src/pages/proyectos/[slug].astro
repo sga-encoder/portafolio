@@ -41,7 +41,7 @@ export async function getStaticPaths() {
 
 const { project, prevSlug, nextSlug } = Astro.props;
 const { Content } = await render(project);
-const { title, summary, coverImage, gallery, techStack, platforms, links, steps, servers, sphereColors, sphereMovement } =
+const { title, summary, coverImage, gallery, techStack, platforms, links, steps, demoFirst, servers, sphereColors, sphereMovement } =
   project.data;
 
 const cover = getCloudinaryUrl(coverImage, "w_900,q_auto,f_auto");
@@ -112,7 +112,7 @@ const otherProjects = PROJECTS.filter((item) => item.id !== project.id).map((ite
 
       <ProjectDivider colors={colors} />
 
-      <ProjectLiveSteps steps={steps} colors={colors} demoHref={links.demo} servers={servers} />
+      <ProjectLiveSteps steps={steps} colors={colors} demoHref={links.demo} demoFirst={demoFirst} servers={servers} />
     </div>
 
     {

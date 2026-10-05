@@ -88,6 +88,9 @@ const projects = defineCollection({
           demo: z.string().url().optional(),
         })
         .default({}),
+      // Pone "Ver demo" antes de los pasos del autor cuando esos pasos se hacen dentro del demo
+      // (ej. "crea una partida"). Con backend Render el demo ya va primero siempre (099).
+      demoFirst: z.boolean().default(false),
       // Override opcional por proyecto del fondo 3D de `/proyectos/[slug]` — ausente, se usa el
       // color autoextraído de `coverImage` (`getCloudinaryColors`) y la coreografía compartida de
       // `projectSceneStops.ts`. Ver 044-editor-visual-contenido-proyectos/plan.md.

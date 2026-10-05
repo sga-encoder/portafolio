@@ -1,6 +1,6 @@
 ---
 title: Territorial
-summary: Proyecto hecho para la universidad, con un mapa interactivo (Next.js + Tailwind CSS) y datos persistidos en un backend real (no construido por mí).
+summary: "Sistema de valoración territorial hecho para la universidad: frontend en Angular + Tailwind CSS con mapas interactivos, conectado a un backend real hecho por la universidad."
 coverImage: projects/territorial/cover
 gallery:
   - image: projects/territorial/gallery-login
@@ -8,8 +8,9 @@ gallery:
   - image: projects/territorial/gallery-mapa-de-seguimiento
   - image: projects/territorial/gallery-entidades
 techStack:
-  - Next.js
+  - Angular
   - Tailwind CSS
+  - MapLibre GL
 platforms:
   - desktop
 links:
@@ -22,8 +23,8 @@ steps:
         label: Correo
       - value: Admin123*
         label: Contraseña
-  - text: "Prueba el sistema de atajos de teclado: mantén presionado Ctrl + Alt."
-  - text: Regístrate y crea tus propias cuentas de estudiante y de maestro para entrar con esos roles (no hay credenciales demo fijas para esos roles, hay que crearlas).
+  - text: Abre el editor de demarcación y mira cómo se dibujan los polígonos de los barrios sobre el mapa.
+  - text: Revisa el mapa de seguimiento de funcionarios y la gestión de entidades.
 servers:
   - id: web
     name: Frontend
@@ -36,6 +37,7 @@ servers:
     kind: other
     company: render
     serviceId: "srv-dakedcgu01pc73ersu5g"
+    url: "https://territorial-backend.onrender.com/"
   - id: db
     name: Base de datos (Neon)
     kind: database
@@ -43,11 +45,10 @@ servers:
     projectId: "rapid-firefly-86210308"
 ---
 
-Territorial es un proyecto que hice para la universidad: una plataforma con un mapa interactivo para
-visualizar y explorar información territorial. El frontend (Next.js + Tailwind CSS) es lo que yo
-construí; los datos persisten en un backend real conectado a una base de datos en Neon, que no
-desarrollé yo.
+Territorial es un sistema de valoración territorial que hice para la universidad. Construí el frontend
+en Angular con Tailwind CSS: mapas interactivos con MapLibre para delimitar barrios dibujando sus
+polígonos y para seguir en tiempo real a los funcionarios en campo, además de la gestión de
+departamentos, ciudades, comunas, entidades y usuarios. El backend lo hizo la universidad.
 
-Reutiliza el mismo sistema de roles de otro proyecto mío (Class Manager): hay una cuenta de administrador
-para gestionar el contenido, y puedes registrarte como estudiante o como profesor para explorar la
-plataforma con esos roles.
+Tiene tres roles (administrador, funcionario y ciudadano) y las cuentas nuevas quedan pendientes hasta
+que un administrador les asigna un rol.

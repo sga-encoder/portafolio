@@ -14,6 +14,7 @@ platforms:
 links:
   repo: "https://github.com/sga-encoder/proyecto-react"
   demo: "https://class-manager-puce.vercel.app/"
+demoFirst: true
 steps:
   - text: "Inicia sesión como administrador y explora la app."
     copyText:

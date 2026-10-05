@@ -16,6 +16,7 @@ platforms:
 links:
   repo: "https://github.com/sga-encoder/city-builder"
   demo: "https://city-builder-ruddy.vercel.app/"
+demoFirst: true
 steps:
   - text: "Crea una partida para empezar a construir tu ciudad."
 servers:

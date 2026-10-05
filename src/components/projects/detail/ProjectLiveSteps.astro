@@ -30,10 +30,12 @@ interface Props {
   steps: Step[];
   colors: [string, string];
   demoHref?: string;
+  /** Demo antes de los pasos del autor aunque no haya backend Render (099). */
+  demoFirst?: boolean;
   servers?: ServerRef[];
 }
 
-const { steps, colors, demoHref, servers } = Astro.props;
+const { steps, colors, demoHref, demoFirst = false, servers } = Astro.props;
 const [first, second] = colors;
 const leftColor = `var(--project-left-color, ${first})`;
 const rightColor = `var(--project-right-color, ${second})`;
@@ -63,8 +65,11 @@ const demoSteps: Step[] = demoHref
       { text: "Prueba el proyecto ya desplegado.", buttons: [{ label: "Ver demo", href: demoHref, locked: gated }] },
     ]
   : [];
-const allSteps: Step[] = [...steps, ...demoSteps];
-const wakeStepIndex = gated && demoHref ? allSteps.length - 2 : -1;
+// Con backend Render, despertar + demo van primero: los pasos del autor suelen tener botones
+// `locked` (ej. panel de admin) que dependen de despertar el backend antes (099). Sin Render, los
+// pasos del autor siguen antes del demo (ej. avisos de "ten paciencia al cargar"), salvo `demoFirst`.
+const allSteps: Step[] = gated || demoFirst ? [...demoSteps, ...steps] : [...steps, ...demoSteps];
+const wakeStepIndex = gated && demoHref ? 0 : -1;
 ---
 
 <div class="flex h-full flex-col gap-4">
@@ -166,7 +171,7 @@ const wakeStepIndex = gated && demoHref ? allSteps.length - 2 : -1;
                   <span class="wake-lock-countdown" data-wake-countdown hidden />
                 </div>
                 <p class="wake-lock-hint" data-wake-hint>
-                  Bloqueado — despertá el backend en el paso anterior para usar "{lockedLabels}".
+                  Bloqueado — despertá el backend en el paso 1 para usar "{lockedLabels}".
                 </p>
               </div>
             )}
