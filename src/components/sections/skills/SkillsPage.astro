@@ -1,6 +1,6 @@
 ---
 import SkillColumn from "./SkillColumn.astro";
-import SkillsImageColumn from "./SkillsImageColumn.astro";
+import SkillsSlashColumn from "./SkillsSlashColumn.astro";
 import type { SkillsColumn } from "../../../data/skillsPages";
 
 interface Props {
@@ -21,20 +21,21 @@ function sideFor(index: number, total: number): "left" | "right" {
   <div class="hidden min-h-0 flex-1 items-center justify-center gap-[2vw] md:flex short:gap-[1vw]">
     {
       columns.map((column, index) =>
-        column.type === "image" ? (
-          <SkillsImageColumn imageKey={column.imageKey ?? ""} />
-        ) : (
+        column.type === "skills" ? (
           <SkillColumn skills={column.skills ?? []} side={sideFor(index, columns.length)} variant="desktop" />
+        ) : (
+          <SkillsSlashColumn />
         ),
       )
     }
   </div>
 
-  {/* Mobile (<768px): columnas apiladas verticalmente, sin chevron. Sin imagen central (082). */}
+  {/* Mobile (<768px): columnas apiladas verticalmente, sin chevron. Sin elemento central: la
+      caja inclinada `\` (101, antes la imagen de `082`) es decoración solo desktop. */}
   <div class="flex flex-1 flex-col items-center justify-center gap-8 py-6 md:hidden">
     {
       columns
-        .filter((column) => column.type !== "image")
+        .filter((column) => column.type === "skills")
         .map((column, index, filtered) => (
           <SkillColumn skills={column.skills ?? []} side={sideFor(index, filtered.length)} variant="mobile" />
         ))

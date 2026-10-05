@@ -2,7 +2,7 @@ import type { SkillsColumn, SkillsColumnType, SkillsPage } from "../../../data/s
 import SkillsColumnCard from "./SkillsColumnCard";
 
 function newColumn(type: SkillsColumnType): SkillsColumn {
-  return type === "skills" ? { type: "skills", skills: [] } : { type: "image", imageKey: "" };
+  return type === "skills" ? { type: "skills", skills: [] } : { type: "slash" };
 }
 
 /** Mismo criterio que `SkillsPage.astro` del sitio público: mitad izquierda del array de
@@ -75,10 +75,10 @@ export default function SkillsPageCard({ page, categories, onChange }: Props) {
           </button>
           <button
             type="button"
-            onClick={() => addColumn("image")}
+            onClick={() => addColumn("slash")}
             className="rounded-lg border-2 border-dashed border-ink-muted/30 px-3 py-1 text-xs text-ink-muted hover:border-ink-muted hover:text-ink"
           >
-            + Columna de imagen
+            + Columna inclinada \
           </button>
         </div>
       )}

@@ -12,14 +12,13 @@ export interface Skill {
   category: SkillCategory;
 }
 
-export type SkillsColumnType = "skills" | "image";
+/** `"slash"` (101) reemplaza a la vieja columna `"image"` (retrato): caja decorativa inclinada `\`. */
+export type SkillsColumnType = "skills" | "slash";
 
 export interface SkillsColumn {
   type: SkillsColumnType;
   /** Solo si type === "skills". `[]` es válido (columna presente, sin habilidades todavía). */
   skills?: Skill[];
-  /** Solo si type === "image". Clave del manifest de Cloudinary. */
-  imageKey?: string;
 }
 
 export interface SkillsPage {

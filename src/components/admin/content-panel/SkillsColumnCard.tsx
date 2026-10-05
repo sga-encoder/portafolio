@@ -1,4 +1,3 @@
-import EditableImage from "../content-editor/EditableImage";
 import type { Skill, SkillsColumn, SkillsColumnType } from "../../../data/skillsPages";
 import SkillRow from "./SkillRow";
 
@@ -7,11 +6,18 @@ function newSkill(defaultCategory: string): Skill {
 }
 
 function emptyColumnOf(type: SkillsColumnType): SkillsColumn {
-  return type === "skills" ? { type: "skills", skills: [] } : { type: "image", imageKey: "" };
+  return type === "skills" ? { type: "skills", skills: [] } : { type: "slash" };
 }
 
+/** Borradores viejos pueden traer `type: "image"` (antes de 101): todo lo que no sea "skills" se
+ * trata como "slash". */
+function normalizedType(column: SkillsColumn): SkillsColumnType {
+  return column.type === "skills" ? "skills" : "slash";
+}
+
+/** La columna "slash" (101) es pura decoración, sin datos que descartar. */
 function hasData(column: SkillsColumn): boolean {
-  return column.type === "skills" ? (column.skills?.length ?? 0) > 0 : Boolean(column.imageKey);
+  return normalizedType(column) === "skills" && (column.skills?.length ?? 0) > 0;
 }
 
 interface Props {
@@ -27,7 +33,8 @@ interface Props {
 }
 
 /**
- * Columna dentro de una página de Habilidades (073): tipo ("skills"/"image"), reordenar
+ * Columna dentro de una página de Habilidades (073): tipo ("skills"/"slash" — caja inclinada `\`
+ * que reemplaza a la vieja "image", 101), reordenar
  * izquierda/derecha, quitar, y contenido según tipo — mismo tamaño `clamp()`/`vh` que el resto del
  * editor para que la página completa quepa en el viewport sin scroll. Cambiar el tipo con datos
  * cargados pide confirmación antes de descartarlos.
@@ -43,11 +50,12 @@ export default function SkillsColumnCard({
   canMoveLeft,
   canMoveRight,
 }: Props) {
+  const type = normalizedType(column);
+
   function handleTypeChange(nextType: SkillsColumnType) {
-    if (nextType === column.type) return;
-    if (hasData(column)) {
-      const discarded = column.type === "skills" ? "las habilidades cargadas" : "la imagen cargada";
-      if (!confirm(`Cambiar el tipo de columna descarta ${discarded}. ¿Continuar?`)) return;
+    if (nextType === type) return;
+    if (hasData(column) && !confirm("Cambiar el tipo de columna descarta las habilidades cargadas. ¿Continuar?")) {
+      return;
     }
     onChange(emptyColumnOf(nextType));
   }
@@ -80,12 +88,12 @@ export default function SkillsColumnCard({
     <div className="flex h-full flex-col items-center gap-1.5">
       <div className="flex shrink-0 items-center gap-1">
         <select
-          value={column.type}
+          value={type}
           onChange={(event) => handleTypeChange(event.target.value as SkillsColumnType)}
           className="rounded-lg border border-ink-muted/30 bg-transparent px-2 py-0.5 text-xs"
         >
           <option value="skills">Habilidades</option>
-          <option value="image">Imagen</option>
+          <option value="slash">Caja inclinada \</option>
         </select>
         <button
           type="button"
@@ -118,7 +126,7 @@ export default function SkillsColumnCard({
         </button>
       </div>
 
-      {column.type === "skills" ? (
+      {type === "skills" ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-[1vh]">
           {skills.map((skill, index) => (
             <SkillRow
@@ -143,12 +151,17 @@ export default function SkillsColumnCard({
           </button>
         </div>
       ) : (
-        <div className="flex flex-1 items-center justify-center">
-          <EditableImage
-            value={column.imageKey ?? ""}
-            onChange={(imageKey) => onChange({ ...column, imageKey })}
-            alt="Imagen de la columna"
-            className="aspect-square w-[clamp(6rem,22vh,12rem)]"
+        // Vista previa de la caja inclinada (`SkillsSlashColumn.astro`): sin datos que editar.
+        <div className="flex flex-1 items-center justify-center px-[clamp(1rem,3vh,2rem)]" aria-hidden="true">
+          <div
+            className="h-[clamp(8rem,40vh,20rem)] w-[clamp(1.5rem,4vw,3.5rem)] border-[6px] border-solid"
+            style={{
+              transform: "skewX(12deg)",
+              borderImage:
+                "conic-gradient(from 315deg at 50% 50%, var(--sphere-left-color, var(--color-brand)) 0%, var(--sphere-right-color, var(--color-accent-2)) 50%, var(--sphere-left-color, var(--color-brand)) 100%) 1",
+              background: "color-mix(in srgb, var(--color-surface) 55%, transparent)",
+              backgroundClip: "padding-box",
+            }}
           />
         </div>
       )}

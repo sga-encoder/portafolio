@@ -4,12 +4,12 @@
  * esto se mantiene a mano: si el español cambia y acá no, se sigue mostrando la traducción vieja; si
  * falta un campo, cae al español (`content.ts`).
  *
- * Palabras del retrato y categorías van como mapa por su valor en español (no por índice), para que
- * reordenar frames/categorías en el panel no desalinee las traducciones.
+ * Las categorías van como mapa por su valor en español (no por índice), para que
+ * reordenar categorías en el panel no desalinee las traducciones.
  */
 export const contentEn = {
   profile: {
-    tagline: "Systems Engineering Student",
+    tagline: "Web Developer",
     ctaLabels: {
       Proyectos: "Projects",
       Blog: "Blog",
@@ -22,11 +22,6 @@ export const contentEn = {
       Pendiente: "Pending",
     } as Record<string, string>,
   },
-  portraitWords: {
-    INTELIGENTE: "SMART",
-    CREATIVO: "CREATIVE",
-    AMABLE: "KIND",
-  } as Record<string, string>,
   skillCategories: {
     lenguajes: "languages",
     herramientas: "tools",

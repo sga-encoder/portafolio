@@ -1,12 +1,10 @@
 import EngineScene3D from "./engine/Scene3D";
 import type { SphereFrameState } from "./engine/SceneContent";
 import { setSphereFrameVars, setStaticHeaderFrameVars } from "./headerFrameVars";
-import { publishSceneLights } from "./sceneLightBus";
 import { resolvedSceneStops, SPHERE_IDS } from "./sceneStops";
 import { mobilePortraitSizeScale } from "./viewport";
 
 function publishHomeSceneVars(spheres: readonly SphereFrameState[]): void {
-  publishSceneLights(spheres);
   const a = spheres.find((sphere) => sphere.id === "a");
   const b = spheres.find((sphere) => sphere.id === "b");
   const c = spheres.find((sphere) => sphere.id === "c");

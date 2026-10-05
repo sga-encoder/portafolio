@@ -2,24 +2,23 @@
 import { getLang } from "../../i18n/config";
 import { getProfile } from "../../i18n/content";
 import { useTranslations } from "../../i18n/ui";
-import { getCloudinaryUrl } from "../../utils/cloudinaryManifest";
 import AboutFrame from "./about/AboutFrame.astro";
 import AboutInfoBlock from "./about/AboutInfoBlock.astro";
 
 const lang = getLang(Astro.url);
 const t = useTranslations(lang);
 const { about } = getProfile(lang);
-const personaUrl = getCloudinaryUrl(about.portraitKey || "about/persona03", "q_auto,f_auto");
 ---
 
+<!-- Feature 101: sin retrato. En desktop el título vertical ocupa la columna derecha (40vw) que
+     antes era de la foto; la columna estrecha izquierda (12vw) desaparece. En mobile el título
+     queda arriba y el bloque de info ocupa todo el ancho. -->
 <section id="sobre-mi" class="flex min-h-screen w-full flex-col pb-20 md:h-screen md:flex-row md:pb-0 short:py-2">
-  <div
-    class="flex shrink-0 items-center justify-center py-6 short:py-1 md:h-full md:w-[12vw] md:items-end md:justify-center md:pb-[6vh]"
-  >
+  <div class="flex shrink-0 items-center justify-center py-6 short:py-1 md:hidden">
     <h2 class="about-title font-display font-bold text-ink">{t("home.aboutTitle")}</h2>
   </div>
 
-  <div class="flex min-w-0 flex-1 flex-col justify-center gap-[3vh] px-[6vw] py-[3vh] short:gap-[1vh] short:py-[1vh] md:px-[4vw]">
+  <div class="flex min-w-0 flex-1 flex-col justify-center gap-[3vh] px-[6vw] py-[3vh] short:gap-[1vh] short:py-[1vh] md:pl-[max(8vw,7rem)] md:pr-[4vw]">
     <AboutFrame>
       <p class="font-body text-ink-muted text-[clamp(0.9rem,1.2vw,1.125rem)] short:text-xs short:line-clamp-3">
         {about.bio}
@@ -28,30 +27,13 @@ const personaUrl = getCloudinaryUrl(about.portraitKey || "about/persona03", "q_a
 
     <AboutInfoBlock about={about} class="hidden md:flex md:flex-col md:gap-[3vh] short:gap-[1vh]" />
 
-    <div class="flex flex-row items-center gap-4 md:hidden">
-      <AboutInfoBlock about={about} class="flex min-w-0 flex-1 flex-col gap-[3vh]" dividerClass="w-full" />
-      <div class="relative w-[30vw] shrink-0">
-        <img
-          src={personaUrl}
-          alt={t("home.fullPortraitAlt")}
-          class="h-auto w-full object-contain"
-          data-portrait-relight
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-    </div>
+    <AboutInfoBlock about={about} class="flex w-full flex-col gap-[3vh] md:hidden" dividerClass="w-full" />
   </div>
 
-  <div class="relative hidden shrink-0 md:block md:h-full md:w-[40vw]">
-    <img
-      src={personaUrl}
-      alt={t("home.fullPortraitAlt")}
-      class="h-full w-full object-contain object-center"
-      data-portrait-relight
-      loading="lazy"
-      decoding="async"
-    />
+  <div class="hidden shrink-0 items-center justify-center overflow-hidden md:flex md:h-full md:w-[40vw]">
+    <h2 class="about-title about-title--vertical font-display font-bold text-ink">
+      {t("home.aboutTitle")}
+    </h2>
   </div>
 </section>
 
@@ -62,11 +44,17 @@ const personaUrl = getCloudinaryUrl(about.portraitKey || "about/persona03", "q_a
   }
 
   @media (min-width: 768px) {
-    .about-title {
+    .about-title--vertical {
       /* `vertical-rl` + rotate(180deg) = texto vertical que se lee de abajo hacia
          arriba (equivalente a rotar -90° un título horizontal), en flujo normal. */
       writing-mode: vertical-rl;
       transform: rotate(180deg);
+      line-height: 1;
+      /* Feature 101: el título llena el hueco de la foto. "Sobre mí"/"About me" en Space Grotesk
+         bold miden ~4.5em, así que 17vh ≈ 77% del alto de la sección. El techo 30vw evita que
+         el grosor de la línea se coma la columna de 40vw en pantallas angostas/altas, y como
+         todo escala en vh también cabe en `short:` (max-height 499px). */
+      font-size: clamp(3rem, min(17vh, 30vw), 17vh);
     }
   }
 </style>

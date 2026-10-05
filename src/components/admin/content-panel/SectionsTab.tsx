@@ -2,38 +2,36 @@ import { useEffect, useState } from "react";
 import { loadJsonContent, publishJson, saveJsonDraft } from "../../../lib/admin/jsonContent";
 import { profile as fallbackProfile, type ProfileData } from "../../../data/profile";
 import SocialLinksEditor from "./SocialLinksEditor";
-import HeaderPortraitFrameRow from "./HeaderPortraitFrameRow";
-import EditableImage from "../content-editor/EditableImage";
 
 const DRAFT_ID = "home:profile";
 const FILE_PATH = "src/data/profile.json";
 
 type Status = "loading" | "idle" | "saving" | "publishing" | "error";
 
+type DeadHeaderFields = { initials?: unknown; portraitFrames?: unknown; portraitIntervalSeconds?: unknown };
+type DeadAboutFields = { portraitKey?: unknown };
+
 /**
- * Migra en memoria un borrador de Firestore guardado antes de `078` (forma vieja
- * `header.initials`, sin `portraitFrames`) — limitación conocida documentada en
- * `.claude/spec/features/078-header-retrato-rotativo/plan.md`: sin esto, cargar ese borrador
- * rompe el panel entero en vez de solo perder los datos de imagen del frame migrado.
+ * Descarta campos muertos que un borrador de Firestore o un `profile.json` viejo puede seguir
+ * arrastrando (JSON.parse no respeta el tipo TS): `header.initials` (antes de `078`),
+ * `header.portraitFrames`/`portraitIntervalSeconds` y `about.portraitKey` (retratos quitados en
+ * `101`). Se aplica al cargar y al guardar/publicar para no reintroducirlos.
  */
-function normalizeHeader(input: ProfileData): ProfileData {
-  const header = input.header as ProfileData["header"] & { initials?: string };
-  if (Array.isArray(header.portraitFrames) && header.portraitFrames.length > 0) {
-    return input;
-  }
-  return {
-    ...input,
-    header: {
-      ...header,
-      portraitFrames: [{ imageKey: "header/persona01", word: header.initials ?? "" }],
-      portraitIntervalSeconds: header.portraitIntervalSeconds ?? 6,
-    },
-  };
+function stripDeadFields(input: ProfileData): ProfileData {
+  const {
+    initials: _initials,
+    portraitFrames: _portraitFrames,
+    portraitIntervalSeconds: _portraitIntervalSeconds,
+    ...header
+  } = input.header as ProfileData["header"] & DeadHeaderFields;
+  const { portraitKey: _portraitKey, ...about } = input.about as ProfileData["about"] & DeadAboutFields;
+  return { ...input, header, about };
 }
 
 /**
- * Pestaña "Secciones" del panel de Contenido (064): edita Header y Sobre mí, que viven en
- * `src/data/profile.json` — incluidos sus retratos (079 y 091), elegidos con `EditableImage`.
+ * Pestaña "Secciones" del panel de Contenido (064): edita los textos de Header y Sobre mí, que
+ * viven en `src/data/profile.json`. Desde `101` Inicio no tiene fotos del autor, así que ya no
+ * hay retratos que elegir.
  */
 export default function SectionsTab() {
   const [data, setData] = useState<ProfileData | null>(null);
@@ -47,7 +45,7 @@ export default function SectionsTab() {
     loadJsonContent<ProfileData>(DRAFT_ID, FILE_PATH)
       .then((loaded) => {
         if (cancelled) return;
-        setData(normalizeHeader(loaded.data));
+        setData(stripDeadFields(loaded.data));
         setSha(loaded.sha);
         setIsDraft(loaded.isDraft);
         setStatus("idle");
@@ -70,26 +68,14 @@ export default function SectionsTab() {
     setData({ ...data, ...patch });
   }
 
-  function moveFrame(index: number, delta: number) {
-    if (!data) return;
-    const frames = data.header.portraitFrames;
-    const target = index + delta;
-    if (target < 0 || target >= frames.length) return;
-    const next = [...frames];
-    [next[index], next[target]] = [next[target], next[index]];
-    update({ header: { ...data.header, portraitFrames: next } });
-  }
-
   /** Recorta renglones/enlaces vacíos antes de guardar — mismo criterio que `cleanFrontmatter` en `ContentEditor.tsx`. */
   function cleanProfile(input: ProfileData): ProfileData {
-    const nameLines = input.header.nameLines.filter((line) => line.trim());
-    // `initials` es un campo muerto de antes de `078` — un borrador/publish viejo puede seguir
-    // arrastrándolo (JSON.parse no respeta el tipo TS); se descarta acá para no reintroducirlo.
-    const { initials: _initials, ...header } = input.header as ProfileData["header"] & { initials?: string };
+    const { header, about, ...rest } = stripDeadFields(input);
+    const nameLines = header.nameLines.filter((line) => line.trim());
     return {
-      ...input,
+      ...rest,
       header: { ...header, nameLines: nameLines.length > 0 ? nameLines : [""] },
-      about: { ...input.about, social: input.about.social.filter((link) => link.label.trim() && link.href.trim()) },
+      about: { ...about, social: about.social.filter((link) => link.label.trim() && link.href.trim()) },
     };
   }
 
@@ -156,56 +142,6 @@ export default function SectionsTab() {
               />
             </label>
           ))}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <span className="text-sm text-ink-muted">Retrato rotativo (imagen + palabra)</span>
-          {data.header.portraitFrames.map((frame, index) => (
-            <HeaderPortraitFrameRow
-              key={index}
-              frame={frame}
-              onChange={(next) => {
-                const portraitFrames = [...data.header.portraitFrames];
-                portraitFrames[index] = next;
-                update({ header: { ...data.header, portraitFrames } });
-              }}
-              onRemove={() => {
-                const portraitFrames = data.header.portraitFrames.filter((_, i) => i !== index);
-                update({ header: { ...data.header, portraitFrames } });
-              }}
-              onMoveUp={() => moveFrame(index, -1)}
-              onMoveDown={() => moveFrame(index, 1)}
-              canMoveUp={index > 0}
-              canMoveDown={index < data.header.portraitFrames.length - 1}
-              canRemove={data.header.portraitFrames.length > 1}
-            />
-          ))}
-          <button
-            type="button"
-            onClick={() =>
-              update({
-                header: {
-                  ...data.header,
-                  portraitFrames: [...data.header.portraitFrames, { imageKey: "", word: "" }],
-                },
-              })
-            }
-            className="rounded-lg border-2 border-dashed border-ink-muted/30 px-2 py-1 text-xs text-ink-muted hover:border-ink-muted hover:text-ink"
-          >
-            + Agregar frame
-          </button>
-
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-ink-muted">Intervalo de rotación (segundos)</span>
-            <input
-              type="number"
-              value={data.header.portraitIntervalSeconds}
-              onChange={(event) =>
-                update({ header: { ...data.header, portraitIntervalSeconds: Number(event.target.value) } })
-              }
-              className="w-32 rounded-lg border border-ink-muted/30 bg-transparent px-3 py-2"
-            />
-          </label>
         </div>
 
         <label className="flex flex-col gap-1 text-sm">
@@ -293,16 +229,6 @@ export default function SectionsTab() {
 
       <section className="flex flex-col gap-4 rounded-2xl bg-surface-muted p-4">
         <h2 className="font-display text-sm font-bold uppercase tracking-wide text-ink-muted">Sobre mí</h2>
-
-        <div className="flex flex-col gap-2">
-          <span className="text-sm text-ink-muted">Retrato</span>
-          <EditableImage
-            value={data.about.portraitKey || "about/persona03"}
-            onChange={(portraitKey) => update({ about: { ...data.about, portraitKey } })}
-            alt="Retrato de Sobre mí"
-            className="h-32 w-32"
-          />
-        </div>
 
         <label className="flex flex-col gap-1 text-sm">
           <span className="text-ink-muted">Biografía</span>

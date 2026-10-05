@@ -1,0 +1,69 @@
+---
+/**
+ * Caja decorativa inclinada como una barra invertida `\` (101): reemplaza a la vieja columna de
+ * imagen (retrato ilustrado) entre las dos columnas de Habilidades. Solo desktop/tablet — en
+ * mobile `SkillsPage.astro` la filtra (sin elemento central, `082`). Sin datos: es pura
+ * decoración, mismo lenguaje visual que el marco del Header (`HeaderFrame`).
+ */
+---
+
+<div class="skills-slash-column" aria-hidden="true">
+  <div class="skills-slash-column__box"></div>
+</div>
+
+<style>
+  .skills-slash-column {
+    /* Alto de la caja: acotado por `vh` (no `100%`) para quedar a la altura de las columnas de
+       skills sin desbordar la sección `md:h-screen`; `max-height: 100%` lo recorta si el
+       contenedor flex queda más bajo. */
+    --slash-height: min(68vh, 40rem);
+    /* Positivo ⇒ `skewX` corre la base hacia la derecha y el tope hacia la izquierda: `\`. */
+    --slash-angle: 12deg;
+    display: flex;
+    height: var(--slash-height);
+    max-height: 100%;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    /* `transform` no afecta el layout: la inclinación saca cada esquina
+       `alto · tan(ángulo) / 2` hacia el costado. Ese margen evita que tape las columnas vecinas. */
+    margin-inline: calc(var(--slash-height) * tan(var(--slash-angle)) / 2);
+  }
+
+  .skills-slash-column__box {
+    height: 100%;
+    width: clamp(3rem, 7vw, 8rem);
+    transform: skewX(var(--slash-angle));
+    /* Mismo grosor de borde que `HeaderFrame` (20px sobre lienzo de 1512px), un poco más fino:
+       la caja es angosta y un borde de 20px se comería el interior. */
+    border-style: solid;
+    border-width: clamp(6px, calc(12 / 1512 * 100vw), 14px);
+    border-image-slice: 1;
+    /* Cónico (como `HeaderFrame`): un lineal recortado en `border-image` deja las esquinas en un
+       color plano. `--sphere-left-color`/`--sphere-right-color` (como `AboutFrame`): el par de
+       esferas realmente en pantalla en esta sección (ver `headerFrameVars.ts`). */
+    border-image-source: conic-gradient(
+      from 315deg at 50% 50%,
+      var(--sphere-left-color, var(--color-brand)) 0%,
+      var(--sphere-right-color, var(--color-accent-2)) 50%,
+      var(--sphere-left-color, var(--color-brand)) 100%
+    );
+    /* Fondo translúcido sobre la escena 3D; `padding-box` para que no asome bajo el borde. */
+    background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+    background-clip: padding-box;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Landscape corto (`short:`, max-height 499px): las columnas de skills también se compactan;
+     la caja ocupa más proporción del alto disponible pero más angosta y menos inclinada. */
+  @media (max-height: 499px) {
+    .skills-slash-column {
+      --slash-height: 78vh;
+      --slash-angle: 10deg;
+    }
+
+    .skills-slash-column__box {
+      width: clamp(2rem, 5vw, 4rem);
+    }
+  }
+</style>

@@ -4,7 +4,7 @@
       "Sebastián Garzón",
       "Arias"
     ],
-    "tagline": "Estudiante de Ingeniería de Sistemas",
+    "tagline": "Web Developer",
     "primaryCta": {
       "label": "Proyectos",
       "href": "/proyectos"
@@ -12,25 +12,7 @@
     "secondaryCta": {
       "label": "Blog",
       "href": "/blog"
-    },
-    "portraitFrames": [
-      {
-        "imageKey": "proyectos/persona-pose-01",
-        "word": "INTELIGENTE",
-        "wordSideDesktop": "left"
-      },
-      {
-        "imageKey": "proyectos/persona-pose-02",
-        "word": "CREATIVO",
-        "wordSideDesktop": "left"
-      },
-      {
-        "imageKey": "proyectos/persona-pose-03",
-        "word": "AMABLE",
-        "wordSideMobile": "right"
-      }
-    ],
-    "portraitIntervalSeconds": 4
+    }
   },
   "about": {
     "bio": "Me presento, soy Sebastián Garzón Arias, un estudiante de Ingeniería en Sistemas Computacionales de la Universidad de Caldas, con una formación previa a través de la curiosidad y mi pasión por la programación. Conocimiento que he adquirido de manera autodidacta; así descubrí que tengo habilidades para aprender y enseñar, y también me dio la habilidad de resolver de forma más eficiente y creativa los obstáculos que se presentan en este tipo de aprendizaje. Soy paciente en los procesos creativos, me gusta la innovación y el crecimiento constante, seguir de cerca la evolución de las tecnologías y crecer con ellas con seguridad. Lo que más me caracteriza es la constancia, la perseverancia y mi constante proceso de aprender nuevas habilidades.",
@@ -46,15 +28,14 @@
       },
       {
         "platform": "linkedin",
-        "label": "Pendiente",
-        "href": "#"
+        "label": "sebastian-garzon-arias",
+        "href": "https://www.linkedin.com/in/sebastian-garzon-arias/"
       },
       {
         "platform": "email",
-        "label": "sebastian.garzon54795@ucaldas.edu.co",
-        "href": "mailto:sebastian.garzon54795@ucaldas.edu.co"
+        "label": "sebastiangarzonarias78@gmail.com",
+        "href": "mailto:sebastiangarzonarias78@gmail.com"
       }
-    ],
-    "portraitKey": "proyectos/persona-pose-06"
+    ]
   }
 }

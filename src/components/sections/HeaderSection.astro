@@ -1,51 +1,23 @@
 ---
 import { getLang } from "../../i18n/config";
 import { getProfile } from "../../i18n/content";
-import { useTranslations } from "../../i18n/ui";
 import HeaderFrame from "./header/HeaderFrame.astro";
 import HeaderDivider from "./header/HeaderDivider.astro";
-import HeaderPortrait from "./header/HeaderPortrait.astro";
-import HeaderContentCard from "./header/HeaderContentCard.astro";
 import HeaderTextBlock from "./header/HeaderTextBlock.astro";
 
 // secondaryCta ("Blog") no se pasa a propósito: sigue en backlog sin contenido
 // (ver roadmap.md), oculto de forma reversible (026) sin borrar el dato en profile.ts.
+// Sin retrato desde 101: el bloque de texto ocupa el marco solo, mismo layout en todos los tamaños.
 const lang = getLang(Astro.url);
-const { nameLines, portraitFrames, portraitIntervalSeconds, tagline, primaryCta } = getProfile(lang).header;
-const portraitAlt = `${useTranslations(lang)("home.portraitAlt")} ${nameLines.join(" ")}`;
+const { nameLines, tagline, primaryCta } = getProfile(lang).header;
 ---
 
 <section id="header" class="h-screen w-full p-[5vw] short:py-[2vh]">
   <HeaderFrame>
-    <!-- Desktop / celular en landscape: layout actual sin cambios. -->
-    <div class="hidden h-full w-full items-stretch gap-[3vw] px-[2vw] landscape:flex md:flex">
-      <div class="flex min-w-0 flex-1 flex-col justify-center gap-6 short:gap-2">
-        <HeaderTextBlock nameLines={nameLines} tagline={tagline} primaryCta={primaryCta}>
-          <HeaderDivider class="w-full" slot="divider" />
-        </HeaderTextBlock>
-      </div>
-      <HeaderPortrait
-        frames={portraitFrames}
-        intervalSeconds={portraitIntervalSeconds}
-        alt={portraitAlt}
-        class="hidden w-[26vw] max-w-[420px] shrink-0 sm:block"
-      />
-    </div>
-
-    <!-- Celular en portrait: retrato de fondo + tarjeta inferior con título/subtítulo/botones.
-         La tarjeta se solapa sobre la parte baja de la persona (piernas), dejando asomar solo
-         la punta del pie por debajo, y sobresale lateralmente del ancho del marco. -->
-    <div class="relative h-full w-full landscape:hidden md:hidden">
-      <HeaderPortrait
-        frames={portraitFrames}
-        intervalSeconds={portraitIntervalSeconds}
-        alt={portraitAlt}
-        variant="background"
-        class="absolute inset-0"
-      />
-      <HeaderContentCard class="absolute inset-x-[-4vw] bottom-[9vh]">
-        <HeaderTextBlock nameLines={nameLines} tagline={tagline} primaryCta={primaryCta} />
-      </HeaderContentCard>
+    <div class="flex h-full w-full flex-col justify-center gap-6 px-[6vw] short:gap-2 md:px-[4vw]">
+      <HeaderTextBlock nameLines={nameLines} tagline={tagline} primaryCta={primaryCta}>
+        <HeaderDivider class="w-full" slot="divider" />
+      </HeaderTextBlock>
     </div>
   </HeaderFrame>
 </section>

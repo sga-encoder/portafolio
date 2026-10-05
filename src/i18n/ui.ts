@@ -25,14 +25,11 @@ const es = {
   "nav.langToggle": "English",
   "nav.timeline": "Navegación de la línea de tiempo",
 
-  "home.portraitAlt": "Retrato de",
   "home.skillsTitle": "Habilidades",
   "home.projectsTitle": "Proyectos",
   "home.aboutTitle": "Sobre mí",
   "home.studies": "Estudios:",
   "home.contact": "Contacto:",
-  "home.fullPortraitAlt": "Retrato de cuerpo completo del autor",
-  "home.illustratedPortraitAlt": "Retrato ilustrado del autor",
 
   "carousel.prevProject": "Proyecto anterior",
   "carousel.nextProject": "Siguiente proyecto",
@@ -101,14 +98,11 @@ const en: Record<UiKey, string> = {
   "nav.langToggle": "Español",
   "nav.timeline": "Timeline navigation",
 
-  "home.portraitAlt": "Portrait of",
   "home.skillsTitle": "Skills",
   "home.projectsTitle": "Projects",
   "home.aboutTitle": "About me",
   "home.studies": "Education:",
   "home.contact": "Contact:",
-  "home.fullPortraitAlt": "Full-body portrait of the author",
-  "home.illustratedPortraitAlt": "Illustrated portrait of the author",
 
   "carousel.prevProject": "Previous project",
   "carousel.nextProject": "Next project",

@@ -26,12 +26,3 @@ const t = useTranslations(lang);
     <AboutSection />
   </div>
 </BaseLayout>
-
-<script>
-  import { initPortraitRelight } from "../scene/portrait/portraitRelight";
-
-  // Retratos iluminados por la escena (093). Idempotente: corre en la carga inicial y al volver
-  // a Inicio vía View Transitions; se limpia solo en `astro:before-swap`.
-  initPortraitRelight();
-  document.addEventListener("astro:page-load", initPortraitRelight);
-</script>

@@ -25,10 +25,6 @@ export function getProfile(lang: Lang): ProfileData {
       tagline: isEn ? en.tagline : header.tagline,
       primaryCta: localizeCta(header.primaryCta),
       secondaryCta: header.secondaryCta && localizeCta(header.secondaryCta),
-      portraitFrames: header.portraitFrames.map((frame) => ({
-        ...frame,
-        word: isEn ? (contentEn.portraitWords[frame.word] ?? frame.word) : frame.word,
-      })),
     },
     about: {
       ...about,
