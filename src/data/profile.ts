@@ -9,10 +9,19 @@ export interface HeaderPortraitFrame {
   /** Clave del manifest de Cloudinary (src/data/cloudinaryManifest.json), mismo criterio que el
    *  resto de `imageKey` del sitio (065/068). */
   imageKey: string;
-  /** Palabra mostrada rotada -90° detrás del retrato (ver HeaderPortrait.astro). Puede repetirse
+  /** Palabra vertical del retrato (ver HeaderPortrait.astro): sobre la pierna en PC, detrás de la
+   *  persona en móvil (094). Puede repetirse
    *  o quedar vacía; sin validación de longitud (mismo criterio permisivo que el resto del panel). */
   word: string;
+  /** Lado de la palabra (094), visto de frente a la foto: depende de hacia dónde mira la persona.
+   *  PC: sobre la pierna izquierda o derecha. Ausente = "right". */
+  wordSideDesktop?: PortraitWordSide;
+  /** Móvil (vertical y horizontal): costado del cuerpo por el que asoma, detrás de la persona.
+   *  Ausente = "left". */
+  wordSideMobile?: PortraitWordSide;
 }
+
+export type PortraitWordSide = "left" | "right";
 
 export interface HeaderData {
   /** Nombre completo; cada línea se muestra en su propio renglón del título. */

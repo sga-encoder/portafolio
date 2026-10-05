@@ -28,17 +28,23 @@ const {
 >
   {frames.map((frame, index) => (
     <div class="header-portrait__frame" data-active={index === 0 ? "true" : "false"}>
-      {!hideWord && (
-        <span class="header-portrait__word" aria-hidden="true">{frame.word}</span>
-      )}
-      <img
-        src={getCloudinaryUrl(frame.imageKey, "q_auto,f_auto")}
-        alt={index === 0 ? alt : ""}
-        class="header-portrait__image"
-        data-portrait-relight
-        loading="eager"
-        decoding="async"
-      />
+      <div
+        class="header-portrait__figure"
+        data-word-desktop={frame.wordSideDesktop ?? "right"}
+        data-word-mobile={frame.wordSideMobile ?? "left"}
+      >
+        {!hideWord && (
+          <span class="header-portrait__word" aria-hidden="true">{frame.word}</span>
+        )}
+        <img
+          src={getCloudinaryUrl(frame.imageKey, "q_auto,f_auto")}
+          alt={index === 0 ? alt : ""}
+          class="header-portrait__image"
+          data-portrait-relight
+          loading="eager"
+          decoding="async"
+        />
+      </div>
     </div>
   ))}
 </div>
@@ -74,6 +80,9 @@ const {
     position: relative;
     height: 100%;
     width: 100%;
+    /* La palabra se dimensiona en cqh/cqw (094): el tamaño de la imagen depende del alto/ancho
+       de este contenedor, no del viewport. */
+    container-type: size;
   }
 
   .header-portrait__frame {
@@ -87,47 +96,101 @@ const {
     opacity: 1;
   }
 
-  .header-portrait__frame .header-portrait__image {
+  /* Caja de la imagen (094): shrink-to-fit alrededor del <img> para ubicar la palabra en % sobre
+     el cuerpo de la persona. Sin `transform`: el canvas del relight (093) se posiciona con
+     getBoundingClientRect y un ancestro escalado lo desalinearía — por eso el antiguo
+     `scale(1.1)` (origen abajo-derecha) pasa a ser alto ×1.1 con el mismo anclaje. */
+  .header-portrait__figure {
     position: absolute;
-    inset: calc(var(--frame-border, 20px) * -1) calc(var(--frame-border, 20px) * -1)
-      calc(var(--frame-border, 20px) * -1) auto;
     right: calc(var(--frame-border, 20px) * -1);
-    height: calc(100% + var(--frame-border, 20px) * 2);
+    bottom: calc(var(--frame-border, 20px) * -1);
+    height: calc((100% + var(--frame-border, 20px) * 2) * 1.1);
+  }
+
+  .header-portrait__image {
+    display: block;
+    height: 100%;
     width: auto;
     max-width: none;
-    object-fit: contain;
-    object-position: bottom right;
-    transform: scale(1.1);
-    transform-origin: bottom right;
   }
 
-  /* Variante "background": el retrato deja de ser una columna lateral y pasa
-     a cubrir todo el marco por detrás del contenido (usada en el layout
-     mobile portrait de HeaderSection). */
-  .header-portrait[data-variant="background"] .header-portrait__frame .header-portrait__image {
-    inset: 0;
-    right: auto;
-    height: 100%;
+  /* Variante "background": el retrato cubre todo el marco por detrás del contenido (layout
+     mobile portrait de HeaderSection), arriba y centrado. Una imagen 1:2 en un marco de celular
+     vertical queda limitada por el ancho, así que equivale al `contain` + `top center` previo. */
+  .header-portrait[data-variant="background"] .header-portrait__figure {
+    inset: 0 0 auto;
+    height: auto;
+  }
+
+  .header-portrait[data-variant="background"] .header-portrait__image {
     width: 100%;
-    object-fit: contain;
-    object-position: top center;
-    transform: none;
+    height: auto;
   }
 
+  /* Palabra vertical (lectura de abajo hacia arriba). `writing-mode` + rotate(180deg) en vez de
+     rotate(-90deg): la caja ocupa su lugar real, así se centra con translate sin depender del
+     largo de la palabra.
+     PC: encima de la pierna derecha de la imagen (piernas entre ~30–70% del ancho y ~52–95% del
+     alto en las poses actuales). */
   .header-portrait__word {
     position: absolute;
     z-index: 1;
-    left: 22%;
-    bottom: 55%;
-    transform-origin: left bottom;
-    transform: rotate(-90deg) translateX(-100%);
-    display: inline-block;
+    left: 58%;
+    top: 73%;
+    transform: translate(-50%, -50%) rotate(180deg);
+    writing-mode: vertical-rl;
     white-space: nowrap;
+    line-height: 1;
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(2.5rem, 5.5vw, 5.5rem);
+    font-size: 5.5cqh;
     letter-spacing: 0.05em;
-    color: color-mix(in srgb, var(--color-ink) 100%, transparent 65%);
+    color: color-mix(in srgb, var(--color-ink) 75%, transparent);
+  }
+
+  /* Celular (horizontal y vertical): detrás de la persona ("a la espalda"). Sin z-index queda
+     debajo del <img> y del canvas del relight, que vienen después en el DOM; asoma por el
+     costado izquierdo del cuerpo a la altura del torso (en vertical, más arriba y más chica para
+     que termine antes de la tarjeta de contenido incluso en 360×740). */
+  @media (max-height: 499px) {
+    .header-portrait__word {
+      z-index: auto;
+      left: 24%;
+      top: 42%;
+      font-size: 8cqh;
+      color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+    }
+  }
+
+  .header-portrait[data-variant="background"] .header-portrait__word {
+    z-index: auto;
+    left: 24%;
+    top: 27%;
+    font-size: 12cqw;
+    color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+  }
+
+  /* Lado elegido por frame desde el panel (094): espejo de las posiciones de arriba. El de PC va
+     acotado a PC (alto ≥ 500px y variante lateral): si no, por especificidad le ganaba a las
+     reglas de móvil y la palabra quedaba en 42%, toda tapada por la persona. En móvil el derecho
+     no es espejo exacto (76%): ese costado del cuerpo es más ancho (brazo/hombro hasta ~75% de la
+     foto). */
+  @media (min-height: 500px) {
+    .header-portrait[data-variant="side"] .header-portrait__figure[data-word-desktop="left"]
+      .header-portrait__word {
+      left: 42%;
+    }
+  }
+
+  @media (max-height: 499px) {
+    .header-portrait__figure[data-word-mobile="right"] .header-portrait__word {
+      left: 84%;
+    }
+  }
+
+  .header-portrait[data-variant="background"] .header-portrait__figure[data-word-mobile="right"]
+    .header-portrait__word {
+    left: 84%;
   }
 
   @media (prefers-reduced-motion: reduce) {
