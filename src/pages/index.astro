@@ -1,31 +1,5 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import SceneFallbackBackground from "../components/scene/SceneFallbackBackground.astro";
-import Scene3D from "../components/scene/Scene3D";
-import HomeNavBridge from "../components/nav/HomeNavBridge";
-import HeaderSection from "../components/sections/HeaderSection.astro";
-import SkillsSection from "../components/sections/SkillsSection.astro";
-import ProjectsSection from "../components/sections/ProjectsSection.astro";
-import AboutSection from "../components/sections/AboutSection.astro";
+import HomePage from "../components/pages/HomePage.astro";
 ---
 
-<BaseLayout title="Sebastián Garzón Arias" description="Hoja de vida interactiva y blog personal.">
-  <SceneFallbackBackground />
-  <Scene3D client:load />
-  <HomeNavBridge client:load />
-  <div class="relative z-10">
-    <HeaderSection />
-    <SkillsSection />
-    <ProjectsSection />
-    <AboutSection />
-  </div>
-</BaseLayout>
-
-<script>
-  import { initPortraitRelight } from "../components/scene/portrait/portraitRelight";
-
-  // Retratos iluminados por la escena (093). Idempotente: corre en la carga inicial y al volver
-  // a Inicio vía View Transitions; se limpia solo en `astro:before-swap`.
-  initPortraitRelight();
-  document.addEventListener("astro:page-load", initPortraitRelight);
-</script>
+<HomePage />

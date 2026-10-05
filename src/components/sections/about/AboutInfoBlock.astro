@@ -2,6 +2,8 @@
 import AboutDivider from "./AboutDivider.astro";
 import SocialLink from "./SocialLink.astro";
 import type { AboutData } from "../../../data/profile";
+import { getLang } from "../../../i18n/config";
+import { useTranslations } from "../../../i18n/ui";
 
 interface Props {
   about: AboutData;
@@ -10,11 +12,12 @@ interface Props {
 }
 
 const { about, class: className, dividerClass = "w-1/2" } = Astro.props;
+const t = useTranslations(getLang(Astro.url));
 ---
 
 <div class:list={[className]}>
   <div>
-    <h3 class="font-display font-bold text-ink text-[clamp(1rem,1.4vw,1.375rem)] short:text-sm">Estudios:</h3>
+    <h3 class="font-display font-bold text-ink text-[clamp(1rem,1.4vw,1.375rem)] short:text-sm">{t("home.studies")}</h3>
     <p class="mt-1 short:mt-0.5 font-body text-ink-muted text-[clamp(0.9rem,1.2vw,1.125rem)] short:text-xs">
       {about.study.institution} <span class="font-display font-bold text-brand">({about.study.period})</span>
     </p>
@@ -23,7 +26,7 @@ const { about, class: className, dividerClass = "w-1/2" } = Astro.props;
   <AboutDivider class={dividerClass} />
 
   <div>
-    <h3 class="font-display font-bold text-ink text-[clamp(1rem,1.4vw,1.375rem)] short:text-sm">Contacto:</h3>
+    <h3 class="font-display font-bold text-ink text-[clamp(1rem,1.4vw,1.375rem)] short:text-sm">{t("home.contact")}</h3>
     <div class="mt-3 short:mt-1 flex flex-col gap-3 short:gap-1">
       {about.social.map((link) => <SocialLink link={link} />)}
     </div>

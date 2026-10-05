@@ -26,6 +26,8 @@
 // (ícono capas), siguiente.
 import NavIcon from "./NavIcon.astro";
 import ProjectSwitcherPanel from "../../nav/ProjectSwitcherPanel";
+import { getLang, localizePath } from "../../../i18n/config";
+import { useTranslations } from "../../../i18n/ui";
 import {
   NAV_BAR_MOBILE_LIST,
   NAV_BAR_MOBILE_SECONDARY,
@@ -54,6 +56,15 @@ const [first, second] = colors;
 const leftColor = `var(--project-left-color, ${first})`;
 const rightColor = `var(--project-right-color, ${second})`;
 const hasSwitcher = otherProjects.length > 0;
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+const switcherProps = {
+  items: otherProjects,
+  color: rightColor,
+  allHref: localizePath("/proyectos", lang),
+  triggerLabel: t("nav.switchProject"),
+  allLabel: t("nav.allProjects"),
+};
 
 interface NavItem {
   key: string;
@@ -72,7 +83,7 @@ interface NavItem {
 // sin cambiar posición ni destino.
 const prevItem: NavItem = {
   key: "prev",
-  label: "Proyecto anterior",
+  label: t("nav.prevProject"),
   href: prevHref,
   color: rightColor,
   disabled: !prevHref,
@@ -80,7 +91,7 @@ const prevItem: NavItem = {
 };
 const nextItem: NavItem = {
   key: "next",
-  label: "Próximo proyecto",
+  label: t("nav.nextProject"),
   href: nextHref,
   color: leftColor,
   disabled: !nextHref,
@@ -103,14 +114,14 @@ const circleStyle = (color: string) =>
 {
   /* Desktop: nav lateral fijo, mismo criterio hidden/md:flex que ScrollDotNav/YearDotNav. */
 }
-<nav aria-label="Navegación entre proyectos" class={NAV_RAIL_DESKTOP_SECONDARY}>
+<nav aria-label={t("nav.projectsPager")} class={NAV_RAIL_DESKTOP_SECONDARY}>
   <div class={NAV_RAIL_FRAME}>
     <ul class={NAV_RAIL_LIST}>
       {
         entries.map((entry) =>
           entry.kind === "switcher" ? (
             <li class="relative flex items-center">
-              <ProjectSwitcherPanel client:load items={otherProjects} color={rightColor} allHref="/proyectos" />
+              <ProjectSwitcherPanel client:load {...switcherProps} />
             </li>
           ) : (
             <li class="group relative flex items-center">
@@ -156,13 +167,13 @@ const circleStyle = (color: string) =>
      posiciona `fixed`/centrado vía CSS global (`.project-switcher-shell`,
      `global.css`), no un `<style>` scoped (054, ver `ProjectSwitcherPanel.tsx`). */
 }
-<nav aria-label="Navegación entre proyectos" class={NAV_BAR_MOBILE_SECONDARY}>
+<nav aria-label={t("nav.projectsPager")} class={NAV_BAR_MOBILE_SECONDARY}>
   <ul class={`${NAV_BAR_MOBILE_LIST} hold-to-navigate-list`}>
     {
       entries.map((entry) =>
         entry.kind === "switcher" ? (
           <li class="relative flex items-center">
-            <ProjectSwitcherPanel client:load items={otherProjects} color={rightColor} allHref="/proyectos" />
+            <ProjectSwitcherPanel client:load {...switcherProps} />
           </li>
         ) : (
           <li class="group relative flex items-center">

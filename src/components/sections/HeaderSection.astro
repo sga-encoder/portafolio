@@ -1,5 +1,7 @@
 ---
-import { profile } from "../../data/profile";
+import { getLang } from "../../i18n/config";
+import { getProfile } from "../../i18n/content";
+import { useTranslations } from "../../i18n/ui";
 import HeaderFrame from "./header/HeaderFrame.astro";
 import HeaderDivider from "./header/HeaderDivider.astro";
 import HeaderPortrait from "./header/HeaderPortrait.astro";
@@ -8,8 +10,9 @@ import HeaderTextBlock from "./header/HeaderTextBlock.astro";
 
 // secondaryCta ("Blog") no se pasa a propósito: sigue en backlog sin contenido
 // (ver roadmap.md), oculto de forma reversible (026) sin borrar el dato en profile.ts.
-const { nameLines, portraitFrames, portraitIntervalSeconds, tagline, primaryCta } = profile.header;
-const portraitAlt = `Retrato de ${nameLines.join(" ")}`;
+const lang = getLang(Astro.url);
+const { nameLines, portraitFrames, portraitIntervalSeconds, tagline, primaryCta } = getProfile(lang).header;
+const portraitAlt = `${useTranslations(lang)("home.portraitAlt")} ${nameLines.join(" ")}`;
 ---
 
 <section id="header" class="h-screen w-full p-[5vw] short:py-[2vh]">

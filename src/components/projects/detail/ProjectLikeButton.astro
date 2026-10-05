@@ -7,16 +7,20 @@
 // (el navegador no re-ejecuta el mismo módulo en soft-nav de View
 // Transitions), la re-inicialización por página ocurre vía el evento
 // `astro:page-load` de Astro, no por re-ejecución del script en sí.
+import { getLang } from "../../../i18n/config";
+import { useTranslations } from "../../../i18n/ui";
+
 interface Props {
   slug: string;
   color: string;
 }
 
 const { slug, color } = Astro.props;
+const t = useTranslations(getLang(Astro.url));
 ---
 
 <div class="like-widget" data-like-root data-slug={slug} style={`--like-color: ${color};`}>
-  <button type="button" class="like-heart" data-like-heart aria-label="Dar like a este proyecto" aria-pressed="false">
+  <button type="button" class="like-heart" data-like-heart aria-label={t("like.button")} aria-pressed="false">
     <svg viewBox="0 0 24 24" width="26" height="26" role="img" aria-hidden="true">
       <path
         d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
@@ -32,25 +36,25 @@ const { slug, color } = Astro.props;
 
   <dialog class="like-dialog" data-like-dialog>
     <form method="dialog" class="like-form" data-like-form novalidate>
-      <h2 class="like-form-title">Dar like a este proyecto</h2>
+      <h2 class="like-form-title">{t("like.button")}</h2>
 
       <label class="like-field">
-        <span>Nombre</span>
+        <span>{t("like.firstName")}</span>
         <input type="text" name="firstName" required maxlength="50" autocomplete="given-name" />
       </label>
 
       <label class="like-field">
-        <span>Apellido <em>(opcional)</em></span>
+        <span>{t("like.lastName")} <em>{t("like.optional")}</em></span>
         <input type="text" name="lastName" maxlength="50" autocomplete="family-name" />
       </label>
 
       <label class="like-field">
-        <span>Link de contacto <em>(opcional)</em></span>
+        <span>{t("like.contactLink")} <em>{t("like.optional")}</em></span>
         <input type="url" name="contactLink" maxlength="300" placeholder="https://…" autocomplete="url" />
       </label>
 
       <label class="like-field">
-        <span>Mensaje <em>(opcional)</em></span>
+        <span>{t("like.message")} <em>{t("like.optional")}</em></span>
         <textarea name="message" maxlength="500" rows="3"></textarea>
       </label>
 
@@ -63,8 +67,8 @@ const { slug, color } = Astro.props;
       </label>
 
       <div class="like-form-actions">
-        <button type="button" class="like-cancel" data-like-cancel>Cancelar</button>
-        <button type="submit" class="like-submit" data-like-submit>Dar like</button>
+        <button type="button" class="like-cancel" data-like-cancel>{t("like.cancel")}</button>
+        <button type="submit" class="like-submit" data-like-submit>{t("like.submit")}</button>
       </div>
     </form>
   </dialog>

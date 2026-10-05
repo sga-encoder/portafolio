@@ -4,6 +4,8 @@ import "@fontsource/space-grotesk/700.css";
 import "@fontsource/montserrat/400.css";
 import { ClientRouter } from "astro:transitions";
 import Footer from "../components/Footer.astro";
+import { getLang, LANG_STORAGE_KEY, switchLangPath } from "../i18n/config";
+import { useTranslations } from "../i18n/ui";
 
 interface Props {
   title: string;
@@ -11,15 +13,26 @@ interface Props {
   noindex?: boolean;
 }
 
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+
 const {
   title,
-  description = "Portafolio personal: hoja de vida y blog.",
+  description = t("site.description"),
   noindex = false,
 } = Astro.props;
+
+// Detección automática de idioma (100): solo en páginas del sitio público que existen en ambos
+// idiomas — `/admin` usa este mismo layout y no tiene versión en inglés.
+const pathname = Astro.url.pathname;
+const isBilingual = !/^\/(en\/)?(admin|api)(\/|$)/.test(pathname);
+const alternates = Astro.site && isBilingual
+  ? (["es", "en"] as const).map((code) => ({ code, href: new URL(switchLangPath(pathname, code), Astro.site).href }))
+  : [];
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,6 +41,35 @@ const {
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
+    {alternates.map((alt) => <link rel="alternate" hreflang={alt.code} href={alt.href} />)}
+    {
+      isBilingual && (
+        <script
+          is:inline
+          data-lang={lang}
+          data-other={switchLangPath(pathname, lang === "es" ? "en" : "es")}
+          data-key={LANG_STORAGE_KEY}
+        >
+          // Idioma automático (100): la elección manual del toggle (localStorage) manda; sin ella, el
+          // idioma del navegador (español → es, cualquier otro → en). Corre antes de pintar y sin
+          // `data-astro-rerun` — solo en cargas completas: las navegaciones internas ya van al idioma
+          // correcto porque todos los enlaces están localizados. Los bots no se redirigen, para que
+          // cada idioma se indexe en su propia URL.
+          (function () {
+            var el = document.currentScript;
+            if (!el) return;
+            if (/bot|crawl|spider|slurp|lighthouse|headless/i.test(navigator.userAgent)) return;
+            var pref = null;
+            try {
+              pref = localStorage.getItem(el.dataset.key);
+            } catch (e) {}
+            var browser = (navigator.languages && navigator.languages[0]) || navigator.language || "es";
+            var wanted = pref === "es" || pref === "en" ? pref : /^es\b/i.test(browser) ? "es" : "en";
+            if (wanted !== el.dataset.lang) location.replace(el.dataset.other + location.search + location.hash);
+          })();
+        </script>
+      )
+    }
     <script is:inline data-astro-rerun>
       // Modo claro desactivado temporalmente (feature 011) — siempre oscuro.
       // `data-astro-rerun`: sin esto, el script no se re-ejecuta en navegaciones

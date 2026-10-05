@@ -1,5 +1,7 @@
 ---
 import ColorLinkButton from "./ColorLinkButton.astro";
+import { getLang } from "../../../i18n/config";
+import { useTranslations } from "../../../i18n/ui";
 
 interface CopyItem {
   value: string;
@@ -36,6 +38,7 @@ interface Props {
 }
 
 const { steps, colors, demoHref, demoFirst = false, servers } = Astro.props;
+const t = useTranslations(getLang(Astro.url));
 const [first, second] = colors;
 const leftColor = `var(--project-left-color, ${first})`;
 const rightColor = `var(--project-right-color, ${second})`;
@@ -58,11 +61,11 @@ const demoSteps: Step[] = demoHref
       ...(gated
         ? [
             {
-              text: "El backend de este proyecto puede estar dormido por inactividad (plan gratuito) — despertalo antes de entrar al demo.",
+              text: t("project.wakeStep"),
             },
           ]
         : []),
-      { text: "Prueba el proyecto ya desplegado.", buttons: [{ label: "Ver demo", href: demoHref, locked: gated }] },
+      { text: t("project.demoStep"), buttons: [{ label: t("project.demo"), href: demoHref, locked: gated }] },
     ]
   : [];
 // Con backend Render, despertar + demo van primero: los pasos del autor suelen tener botones
@@ -73,7 +76,7 @@ const wakeStepIndex = gated && demoHref ? 0 : -1;
 ---
 
 <div class="flex h-full flex-col gap-4">
-  <h2 class="font-display text-sm font-bold uppercase tracking-wide text-ink-muted">Cómo verlo en vivo</h2>
+  <h2 class="font-display text-sm font-bold uppercase tracking-wide text-ink-muted">{t("project.liveSteps")}</h2>
 
   <ol class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     {
@@ -101,7 +104,8 @@ const wakeStepIndex = gated && demoHref ? 0 : -1;
                 type="button"
                 class="copy-chip"
                 data-copy-text={item.value}
-                aria-label={item.label ? `Copiar ${item.label}: ${item.value}` : `Copiar: ${item.value}`}
+                data-copied-label={t("project.copied")}
+                aria-label={item.label ? `${t("project.copy")} ${item.label}: ${item.value}` : `${t("project.copy")}: ${item.value}`}
                 style={`--chip-color: ${stepColor};`}
               >
                 <span class="copy-chip-text">
@@ -109,7 +113,7 @@ const wakeStepIndex = gated && demoHref ? 0 : -1;
                   <code class="copy-chip-code">{item.value}</code>
                 </span>
                 <span class="copy-chip-feedback" data-copy-feedback>
-                  Copiar
+                  {t("project.copy")}
                 </span>
               </button>
             ))}
@@ -149,9 +153,13 @@ const wakeStepIndex = gated && demoHref ? 0 : -1;
                 class="wake-backend-button"
                 data-wake-trigger
                 data-wake-urls={JSON.stringify(renderUrls)}
+                data-text-waking={t("project.waking")}
+                data-text-slow={t("project.wakingSlow")}
+                data-text-ready={t("project.wakeReady")}
+                data-text-timeout={t("project.wakeTimeout")}
                 style={`--btn-color: ${stepColor};`}
               >
-                Despertar backend
+                {t("project.wakeButton")}
               </button>
             )}
 
@@ -171,7 +179,7 @@ const wakeStepIndex = gated && demoHref ? 0 : -1;
                   <span class="wake-lock-countdown" data-wake-countdown hidden />
                 </div>
                 <p class="wake-lock-hint" data-wake-hint>
-                  Bloqueado — despertá el backend en el paso 1 para usar "{lockedLabels}".
+                  {t("project.lockedHint")} "{lockedLabels}".
                 </p>
               </div>
             )}
@@ -356,7 +364,7 @@ const wakeStepIndex = gated && demoHref ? 0 : -1;
         try {
           await navigator.clipboard.writeText(text);
           if (feedback) {
-            feedback.textContent = "¡Copiado!";
+            feedback.textContent = button.getAttribute("data-copied-label") || "";
             setTimeout(() => {
               feedback.textContent = original;
             }, 1500);
@@ -390,7 +398,7 @@ const wakeStepIndex = gated && demoHref ? 0 : -1;
         // El candado se queda visible y la cuenta regresiva aparece junto a él, ambos centrados
         // sobre el fondo difuminado de cada paso bloqueado.
         countdownEls.forEach((el) => (el.hidden = false));
-        hints.forEach((el) => (el.textContent = "Despertando el backend…"));
+        hints.forEach((el) => (el.textContent = button.dataset.textWaking));
 
         let remaining = ESTIMATED_WAKE_SECONDS;
         countdownEls.forEach((el) => (el.textContent = String(remaining)));
@@ -398,7 +406,7 @@ const wakeStepIndex = gated && demoHref ? 0 : -1;
           remaining = Math.max(0, remaining - 1);
           countdownEls.forEach((el) => (el.textContent = String(remaining)));
           if (remaining === 0) {
-            hints.forEach((el) => (el.textContent = "Esto está tardando más de lo esperado…"));
+            hints.forEach((el) => (el.textContent = button.dataset.textSlow));
           }
         }, 1000);
 
@@ -420,8 +428,8 @@ const wakeStepIndex = gated && demoHref ? 0 : -1;
 
         const allOk = results.every((result) => result.status === "fulfilled");
         const finalText = allOk
-          ? `✓ Backend listo (respondió en ${(elapsedMs / 1000).toFixed(1)}s)`
-          : "No respondió a tiempo — igual podés intentar abrir el link";
+          ? button.dataset.textReady.replace("{s}", (elapsedMs / 1000).toFixed(1))
+          : button.dataset.textTimeout;
         hints.forEach((el) => (el.textContent = finalText));
 
         // Pausa breve para que el mensaje final se alcance a leer antes de que el overlay se

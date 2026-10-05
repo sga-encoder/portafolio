@@ -3,19 +3,26 @@ import { getCollection } from "astro:content";
 import { getCloudinaryUrl } from "../../utils/cloudinaryManifest";
 import { CAROUSEL_CONFIG, CAROUSEL_PROJECT_IDS } from "../../data/carousel";
 import ProjectCarousel from "../projects/ProjectCarousel";
+import { getLang, localizePath } from "../../i18n/config";
+import { localizeProjectData } from "../../i18n/content";
+import { useTranslations } from "../../i18n/ui";
 
 // Título/descripción/imagen salen del content collection (071) — misma fuente que
 // `/proyectos/[slug]` — nunca de `projects.json`, para que no puedan desincronizarse de la
 // portada real. `carousel.ts` solo aporta membresía + orden.
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
 const entries = await getCollection("projects");
+const enEntries = lang === "en" ? await getCollection("projectsEn") : [];
 const projects = CAROUSEL_PROJECT_IDS.map((id) => {
   const entry = entries.find((candidate) => candidate.id === id);
   if (!entry) return null;
+  const data = localizeProjectData(entry.data, enEntries.find((candidate) => candidate.id === id)?.data);
   return {
     id,
-    title: entry.data.title,
-    description: entry.data.summary,
-    link: `/proyectos/${id}`,
+    title: data.title,
+    description: data.summary,
+    link: localizePath(`/proyectos/${id}`, lang),
     imageSrc: getCloudinaryUrl(entry.data.coverImage, "w_1200,q_auto,f_auto"),
   };
 }).filter((project): project is NonNullable<typeof project> => project !== null);
@@ -25,10 +32,10 @@ const projects = CAROUSEL_PROJECT_IDS.map((id) => {
   id="proyectos"
   class="flex min-h-screen w-full flex-col justify-center gap-10 px-4 py-16 md:h-screen short:gap-8 short:py-4"
 >
-  <ProjectCarousel client:load projects={projects} autoplaySeconds={CAROUSEL_CONFIG.autoplaySeconds} />
+  <ProjectCarousel client:load projects={projects} autoplaySeconds={CAROUSEL_CONFIG.autoplaySeconds} lang={lang} />
   <h2
     class="text-center font-display text-[clamp(1.75rem,9vw,3rem)] font-bold text-ink md:text-8xl short:text-[clamp(1.25rem,6vh,3rem)]"
   >
-    Proyectos
+    {t("home.projectsTitle")}
   </h2>
 </section>

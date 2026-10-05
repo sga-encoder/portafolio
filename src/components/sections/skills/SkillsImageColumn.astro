@@ -1,5 +1,7 @@
 ---
 import { getCloudinaryUrl } from "../../../utils/cloudinaryManifest";
+import { getLang } from "../../../i18n/config";
+import { useTranslations } from "../../../i18n/ui";
 
 interface Props {
   imageKey: string;
@@ -12,7 +14,7 @@ const imageUrl = getCloudinaryUrl(imageKey, "q_auto,f_auto");
 <div class="skills-image-column">
   <img
     src={imageUrl}
-    alt="Retrato ilustrado del autor"
+    alt={useTranslations(getLang(Astro.url))("home.illustratedPortraitAlt")}
     class="skills-image-column__img"
     data-portrait-relight
     loading="lazy"

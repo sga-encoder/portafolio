@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import type { Lang } from "../../i18n/config";
+import { useTranslations } from "../../i18n/ui";
 
 export interface CarouselProject {
   id: string;
@@ -12,6 +14,7 @@ interface Props {
   projects: CarouselProject[];
   /** Segundos entre avances automáticos (098); `0` lo desactiva. */
   autoplaySeconds?: number;
+  lang?: Lang;
 }
 
 function ChevronIcon({ direction }: { direction: "left" | "right" }) {
@@ -25,7 +28,8 @@ function ChevronIcon({ direction }: { direction: "left" | "right" }) {
 
 const SWIPE_THRESHOLD_PX = 45;
 
-export default function ProjectCarousel({ projects, autoplaySeconds = 0 }: Props) {
+export default function ProjectCarousel({ projects, autoplaySeconds = 0, lang = "es" }: Props) {
+  const t = useTranslations(lang);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -94,7 +98,7 @@ export default function ProjectCarousel({ projects, autoplaySeconds = 0 }: Props
       <div className="relative hidden px-12 short:px-6 landscape:block sm:px-16 md:block">
         <button
           type="button"
-          aria-label="Proyecto anterior"
+          aria-label={t("carousel.prevProject")}
           onClick={() => goTo(-1)}
           className="absolute left-0 short:left-20 top-1/2 z-20 -translate-y-1/2 transition-transform hover:scale-110"
           style={{ color: "var(--sphere-left-color, var(--color-brand))" }}
@@ -104,7 +108,7 @@ export default function ProjectCarousel({ projects, autoplaySeconds = 0 }: Props
 
         <button
           type="button"
-          aria-label="Siguiente proyecto"
+          aria-label={t("carousel.nextProject")}
           onClick={() => goTo(1)}
           className="absolute right-0 top-1/2 z-20 -translate-y-1/2 transition-transform hover:scale-110"
           style={{ color: "var(--sphere-right-color, var(--color-accent-2))" }}
@@ -141,7 +145,7 @@ export default function ProjectCarousel({ projects, autoplaySeconds = 0 }: Props
                 className="mt-4 short:mt-0 inline-block rounded-full px-5 py-2 short:px-3 short:py-1 short:text-xs font-body text-sm font-semibold text-(--color-brand-contrast)"
                 style={{ backgroundColor: "var(--sphere-right-color, var(--color-accent-2))" }}
               >
-                Ver más
+                {t("carousel.seeMore")}
               </a>
             </div>
           </div>
@@ -173,7 +177,7 @@ export default function ProjectCarousel({ projects, autoplaySeconds = 0 }: Props
 
             <button
               type="button"
-              aria-label="Proyecto anterior"
+              aria-label={t("carousel.prevProject")}
               onClick={() => goTo(-1)}
               className="absolute left-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/30 p-1.5 backdrop-blur-sm transition-transform hover:scale-110"
               style={{ color: "var(--sphere-left-color, var(--color-brand))" }}
@@ -183,7 +187,7 @@ export default function ProjectCarousel({ projects, autoplaySeconds = 0 }: Props
 
             <button
               type="button"
-              aria-label="Siguiente proyecto"
+              aria-label={t("carousel.nextProject")}
               onClick={() => goTo(1)}
               className="absolute right-2 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/30 p-1.5 backdrop-blur-sm transition-transform hover:scale-110"
               style={{ color: "var(--sphere-right-color, var(--color-accent-2))" }}
@@ -209,7 +213,7 @@ export default function ProjectCarousel({ projects, autoplaySeconds = 0 }: Props
                 className="inline-block self-start rounded-full px-5 py-2 font-body text-sm font-semibold text-(--color-brand-contrast)"
                 style={{ backgroundColor: "var(--sphere-right-color, var(--color-accent-2))" }}
               >
-                Ver más
+                {t("carousel.seeMore")}
               </a>
             </div>
           </div>

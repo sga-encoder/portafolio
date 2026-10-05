@@ -1,10 +1,14 @@
 ---
-import { profile } from "../../data/profile";
+import { getLang } from "../../i18n/config";
+import { getProfile } from "../../i18n/content";
+import { useTranslations } from "../../i18n/ui";
 import { getCloudinaryUrl } from "../../utils/cloudinaryManifest";
 import AboutFrame from "./about/AboutFrame.astro";
 import AboutInfoBlock from "./about/AboutInfoBlock.astro";
 
-const { about } = profile;
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+const { about } = getProfile(lang);
 const personaUrl = getCloudinaryUrl(about.portraitKey || "about/persona03", "q_auto,f_auto");
 ---
 
@@ -12,7 +16,7 @@ const personaUrl = getCloudinaryUrl(about.portraitKey || "about/persona03", "q_a
   <div
     class="flex shrink-0 items-center justify-center py-6 short:py-1 md:h-full md:w-[12vw] md:items-end md:justify-center md:pb-[6vh]"
   >
-    <h2 class="about-title font-display font-bold text-ink">Sobre mí</h2>
+    <h2 class="about-title font-display font-bold text-ink">{t("home.aboutTitle")}</h2>
   </div>
 
   <div class="flex min-w-0 flex-1 flex-col justify-center gap-[3vh] px-[6vw] py-[3vh] short:gap-[1vh] short:py-[1vh] md:px-[4vw]">
@@ -29,7 +33,7 @@ const personaUrl = getCloudinaryUrl(about.portraitKey || "about/persona03", "q_a
       <div class="relative w-[30vw] shrink-0">
         <img
           src={personaUrl}
-          alt="Retrato de cuerpo completo del autor"
+          alt={t("home.fullPortraitAlt")}
           class="h-auto w-full object-contain"
           data-portrait-relight
           loading="lazy"
@@ -42,7 +46,7 @@ const personaUrl = getCloudinaryUrl(about.portraitKey || "about/persona03", "q_a
   <div class="relative hidden shrink-0 md:block md:h-full md:w-[40vw]">
     <img
       src={personaUrl}
-      alt="Retrato de cuerpo completo del autor"
+      alt={t("home.fullPortraitAlt")}
       class="h-full w-full object-contain object-center"
       data-portrait-relight
       loading="lazy"

@@ -1,0 +1,37 @@
+---
+// Cuerpo de Inicio, compartido por `/` y `/en/` (100) — el idioma sale de la URL (`getLang`).
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SceneFallbackBackground from "../scene/SceneFallbackBackground.astro";
+import Scene3D from "../scene/Scene3D";
+import HomeNavBridge from "../nav/HomeNavBridge";
+import HeaderSection from "../sections/HeaderSection.astro";
+import SkillsSection from "../sections/SkillsSection.astro";
+import ProjectsSection from "../sections/ProjectsSection.astro";
+import AboutSection from "../sections/AboutSection.astro";
+import { getLang } from "../../i18n/config";
+import { useTranslations } from "../../i18n/ui";
+
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+---
+
+<BaseLayout title="Sebastián Garzón Arias" description={t("home.description")}>
+  <SceneFallbackBackground />
+  <Scene3D client:load />
+  <HomeNavBridge client:load lang={lang} />
+  <div class="relative z-10">
+    <HeaderSection />
+    <SkillsSection />
+    <ProjectsSection />
+    <AboutSection />
+  </div>
+</BaseLayout>
+
+<script>
+  import { initPortraitRelight } from "../scene/portrait/portraitRelight";
+
+  // Retratos iluminados por la escena (093). Idempotente: corre en la carga inicial y al volver
+  // a Inicio vía View Transitions; se limpia solo en `astro:before-swap`.
+  initPortraitRelight();
+  document.addEventListener("astro:page-load", initPortraitRelight);
+</script>

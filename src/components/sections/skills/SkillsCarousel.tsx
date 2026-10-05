@@ -1,7 +1,10 @@
 import { useRef, useState, type ReactNode } from "react";
+import type { Lang } from "../../../i18n/config";
+import { useTranslations } from "../../../i18n/ui";
 
 interface Props {
   pageCount: number;
+  lang?: Lang;
   children: ReactNode;
 }
 
@@ -23,7 +26,8 @@ const SWIPE_THRESHOLD_PX = 45;
  * swipe, igual que `ProjectCarousel.tsx`/`ProjectGallery.tsx` combinados (ver `plan.md`, "opción
  * 2").
  */
-export default function SkillsCarousel({ pageCount, children }: Props) {
+export default function SkillsCarousel({ pageCount, children, lang = "es" }: Props) {
+  const t = useTranslations(lang);
   const [currentIndex, setCurrentIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
@@ -62,7 +66,7 @@ export default function SkillsCarousel({ pageCount, children }: Props) {
           <>
             <button
               type="button"
-              aria-label="Página anterior"
+              aria-label={t("skills.prevPage")}
               onClick={() => goTo(-1)}
               className="absolute left-0 top-1/2 z-20 -translate-y-1/2 transition-transform hover:scale-110"
               style={{ color: "var(--sphere-left-color, var(--color-brand))" }}
@@ -72,7 +76,7 @@ export default function SkillsCarousel({ pageCount, children }: Props) {
 
             <button
               type="button"
-              aria-label="Página siguiente"
+              aria-label={t("skills.nextPage")}
               onClick={() => goTo(1)}
               className="absolute right-0 top-1/2 z-20 -translate-y-1/2 transition-transform hover:scale-110"
               style={{ color: "var(--sphere-right-color, var(--color-accent-2))" }}
@@ -89,7 +93,7 @@ export default function SkillsCarousel({ pageCount, children }: Props) {
             <button
               key={index}
               type="button"
-              aria-label={`Ir a la página ${index + 1}`}
+              aria-label={`${t("skills.goToPage")} ${index + 1}`}
               onClick={() => setCurrentIndex(index)}
               className="h-2 w-2 rounded-full transition-opacity"
               style={{

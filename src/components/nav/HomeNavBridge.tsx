@@ -3,16 +3,17 @@ import AdminDotNav from "../admin/AdminDotNav";
 import { useAdminAuth } from "../admin/useAdminAuth";
 import ProjectsAllDotNav from "./ProjectsAllDotNav";
 import ScrollDotNav from "./ScrollDotNav";
+import type { Lang } from "../../i18n/config";
 
-export default function HomeNavBridge() {
+export default function HomeNavBridge({ lang }: { lang: Lang }) {
   const { status } = useAdminAuth();
   const [showAdminNav, setShowAdminNav] = useState(false);
 
   if (status !== "signedIn") {
     return (
       <>
-        <ScrollDotNav />
-        <ProjectsAllDotNav />
+        <ScrollDotNav lang={lang} />
+        <ProjectsAllDotNav lang={lang} />
       </>
     );
   }
@@ -20,6 +21,7 @@ export default function HomeNavBridge() {
   return (
     <>
       <ScrollDotNav
+        lang={lang}
         toggle={{
           page: "home",
           enabled: showAdminNav,
@@ -27,7 +29,7 @@ export default function HomeNavBridge() {
         }}
       />
       {showAdminNav && <AdminDotNav side="secondary" active="dashboard" switcherProjects={[]} />}
-      <ProjectsAllDotNav />
+      <ProjectsAllDotNav lang={lang} />
     </>
   );
 }

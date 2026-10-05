@@ -13,6 +13,9 @@ import {
   NAV_RAIL_LIST,
 } from "./navRailClasses";
 import { NavModeToggle, type NavMode } from "./NavModeToggle";
+import { LangToggle } from "./LangToggle";
+import { isHomePath, localizePath, type Lang } from "../../i18n/config";
+import { useTranslations } from "../../i18n/ui";
 
 function scrollToSection(id: string) {
   const el = document.getElementById(id);
@@ -40,6 +43,9 @@ type NavSide = "left" | "secondary";
 
 interface Props {
   side?: NavSide;
+  /** Idioma de la página (100). Solo el sitio público lo pasa — y con él aparece el toggle ES/EN;
+   *  en `/admin` (`AdminNavBridge`) queda en español y sin toggle, porque el panel no tiene `/en/`. */
+  lang?: Lang;
   toggle?: {
     page: NavMode;
     enabled: boolean;
@@ -47,7 +53,9 @@ interface Props {
   };
 }
 
-export default function ScrollDotNav({ side = "left", toggle }: Props) {
+export default function ScrollDotNav({ side = "left", toggle, lang }: Props) {
+  const t = useTranslations(lang ?? "es");
+  const homeHref = localizePath("/", lang ?? "es");
   const { activeIndex } = useSectionScroll(SECTION_IDS);
   const mobileListRef = useRef<HTMLUListElement>(null);
   const desktopClassName =
@@ -57,8 +65,8 @@ export default function ScrollDotNav({ side = "left", toggle }: Props) {
   const mobileClassName = side === "secondary" ? NAV_BAR_MOBILE_SECONDARY : NAV_BAR_MOBILE;
 
   const handleSectionClick = (id: string) => {
-    if (window.location.pathname !== "/") {
-      window.location.href = `/#${id}`;
+    if (!isHomePath(window.location.pathname)) {
+      window.location.href = `${homeHref}#${id}`;
       return;
     }
 
@@ -69,17 +77,17 @@ export default function ScrollDotNav({ side = "left", toggle }: Props) {
     const list = mobileListRef.current;
     if (!list) return;
     return attachHoldToNavigate(list, (id) => {
-      if (window.location.pathname !== "/") {
-        window.location.href = `/#${id}`;
+      if (!isHomePath(window.location.pathname)) {
+        window.location.href = `${homeHref}#${id}`;
         return;
       }
       scrollToSection(id);
     });
-  }, []);
+  }, [homeHref]);
 
   return (
     <>
-      <nav aria-label="Navegación de secciones" className={desktopClassName}>
+      <nav aria-label={t("nav.sections")} className={desktopClassName}>
         <div className={NAV_RAIL_FRAME} data-home-main-rail={side === "left" ? "desktop" : undefined}>
           <ul className={NAV_RAIL_LIST}>
             {SCROLL_NAV_ITEMS.map((item, index) => {
@@ -91,7 +99,7 @@ export default function ScrollDotNav({ side = "left", toggle }: Props) {
                 <li key={item.id} className="group relative flex items-center">
                   <button
                     type="button"
-                    aria-label={item.label}
+                    aria-label={t(item.labelKey)}
                     aria-current={isActive ? "true" : undefined}
                     onClick={() => handleSectionClick(item.id)}
                     className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-brand)"
@@ -107,17 +115,18 @@ export default function ScrollDotNav({ side = "left", toggle }: Props) {
                       boxShadow: "0 4px 16px -2px var(--sphere-left-color, var(--color-brand))",
                     }}
                   >
-                    {item.label}
+                    {t(item.labelKey)}
                   </span>
                 </li>
               );
             })}
             {toggle && <NavModeToggle page={toggle.page} enabled={toggle.enabled} onToggle={toggle.onToggle} variant="desktop" placement="start" />}
+            {lang && <LangToggle lang={lang} variant="desktop" />}
           </ul>
         </div>
       </nav>
 
-      <nav aria-label="Navegación de secciones" className={mobileClassName}>
+      <nav aria-label={t("nav.sections")} className={mobileClassName}>
         <ul
           ref={mobileListRef}
           className={NAV_BAR_MOBILE_LIST}
@@ -132,7 +141,7 @@ export default function ScrollDotNav({ side = "left", toggle }: Props) {
               <li key={item.id} className="group relative flex items-center">
                 <button
                   type="button"
-                  aria-label={item.label}
+                  aria-label={t(item.labelKey)}
                   aria-current={isActive ? "true" : undefined}
                   data-hold-nav={item.id}
                   onClick={() => handleSectionClick(item.id)}
@@ -153,12 +162,13 @@ export default function ScrollDotNav({ side = "left", toggle }: Props) {
                     boxShadow: "0 4px 16px -2px var(--sphere-left-color, var(--color-brand))",
                   }}
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                 </span>
               </li>
             );
           })}
           {toggle && <NavModeToggle page={toggle.page} enabled={toggle.enabled} onToggle={toggle.onToggle} variant="mobile" placement="start" />}
+          {lang && <LangToggle lang={lang} variant="mobile" />}
         </ul>
       </nav>
     </>

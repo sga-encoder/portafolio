@@ -3,6 +3,8 @@ import { useSectionScroll } from "../scene/useSectionScroll";
 import { SECTION_IDS } from "../scene/sceneStops";
 import NavIcon from "./NavIcon";
 import { NAV_BAR_MOBILE_SECONDARY, NAV_RAIL_DESKTOP_SECONDARY } from "./navRailClasses";
+import { localizePath, type Lang } from "../../i18n/config";
+import { useTranslations } from "../../i18n/ui";
 
 const PROYECTOS_INDEX = SECTION_IDS.indexOf("proyectos");
 
@@ -91,7 +93,9 @@ function useSyncWithMainRail(ref: RefObject<HTMLElement | null>, kind: "desktop"
  * tamaño que el menú principal, con el ícono y el texto visibles — girados -90° en el riel
  * vertical de escritorio, horizontales en la barra inferior de mobile.
  */
-export default function ProjectsAllDotNav() {
+export default function ProjectsAllDotNav({ lang = "es" }: { lang?: Lang }) {
+  const label = useTranslations(lang)("nav.allProjects");
+  const href = localizePath("/proyectos", lang);
   const { activeIndex } = useSectionScroll(SECTION_IDS);
   const desktopSize = useMainRailSize("desktop");
   const mobileSize = useMainRailSize("mobile");
@@ -111,10 +115,10 @@ export default function ProjectsAllDotNav() {
 
   return (
     <>
-      <nav aria-label="Ver todos los proyectos" className={NAV_RAIL_DESKTOP_SECONDARY}>
+      <nav aria-label={label} className={NAV_RAIL_DESKTOP_SECONDARY}>
         <a
           ref={desktopRef}
-          href="/proyectos"
+          href={href}
           className="nav-rail-glow flex items-center justify-center rounded-2xl transition-transform duration-200 hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-brand)"
           style={{
             ...buttonStyle,
@@ -131,15 +135,15 @@ export default function ProjectsAllDotNav() {
             <span className="flex" style={{ transform: "rotate(90deg)" }}>
               <NavIcon icon="layers" />
             </span>
-            Ver todos los proyectos
+            {label}
           </span>
         </a>
       </nav>
 
-      <nav aria-label="Ver todos los proyectos" className={NAV_BAR_MOBILE_SECONDARY}>
+      <nav aria-label={label} className={NAV_BAR_MOBILE_SECONDARY}>
         <a
           ref={mobileRef}
-          href="/proyectos"
+          href={href}
           className="nav-rail-glow flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl font-body text-sm font-semibold transition-transform duration-200 active:scale-95"
           style={{
             ...buttonStyle,
@@ -149,7 +153,7 @@ export default function ProjectsAllDotNav() {
           }}
         >
           <NavIcon icon="layers" />
-          Ver todos los proyectos
+          {label}
         </a>
       </nav>
     </>

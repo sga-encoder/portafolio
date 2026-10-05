@@ -1,11 +1,14 @@
 ---
+import { getLang } from "../../../i18n/config";
+import { useTranslations } from "../../../i18n/ui";
 interface Props {
   platform: "mobile" | "desktop";
   class?: string;
 }
 
 const { platform, class: className } = Astro.props;
-const label = platform === "mobile" ? "Móvil" : "PC";
+const t = useTranslations(getLang(Astro.url));
+const label = platform === "mobile" ? t("project.mobile") : t("project.desktop");
 ---
 
 {

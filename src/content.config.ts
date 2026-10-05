@@ -111,4 +111,25 @@ const projectContent = defineCollection({
   schema: () => z.object({}),
 });
 
-export const collections = { projects, projectContent };
+// Traducción al inglés de `projects` (100), mismo slug de archivo. Solo textos: valores copiables,
+// hrefs, imágenes y servidores siguen saliendo del Markdown en español; los pasos se combinan por
+// índice (ver `localizeProjectEntry` en `src/i18n/content.ts`). Cuerpo = "Contexto" en inglés.
+const projectsEn = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/projects-en" }),
+  schema: () =>
+    z.object({
+      title: z.string().optional(),
+      summary: z.string().optional(),
+      steps: z
+        .array(
+          z.object({
+            text: z.string().optional(),
+            copyLabels: z.array(z.string()).optional(),
+            buttonLabels: z.array(z.string()).optional(),
+          }),
+        )
+        .optional(),
+    }),
+});
+
+export const collections = { projects, projectContent, projectsEn };

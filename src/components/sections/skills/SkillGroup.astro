@@ -1,6 +1,8 @@
 ---
 import SkillCard from "./SkillCard.astro";
 import type { Skill, SkillCategory } from "../../../data/skillsPages";
+import { getLang } from "../../../i18n/config";
+import { skillCategoryLabel } from "../../../i18n/content";
 
 interface Props {
   category: SkillCategory;
@@ -17,7 +19,7 @@ const { category, items, variant, side, align } = Astro.props;
 <div
   class={`skill-group skill-group--${variant} ${variant === "desktop" ? `skill-group--${side} skill-group--align-${align}` : ""}`}
 >
-  <span class="skill-group__label font-display font-bold capitalize text-ink">{category}</span>
+  <span class="skill-group__label font-display font-bold capitalize text-ink">{skillCategoryLabel(category, getLang(Astro.url))}</span>
   <div class="skill-group__items">
     {
       items.map(({ skill, offset }) => (

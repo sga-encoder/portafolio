@@ -6,6 +6,8 @@
 import ProjectHeaderFrame from "../detail/ProjectHeaderFrame.astro";
 import ColorLinkButton from "../detail/ColorLinkButton.astro";
 import { TIMELINE_COLORS } from "./timelineColors";
+import { getLang } from "../../../i18n/config";
+import { useTranslations } from "../../../i18n/ui";
 
 interface Props {
   title: string;
@@ -15,6 +17,7 @@ interface Props {
 }
 
 const { title, description, imageSrc, href } = Astro.props;
+const t = useTranslations(getLang(Astro.url));
 const [, second] = TIMELINE_COLORS;
 const rightColor = `var(--project-right-color, ${second})`;
 ---
@@ -28,7 +31,7 @@ const rightColor = `var(--project-right-color, ${second})`;
     <h3 class="font-display text-2xl font-bold text-ink sm:text-3xl">{title}</h3>
     <p class="font-body text-ink-muted">{description}</p>
     <ColorLinkButton href={href} color={rightColor} variant="solid" class="w-fit">
-      Ver más
+      {t("carousel.seeMore")}
     </ColorLinkButton>
   </div>
 </ProjectHeaderFrame>

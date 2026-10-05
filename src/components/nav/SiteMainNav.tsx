@@ -1,6 +1,9 @@
 import { useEffect, useRef } from "react";
 import NavIcon, { type NavIconName } from "./NavIcon";
 import { attachHoldToNavigate } from "./holdToNavigate";
+import { LangToggle } from "./LangToggle";
+import { localizePath, type Lang } from "../../i18n/config";
+import { useTranslations, type UiKey } from "../../i18n/ui";
 import {
   NAV_BAR_MOBILE,
   NAV_BAR_MOBILE_LIST,
@@ -22,16 +25,16 @@ const ACTIVE = "var(--project-left-color, var(--color-brand))";
 
 interface MainNavItem {
   href: string;
-  label: string;
+  labelKey: UiKey;
   icon: NavIconName;
   active: boolean;
 }
 
 const ITEMS: readonly MainNavItem[] = [
-  { href: "/", label: "Inicio", icon: "home", active: false },
-  { href: "/#habilidades", label: "Habilidades", icon: "gear", active: false },
-  { href: "/proyectos", label: "Proyectos", icon: "folder", active: true },
-  { href: "/#sobre-mi", label: "Sobre mí", icon: "user", active: false },
+  { href: "/", labelKey: "nav.home", icon: "home", active: false },
+  { href: "/#habilidades", labelKey: "nav.skills", icon: "gear", active: false },
+  { href: "/proyectos", labelKey: "nav.projects", icon: "folder", active: true },
+  { href: "/#sobre-mi", labelKey: "nav.about", icon: "user", active: false },
 ];
 
 /**
@@ -44,8 +47,10 @@ const ITEMS: readonly MainNavItem[] = [
  * (`NAV_RAIL_DESKTOP_SECONDARY`/`NAV_BAR_MOBILE_SECONDARY`, mismo mecanismo que `SubPageDotNav` de
  * `/admin`).
  */
-export default function SiteMainNav() {
+export default function SiteMainNav({ lang = "es" }: { lang?: Lang }) {
   const mobileListRef = useRef<HTMLUListElement>(null);
+  const t = useTranslations(lang);
+  const items = ITEMS.map((item) => ({ ...item, href: localizePath(item.href, lang), label: t(item.labelKey) }));
 
   useEffect(() => {
     const list = mobileListRef.current;
@@ -57,10 +62,10 @@ export default function SiteMainNav() {
 
   return (
     <>
-      <nav aria-label="Navegación principal" className={NAV_RAIL_DESKTOP}>
+      <nav aria-label={t("nav.main")} className={NAV_RAIL_DESKTOP}>
         <div className={NAV_RAIL_FRAME}>
           <ul className={NAV_RAIL_LIST}>
-            {ITEMS.map((item) => {
+            {items.map((item) => {
               const color = item.active ? ACTIVE : MUTED;
               return (
                 <li key={item.href} className="group relative flex items-center">
@@ -82,13 +87,14 @@ export default function SiteMainNav() {
                 </li>
               );
             })}
+            <LangToggle lang={lang} variant="desktop" />
           </ul>
         </div>
       </nav>
 
-      <nav aria-label="Navegación principal" className={NAV_BAR_MOBILE}>
+      <nav aria-label={t("nav.main")} className={NAV_BAR_MOBILE}>
         <ul ref={mobileListRef} className={NAV_BAR_MOBILE_LIST}>
-          {ITEMS.map((item) => {
+          {items.map((item) => {
             const color = item.active ? ACTIVE : MUTED;
             return (
               <li key={item.href} className="group relative flex items-center">
@@ -115,6 +121,7 @@ export default function SiteMainNav() {
               </li>
             );
           })}
+          <LangToggle lang={lang} variant="mobile" />
         </ul>
       </nav>
     </>

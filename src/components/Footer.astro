@@ -7,7 +7,8 @@
 // coexisten los dos pares en la misma página, así que la cadena no es ambigua. Estático
 // (--color-brand/--color-accent-2) si ningún script de esfera corrió.
 import SocialLink from "./sections/about/SocialLink.astro";
-import { profile } from "../data/profile";
+import { getLang } from "../i18n/config";
+import { getProfile } from "../i18n/content";
 
 const year = new Date().getFullYear();
 const leftColor = "var(--sphere-left-color, var(--project-left-color, var(--color-brand)))";
@@ -34,7 +35,7 @@ const rightColor = "var(--sphere-right-color, var(--project-right-color, var(--c
     </p>
     <div class="flex gap-3">
       {
-        profile.about.social.map((link, index) => (
+        getProfile(getLang(Astro.url)).about.social.map((link, index) => (
           <SocialLink link={link} compact color={index % 2 === 0 ? leftColor : rightColor} />
         ))
       }

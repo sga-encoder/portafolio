@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import type { Lang } from "../../../i18n/config";
+import { useTranslations } from "../../../i18n/ui";
 
 interface GalleryImage {
   src: string;
@@ -10,6 +12,7 @@ interface Props {
   images: GalleryImage[];
   colorLeft: string;
   colorRight: string;
+  lang?: Lang;
 }
 
 interface OrientationLockAPI {
@@ -58,7 +61,8 @@ function RotateIcon() {
   );
 }
 
-export default function ProjectGallery({ images, colorLeft, colorRight }: Props) {
+export default function ProjectGallery({ images, colorLeft, colorRight, lang = "es" }: Props) {
+  const t = useTranslations(lang);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [rotated, setRotated] = useState(false);
@@ -157,7 +161,7 @@ export default function ProjectGallery({ images, colorLeft, colorRight }: Props)
         <>
           <button
             type="button"
-            aria-label="Imagen anterior"
+            aria-label={t("gallery.prev")}
             onClick={() => goTo(-1)}
             className="absolute left-0 top-1/2 z-20 -translate-y-1/2 transition-transform hover:scale-110"
             style={{ color: colorLeft }}
@@ -167,7 +171,7 @@ export default function ProjectGallery({ images, colorLeft, colorRight }: Props)
 
           <button
             type="button"
-            aria-label="Siguiente imagen"
+            aria-label={t("gallery.next")}
             onClick={() => goTo(1)}
             className="absolute right-0 top-1/2 z-20 -translate-y-1/2 transition-transform hover:scale-110"
             style={{ color: colorRight }}
@@ -179,7 +183,7 @@ export default function ProjectGallery({ images, colorLeft, colorRight }: Props)
 
       <button
         type="button"
-        aria-label="Ver imagen en grande"
+        aria-label={t("gallery.enlarge")}
         onClick={openLightbox}
         className="block aspect-video w-full cursor-zoom-in overflow-hidden rounded-2xl bg-surface-muted"
       >
@@ -194,7 +198,7 @@ export default function ProjectGallery({ images, colorLeft, colorRight }: Props)
             <button
               key={img.src}
               type="button"
-              aria-label={`Ir a la imagen ${index + 1}`}
+              aria-label={`${t("gallery.goTo")} ${index + 1}`}
               onClick={() => selectIndex(index)}
               className="h-2 w-2 rounded-full transition-opacity"
               style={{
@@ -221,7 +225,7 @@ export default function ProjectGallery({ images, colorLeft, colorRight }: Props)
               {images.length > 1 && (
                 <button
                   type="button"
-                  aria-label="Imagen anterior"
+                  aria-label={t("gallery.prev")}
                   onClick={() => goTo(-1)}
                   className="absolute -left-14 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-transform hover:scale-110"
                   style={{ color: colorLeft }}
@@ -244,7 +248,7 @@ export default function ProjectGallery({ images, colorLeft, colorRight }: Props)
               {images.length > 1 && (
                 <button
                   type="button"
-                  aria-label="Siguiente imagen"
+                  aria-label={t("gallery.next")}
                   onClick={() => goTo(1)}
                   className="absolute -right-14 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-transform hover:scale-110"
                   style={{ color: colorRight }}
@@ -260,7 +264,7 @@ export default function ProjectGallery({ images, colorLeft, colorRight }: Props)
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                aria-label="Cerrar imagen"
+                aria-label={t("gallery.close")}
                 onClick={closeLightbox}
                 className="flex h-11 w-11 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm transition-transform hover:scale-110"
               >
@@ -269,7 +273,7 @@ export default function ProjectGallery({ images, colorLeft, colorRight }: Props)
 
               <button
                 type="button"
-                aria-label={rotated ? "Volver a posición vertical" : "Ver en posición horizontal"}
+                aria-label={rotated ? t("gallery.portrait") : t("gallery.landscape")}
                 onClick={toggleRotate}
                 className="flex h-11 w-11 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm transition-transform hover:scale-110 md:hidden"
               >

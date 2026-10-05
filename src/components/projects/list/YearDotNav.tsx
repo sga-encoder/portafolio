@@ -17,7 +17,11 @@ const circleStyle = (color: string) =>
     backgroundColor: "color-mix(in srgb, var(--color-surface) 80%, transparent)",
   }) as const;
 
+import type { Lang } from "../../../i18n/config";
+import { useTranslations } from "../../../i18n/ui";
+
 interface Props {
+  lang?: Lang;
   /** Años ya ordenados de más nuevo a más viejo — mismo orden que las zonas del fondo 3D (`projects-year-{year}`). */
   years: readonly string[];
 }
@@ -40,7 +44,8 @@ function scrollToZone(id: string) {
  * `SiteMainNav` — el círculo "volver al inicio" que tenía antes se quitó porque
  * `SiteMainNav` ya cubre esa función.
  */
-export default function YearDotNav({ years }: Props) {
+export default function YearDotNav({ years, lang = "es" }: Props) {
+  const t = useTranslations(lang);
   const zoneIds = years.map((year) => `projects-year-${year}`);
   const { activeIndex } = useSectionScroll(zoneIds);
   const mobileListRef = useRef<HTMLUListElement>(null);
@@ -53,7 +58,7 @@ export default function YearDotNav({ years }: Props) {
 
   return (
     <>
-      <nav aria-label="Navegación de la línea de tiempo" className={NAV_RAIL_DESKTOP_SECONDARY}>
+      <nav aria-label={t("nav.timeline")} className={NAV_RAIL_DESKTOP_SECONDARY}>
         <div className={NAV_RAIL_FRAME}>
           <ul className={NAV_RAIL_LIST}>
             {years.map((year, index) => {
@@ -90,7 +95,7 @@ export default function YearDotNav({ years }: Props) {
         </div>
       </nav>
 
-      <nav aria-label="Navegación de la línea de tiempo" className={NAV_BAR_MOBILE_SECONDARY}>
+      <nav aria-label={t("nav.timeline")} className={NAV_BAR_MOBILE_SECONDARY}>
         <ul ref={mobileListRef} className={NAV_BAR_MOBILE_LIST}>
           {years.map((year, index) => {
             const isActive = index === activeIndex;

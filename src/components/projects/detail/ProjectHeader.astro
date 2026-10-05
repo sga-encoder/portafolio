@@ -3,6 +3,8 @@ import ProjectHeaderFrame from "./ProjectHeaderFrame.astro";
 import PlatformIcon from "./PlatformIcon.astro";
 import ColorLinkButton from "./ColorLinkButton.astro";
 import ProjectLikeButton from "./ProjectLikeButton.astro";
+import { getLang } from "../../../i18n/config";
+import { INTL_LOCALE, useTranslations } from "../../../i18n/ui";
 
 interface Props {
   slug: string;
@@ -20,7 +22,9 @@ const { slug, title, coverSrc, techStack, platforms, repoHref, colors, date } = 
 const [, second] = colors;
 const rightColor = `var(--project-right-color, ${second})`;
 
-const monthYearFormatter = new Intl.DateTimeFormat("es", { month: "long", year: "numeric" });
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
+const monthYearFormatter = new Intl.DateTimeFormat(INTL_LOCALE[lang], { month: "long", year: "numeric" });
 function formatProjectDate(value: string): string {
   const [year, month] = value.split("-").map(Number);
   const label = monthYearFormatter.format(new Date(year, month - 1, 1));
@@ -60,7 +64,7 @@ function formatProjectDate(value: string): string {
     {
       repoHref && (
         <ColorLinkButton href={repoHref} target="_blank" rel="noopener noreferrer" color={rightColor} variant="solid" class="w-fit">
-          Repositorio
+          {t("project.repo")}
         </ColorLinkButton>
       )
     }

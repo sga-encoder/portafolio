@@ -2,6 +2,11 @@
 import { skillsPages } from "../../data/skillsPages";
 import SkillsCarousel from "./skills/SkillsCarousel";
 import SkillsPage from "./skills/SkillsPage.astro";
+import { getLang } from "../../i18n/config";
+import { useTranslations } from "../../i18n/ui";
+
+const lang = getLang(Astro.url);
+const t = useTranslations(lang);
 ---
 
 <section id="habilidades" class="flex min-h-screen w-full flex-col px-[5vw] py-[2vh] md:h-screen">
@@ -15,7 +20,7 @@ import SkillsPage from "./skills/SkillsPage.astro";
   <h2
     class="shrink-0 text-center font-display font-bold text-ink text-[clamp(1.75rem,9vw,3rem)] md:text-[clamp(3rem,calc(-0.15rem_+_0.41vw),6rem)] short:text-[clamp(1.25rem,6vh,2rem)]"
   >
-    Habilidades
+    {t("home.skillsTitle")}
   </h2>
 
   {/*
@@ -24,7 +29,7 @@ import SkillsPage from "./skills/SkillsPage.astro";
     reutiliza `SkillColumn`/`SkillGroup`/`SkillCard` sin tocarlos) y el island `SkillsCarousel`
     solo orquesta qué página se ve (flechas/dots/swipe), ver `plan.md` ("opción 2").
   */}
-  <SkillsCarousel client:load pageCount={skillsPages.length}>
+  <SkillsCarousel client:load pageCount={skillsPages.length} lang={lang}>
     {skillsPages.map((page) => <SkillsPage columns={page.columns} />)}
   </SkillsCarousel>
 </section>
