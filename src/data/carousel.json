@@ -1,12 +1,12 @@
 {
   "projectIds": [
-    "pelis",
-    "practica-estilos",
-    "blog-semillero",
+    "territorial",
+    "class-manager",
     "montaneros",
     "city-builder",
-    "class-manager",
-    "territorial"
+    "blog-semillero",
+    "practica-estilos",
+    "pelis"
   ],
   "autoplaySeconds": 6
 }
