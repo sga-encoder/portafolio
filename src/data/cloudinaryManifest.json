@@ -602,6 +602,146 @@
       ],
       "sourcePath": "admin:upload",
       "uploadedAt": "2026-09-29T15:47:29.024Z"
+    },
+    "projects/montaneros/gallery-operador-turistico": {
+      "publicId": "portafolio/projects/montaneros/gallery-operador-turistico",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1791183908/portafolio/projects/montaneros/gallery-operador-turistico.png",
+      "hash": "sha1:d93d263653e869be1bff0215809433b674f6c140",
+      "width": 1915,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#99b4c7",
+        "#5a6539"
+      ],
+      "sourcePath": "projects/montaneros/gallery-operador-turistico.png",
+      "uploadedAt": "2026-10-05T07:05:08.826Z"
+    },
+    "projects/montaneros/gallery-home-section-02": {
+      "publicId": "portafolio/projects/montaneros/gallery-home-section-02",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1791183910/portafolio/projects/montaneros/gallery-home-section-02.png",
+      "hash": "sha1:5c83285df951ca3035b8d2f32e0088686dabb0e4",
+      "width": 1915,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#3699d9",
+        "#c6c737"
+      ],
+      "sourcePath": "projects/montaneros/gallery-home-section-02.png",
+      "uploadedAt": "2026-10-05T07:05:10.771Z"
+    },
+    "projects/montaneros/cover": {
+      "publicId": "portafolio/projects/montaneros/cover",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1791183912/portafolio/projects/montaneros/cover.png",
+      "hash": "sha1:aee7a4e09262a0867809426a9be1edf50bf7256b",
+      "width": 1600,
+      "height": 1000,
+      "format": "png",
+      "colors": [
+        "#59a5c5",
+        "#98b4c7"
+      ],
+      "sourcePath": "projects/montaneros/cover.png",
+      "uploadedAt": "2026-10-05T07:05:13.403Z"
+    },
+    "projects/montaneros/gallery-recurso-turistico": {
+      "publicId": "portafolio/projects/montaneros/gallery-recurso-turistico",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1791183915/portafolio/projects/montaneros/gallery-recurso-turistico.png",
+      "hash": "sha1:51ff12c5713a4c3207b24c6c5ed214aa693ec87c",
+      "width": 1915,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#68653b",
+        "#968a58"
+      ],
+      "sourcePath": "projects/montaneros/gallery-recurso-turistico.png",
+      "uploadedAt": "2026-10-05T07:05:15.701Z"
+    },
+    "projects/territorial/cover": {
+      "publicId": "portafolio/projects/territorial/cover",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1791183915/portafolio/projects/territorial/cover.png",
+      "hash": "sha1:ca8ecca04e5160df970f1b51d0957513851c20ac",
+      "width": 1600,
+      "height": 1000,
+      "format": "png",
+      "colors": [
+        "#2b67d1",
+        "#6194db"
+      ],
+      "sourcePath": "projects/territorial/cover.png",
+      "uploadedAt": "2026-10-05T07:05:16.678Z"
+    },
+    "projects/territorial/gallery-login": {
+      "publicId": "portafolio/projects/territorial/gallery-login",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1791183918/portafolio/projects/territorial/gallery-login.png",
+      "hash": "sha1:2ac99bd6139101e14ae86ea1b24c767c5e9390c9",
+      "width": 1915,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#96a5bb",
+        "#c8d3e8"
+      ],
+      "sourcePath": "projects/territorial/gallery-login.png",
+      "uploadedAt": "2026-10-05T07:05:19.577Z"
+    },
+    "projects/territorial/gallery-mapa-interactivo": {
+      "publicId": "portafolio/projects/territorial/gallery-mapa-interactivo",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1791183920/portafolio/projects/territorial/gallery-mapa-interactivo.png",
+      "hash": "sha1:1f650f61c508a739480f093e4e71381eaac3d39e",
+      "width": 1915,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#334464",
+        "#6796d8"
+      ],
+      "sourcePath": "projects/territorial/gallery-mapa-interactivo.png",
+      "uploadedAt": "2026-10-05T07:05:21.233Z"
+    },
+    "projects/territorial/gallery-mapa-de-seguimiento": {
+      "publicId": "portafolio/projects/territorial/gallery-mapa-de-seguimiento",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1791183921/portafolio/projects/territorial/gallery-mapa-de-seguimiento.png",
+      "hash": "sha1:aadb809b7063d92f5676f493e9b41d8849dc378b",
+      "width": 1915,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#3c425b",
+        "#6796d8"
+      ],
+      "sourcePath": "projects/territorial/gallery-mapa-de-seguimiento.png",
+      "uploadedAt": "2026-10-05T07:05:22.658Z"
+    },
+    "projects/territorial/gallery-entidades": {
+      "publicId": "portafolio/projects/territorial/gallery-entidades",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1791183923/portafolio/projects/territorial/gallery-entidades.png",
+      "hash": "sha1:70b643cbb599510416109f4267655dc93dc7407e",
+      "width": 1915,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#3a4566",
+        "#6796d8"
+      ],
+      "sourcePath": "projects/territorial/gallery-entidades.png",
+      "uploadedAt": "2026-10-05T07:05:23.997Z"
+    },
+    "projects/montaneros/gallery-home": {
+      "publicId": "portafolio/projects/montaneros/gallery-home",
+      "url": "https://res.cloudinary.com/ggaglzyq/image/upload/v1791184017/portafolio/projects/montaneros/gallery-home.png",
+      "hash": "sha1:dc5073f48d0f588d0e34c71a74b4ff92cb18527b",
+      "width": 1915,
+      "height": 1200,
+      "format": "png",
+      "colors": [
+        "#3187ca",
+        "#a8c5d6"
+      ],
+      "sourcePath": "projects/montaneros/gallery-home.png",
+      "uploadedAt": "2026-10-05T07:06:57.913Z"
     }
   }
 }

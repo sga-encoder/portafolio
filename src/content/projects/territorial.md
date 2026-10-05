@@ -1,9 +1,12 @@
 ---
 title: Territorial
 summary: Proyecto hecho para la universidad, con un mapa interactivo (Next.js + Tailwind CSS) y datos persistidos en un backend real (no construido por mí).
-coverImage: projects/proyecto-01
+coverImage: projects/territorial/cover
 gallery:
-  - image: projects/proyecto-01
+  - image: projects/territorial/gallery-login
+  - image: projects/territorial/gallery-mapa-interactivo
+  - image: projects/territorial/gallery-mapa-de-seguimiento
+  - image: projects/territorial/gallery-entidades
 techStack:
   - Next.js
   - Tailwind CSS

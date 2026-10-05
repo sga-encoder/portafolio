@@ -1,9 +1,12 @@
 ---
 title: Montañeros
 summary: Directorio turístico hecho como proyecto escolar, con backend en Payload CMS y frontend en Next.js.
-coverImage: projects/proyecto-01
+coverImage: projects/montaneros/cover
 gallery:
-  - image: projects/proyecto-01
+  - image: projects/montaneros/gallery-home
+  - image: projects/montaneros/gallery-home-section-02
+  - image: projects/montaneros/gallery-recurso-turistico
+  - image: projects/montaneros/gallery-operador-turistico
 techStack:
   - Next.js
   - Payload CMS

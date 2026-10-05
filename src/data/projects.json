@@ -27,7 +27,7 @@
     "id": "montaneros",
     "title": "Montañeros",
     "description": "Directorio turístico hecho como proyecto escolar, con backend en Payload CMS y frontend en Next.js.",
-    "imageKey": "projects/proyecto-01",
+    "imageKey": "projects/montaneros/cover",
     "link": "/proyectos/montaneros",
     "date": "2023-05"
   },
@@ -51,7 +51,7 @@
     "id": "territorial",
     "title": "Territorial",
     "description": "Proyecto frontend hecho para la universidad, con un mapa interactivo (Next.js + Tailwind CSS).",
-    "imageKey": "projects/proyecto-01",
+    "imageKey": "projects/territorial/cover",
     "link": "/proyectos/territorial",
     "date": "2026-06"
   }
