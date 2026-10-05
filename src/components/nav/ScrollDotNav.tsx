@@ -80,7 +80,7 @@ export default function ScrollDotNav({ side = "left", toggle }: Props) {
   return (
     <>
       <nav aria-label="Navegación de secciones" className={desktopClassName}>
-        <div className={NAV_RAIL_FRAME}>
+        <div className={NAV_RAIL_FRAME} data-home-main-rail={side === "left" ? "desktop" : undefined}>
           <ul className={NAV_RAIL_LIST}>
             {SCROLL_NAV_ITEMS.map((item, index) => {
               const isActive = index === activeIndex;
@@ -118,7 +118,11 @@ export default function ScrollDotNav({ side = "left", toggle }: Props) {
       </nav>
 
       <nav aria-label="Navegación de secciones" className={mobileClassName}>
-        <ul ref={mobileListRef} className={NAV_BAR_MOBILE_LIST}>
+        <ul
+          ref={mobileListRef}
+          className={NAV_BAR_MOBILE_LIST}
+          data-home-main-rail={side === "left" ? "mobile" : undefined}
+        >
           {SCROLL_NAV_ITEMS.map((item, index) => {
             const isActive = index === activeIndex;
             const color = isActive

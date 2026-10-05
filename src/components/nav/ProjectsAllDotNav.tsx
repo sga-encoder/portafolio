@@ -1,82 +1,156 @@
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { useSectionScroll } from "../scene/useSectionScroll";
 import { SECTION_IDS } from "../scene/sceneStops";
 import NavIcon from "./NavIcon";
-import {
-  NAV_BAR_MOBILE_LIST,
-  NAV_BAR_MOBILE_SECONDARY,
-  NAV_ITEM_HIT_AREA,
-  NAV_RAIL_DESKTOP_SECONDARY,
-  NAV_RAIL_FRAME,
-  NAV_RAIL_LIST,
-} from "./navRailClasses";
-
-const circleStyle = (color: string) =>
-  ({
-    border: `2px solid ${color}`,
-    color,
-    backgroundColor: "color-mix(in srgb, var(--color-surface) 80%, transparent)",
-  }) as const;
+import { NAV_BAR_MOBILE_SECONDARY, NAV_RAIL_DESKTOP_SECONDARY } from "./navRailClasses";
 
 const PROYECTOS_INDEX = SECTION_IDS.indexOf("proyectos");
+
+interface RailSize {
+  width: number;
+  height: number;
+}
+
+/**
+ * Mide el riel desktop y la barra mobile de `ScrollDotNav` (marcados con `data-home-main-rail`)
+ * para que el botón tenga exactamente su mismo tamaño (096), aunque el riel crezca (p. ej. el
+ * toggle de admin). `offsetWidth/Height` ignora los `transform` de la animación idle (049).
+ */
+function useMainRailSize(kind: "desktop" | "mobile"): RailSize | null {
+  const [size, setSize] = useState<RailSize | null>(null);
+
+  useEffect(() => {
+    const el = document.querySelector<HTMLElement>(`[data-home-main-rail="${kind}"]`);
+    if (!el) return;
+    const measure = () => setSize({ width: el.offsetWidth, height: el.offsetHeight });
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [kind]);
+
+  return size;
+}
+
+/**
+ * El riel principal arranca su animación idle + borde (`.nav-rail-glow`, 049) al cargar la
+ * página y `BaseLayout.astro` registra la pausa por interacción una sola vez; este botón se monta
+ * después (al llegar a "Proyectos"), así que su animación arrancaría desfasada y no se pausaría
+ * con el menú. Al montarse copia el `currentTime` de las animaciones del riel (por nombre y
+ * pseudo-elemento), espeja su `.is-paused`, y reenvía sus propios hover/focus al riel para que
+ * pausar uno pause a los dos (096).
+ */
+function useSyncWithMainRail(ref: RefObject<HTMLElement | null>, kind: "desktop" | "mobile", active: boolean) {
+  useEffect(() => {
+    const target = ref.current;
+    const source = document.querySelector<HTMLElement>(`[data-home-main-rail="${kind}"]`);
+    if (!active || !target || !source) return;
+
+    const sync = () => {
+      const sourceAnimations = source.getAnimations({ subtree: true }) as CSSAnimation[];
+      for (const animation of target.getAnimations({ subtree: true }) as CSSAnimation[]) {
+        const pseudo = (animation.effect as KeyframeEffect | null)?.pseudoElement ?? null;
+        const match = sourceAnimations.find(
+          (candidate) =>
+            candidate.animationName === animation.animationName &&
+            ((candidate.effect as KeyframeEffect | null)?.pseudoElement ?? null) === pseudo,
+        );
+        if (match?.currentTime != null) animation.currentTime = match.currentTime;
+      }
+    };
+
+    const mirrorPause = () => target.classList.toggle("is-paused", source.classList.contains("is-paused"));
+    mirrorPause();
+    sync();
+
+    const observer = new MutationObserver(mirrorPause);
+    observer.observe(source, { attributes: true, attributeFilter: ["class"] });
+
+    // Cruzar el breakpoint `md` cambia el keyframe (x ↔ y) y reinicia la animación.
+    const media = window.matchMedia("(min-width: 768px)");
+    const resync = () => requestAnimationFrame(sync);
+    media.addEventListener("change", resync);
+
+    const forward = (event: Event) =>
+      source.dispatchEvent(new Event(event.type, { bubbles: event.type.startsWith("focus") }));
+    const types = ["pointerenter", "pointerleave", "focusin", "focusout"] as const;
+    types.forEach((type) => target.addEventListener(type, forward));
+
+    return () => {
+      observer.disconnect();
+      media.removeEventListener("change", resync);
+      types.forEach((type) => target.removeEventListener(type, forward));
+    };
+  }, [ref, kind, active]);
+}
 
 /**
  * Segundo riel/barra (081) que solo aparece mientras la sección "Proyectos" de Inicio está activa
  * — reemplaza el botón "Ver todos los proyectos →" que vivía dentro de `ProjectsSection.astro`
- * (debajo del carrusel), ahora como un punto al lado de `ScrollDotNav`, mismo mecanismo que el
- * dot-nav de sub-páginas de `/admin` (`SubPageDotNav.tsx`) — un control que solo tiene sentido
- * mientras esa sección concreta está en pantalla, así que aparece/desaparece con ella en vez de
- * quedar siempre visible en el riel principal.
+ * (debajo del carrusel). Desde 096 ya no es un círculo: es un rectángulo redondeado del mismo
+ * tamaño que el menú principal, con el ícono y el texto visibles — girados -90° en el riel
+ * vertical de escritorio, horizontales en la barra inferior de mobile.
  */
 export default function ProjectsAllDotNav() {
   const { activeIndex } = useSectionScroll(SECTION_IDS);
-  if (activeIndex !== PROYECTOS_INDEX) return null;
+  const desktopSize = useMainRailSize("desktop");
+  const mobileSize = useMainRailSize("mobile");
+  const desktopRef = useRef<HTMLAnchorElement>(null);
+  const mobileRef = useRef<HTMLAnchorElement>(null);
+  const isActive = activeIndex === PROYECTOS_INDEX;
+  useSyncWithMainRail(desktopRef, "desktop", isActive);
+  useSyncWithMainRail(mobileRef, "mobile", isActive);
+  if (!isActive) return null;
 
   const color = "var(--sphere-left-color, var(--color-brand))";
+  const buttonStyle = {
+    border: `2px solid ${color}`,
+    color,
+    backgroundColor: "color-mix(in srgb, var(--color-surface) 80%, transparent)",
+  } as const;
 
   return (
     <>
       <nav aria-label="Ver todos los proyectos" className={NAV_RAIL_DESKTOP_SECONDARY}>
-        <div className={NAV_RAIL_FRAME}>
-          <ul className={NAV_RAIL_LIST}>
-            <li className="group relative flex items-center">
-              <a
-                href="/proyectos"
-                aria-label="Ver todos los proyectos"
-                className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-brand)"
-                style={circleStyle(color)}
-              >
-                <NavIcon icon="layers" />
-              </a>
-              <span
-                className="scroll-dot-label pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-lg px-3 py-1.5 font-body text-base font-semibold"
-                style={{ backgroundColor: "#000622", color, boxShadow: `0 4px 16px -2px ${color}` }}
-              >
-                Ver todos los proyectos
-              </span>
-            </li>
-          </ul>
-        </div>
+        <a
+          ref={desktopRef}
+          href="/proyectos"
+          className="nav-rail-glow flex items-center justify-center rounded-2xl transition-transform duration-200 hover:scale-[1.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--color-brand)"
+          style={{
+            ...buttonStyle,
+            width: desktopSize ? `${desktopSize.width}px` : "3.75rem",
+            height: desktopSize ? `${desktopSize.height}px` : "16rem",
+          }}
+        >
+          {/* vertical-rl + 180° = texto girado -90° (se lee de abajo hacia arriba); el SVG no
+              rota con writing-mode, así que lleva 90° extra para quedar también a -90°. */}
+          <span
+            className="flex items-center gap-2 whitespace-nowrap font-body text-sm font-semibold"
+            style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+          >
+            <span className="flex" style={{ transform: "rotate(90deg)" }}>
+              <NavIcon icon="layers" />
+            </span>
+            Ver todos los proyectos
+          </span>
+        </a>
       </nav>
 
       <nav aria-label="Ver todos los proyectos" className={NAV_BAR_MOBILE_SECONDARY}>
-        <ul className={NAV_BAR_MOBILE_LIST}>
-          <li className="group relative flex items-center">
-            <a href="/proyectos" aria-label="Ver todos los proyectos" className={NAV_ITEM_HIT_AREA}>
-              <span
-                className="flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 active:scale-95"
-                style={circleStyle(color)}
-              >
-                <NavIcon icon="layers" />
-              </span>
-            </a>
-            <span
-              className="scroll-dot-label pointer-events-none absolute bottom-full left-0 mb-2 whitespace-nowrap rounded-lg px-3 py-1.5 font-body text-base font-semibold"
-              style={{ backgroundColor: "#000622", color, boxShadow: `0 4px 16px -2px ${color}` }}
-            >
-              Ver todos los proyectos
-            </span>
-          </li>
-        </ul>
+        <a
+          ref={mobileRef}
+          href="/proyectos"
+          className="nav-rail-glow flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl font-body text-sm font-semibold transition-transform duration-200 active:scale-95"
+          style={{
+            ...buttonStyle,
+            width: mobileSize ? `${mobileSize.width}px` : "auto",
+            height: mobileSize ? `${mobileSize.height}px` : "2.75rem",
+            paddingInline: mobileSize ? undefined : "1rem",
+          }}
+        >
+          <NavIcon icon="layers" />
+          Ver todos los proyectos
+        </a>
       </nav>
     </>
   );
